@@ -1,0 +1,17 @@
+{
+  "hitstop": { "parry": 4, "finisher": 10, "postureBreak": 6, "blocked": 2, "useAttackHitstop": true },
+  "shake": {
+    "parry": 0.28, "finisher": 0.5, "guardBreak": 0.35, "playerHit": 0.12,
+    "decay": 2.6, "frequency": 26, "maxOffset": 0.32, "maxRoll": 0.035
+  },
+  "trail": { "seconds": 0.14, "maxSamples": 40, "color": "#dfe9ff", "enemyColor": "#ffb070", "intensity": 0.85, "from": 0.3 },
+  "particles": {
+    "max": 600,
+    "hit": { "count": 14, "color": "#ffb347", "speed": 5.5, "life": 0.32, "size": 0.09, "gravity": 9 },
+    "heavyHit": { "count": 24, "color": "#ff9a3c", "speed": 7.5, "life": 0.4, "size": 0.11, "gravity": 9 },
+    "block": { "count": 12, "color": "#8fd3ff", "speed": 5, "life": 0.25, "size": 0.08, "gravity": 6 },
+    "parry": { "count": 40, "color": "#fff3b0", "speed": 10, "life": 0.45, "size": 0.13, "gravity": 4 },
+    "finisher": { "count": 50, "color": "#ff4d6d", "speed": 9, "life": 0.6, "size": 0.14, "gravity": 7 }
+  },
+  "parryFlash": { "lightColor": "#fff4cc", "lightIntensity": 40, "lightDistance": 9, "seconds": 0.18, "screenFlash": 0.35 }
+}

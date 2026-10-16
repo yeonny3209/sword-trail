@@ -18,6 +18,10 @@ export interface GameEvents {
   /** 고정 시간 단계 한 번 */
   tick: { frame: number; dt: number };
   debugToggle: Record<string, never>;
+  /** 게임 논리를 N프레임 멈춘다(히트스톱) */
+  hitstop: { frames: number };
+  /** 사운드 키로 재생 */
+  sfx: { key: string; volume?: number };
 
   fighterSpawned: { fighter: Fighter };
   fighterRemoved: { fighter: Fighter };

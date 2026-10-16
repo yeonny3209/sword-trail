@@ -12,6 +12,9 @@ import { Debug } from '../ui/Debug';
 import { Hud } from '../ui/Hud';
 import { CombatSystem } from '../combat/CombatSystem';
 import { Dummy } from '../enemies/Dummy';
+import { FxSystem } from '../fx/FxSystem';
+import { Audio } from '../audio/Audio';
+import { SfxRouter } from '../audio/SfxRouter';
 
 interface CameraData { fov: number; near: number; far: number }
 
@@ -32,6 +35,9 @@ export class Game {
   private debug!: Debug;
   private hud!: Hud;
   private dummies: Dummy[] = [];
+  private fx!: FxSystem;
+  /** 히트스톱 남은 프레임 */
+  private freeze = 0;
 
   constructor(private readonly mount: HTMLElement, private readonly ui: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -53,6 +59,10 @@ export class Game {
     this.combat = new CombatSystem();
     this.debug = new Debug(this.scene, this.camera, this.ui);
     this.hud = new Hud(this.ui);
+    this.fx = new FxSystem(this.scene, this.ui);
+    new Audio();
+    new SfxRouter();
+    bus.on('hitstop', ({ frames }) => (this.freeze = Math.max(this.freeze, frames)));
     this.player = new Player(this.scene, this.physics);
     for (const [x, z, yaw] of getData<{ positions: number[][] }>('enemies/dummy').positions) {
       this.dummies.push(new Dummy(this.scene, this.physics, x, z, yaw));
@@ -64,6 +74,11 @@ export class Game {
   }
 
   private update = (dt: number, frame: number): void => {
+    if (this.freeze > 0) {
+      // 히트스톱: 논리는 멈추고 입력은 쌓아 둔다
+      this.freeze--;
+      return;
+    }
     this.input.beginTick();
     if (this.input.pressed.has('debug')) bus.emit('debugToggle', {});
     bus.emit('tick', { frame, dt });
@@ -74,6 +89,8 @@ export class Game {
   };
 
   private render = (alpha: number, realDt: number): void => {
+    const frozen = this.freeze > 0;
+    if (frozen) alpha = 1;
     const m = this.input.consumeMouse();
     this.rig.rotate(m.dx, m.dy);
     this.player.render(alpha, realDt);
@@ -81,6 +98,7 @@ export class Game {
     this.renderPos.copy(this.player.view.root.position);
     this.rig.update(this.renderPos, realDt);
     this.arena.follow(this.renderPos.x, this.renderPos.z);
+    this.fx.render(this.camera, alpha, realDt, frozen);
     this.debug.render();
     this.hud.render(realDt);
     this.fps.update(realDt);
