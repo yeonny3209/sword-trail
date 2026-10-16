@@ -8,6 +8,7 @@ import type { Env } from '../env';
 import { Combat } from './Combat';
 import { Monster } from './Monster';
 import { PlayerSession } from './PlayerSession';
+import { onReset, onSkill, onStat } from './Progress';
 
 const PLAYER_RADIUS = 0.4;
 const SAVE_EVERY_MS = 30_000;
@@ -98,6 +99,9 @@ export class ZoneDO extends DurableObject<Env> {
       case 'hit': return this.combat?.onHit(p, msg);
       case 'hurt': return this.combat?.onHurt(p, msg);
       case 'revive': return this.combat?.onRevive(p);
+      case 'stat': return onStat(p, msg);
+      case 'skill': return onSkill(p, msg);
+      case 'reset': return onReset(p);
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });
@@ -121,9 +125,11 @@ export class ZoneDO extends DurableObject<Env> {
     let x = Number(m.x), z = Number(m.z);
     if (!Number.isFinite(x) || !Number.isFinite(z)) return;
     // 속도 검사: 대시·밀림을 감안해 넉넉하게, 넘으면 이동 방향으로 잘라낸다
-    const maxStep = p.stats.speed * 2.4 * dt + 0.8;
+    const base = p.stats.speed * 2.4 * dt + 0.8;
+    const maxStep = base + p.moveBudget;
     const dx = x - p.x, dz = z - p.z;
     const d = Math.hypot(dx, dz);
+    p.moveBudget = Math.max(0, p.moveBudget - Math.max(0, d - base));
     let corrected = false;
     if (d > maxStep) {
       x = p.x + (dx / d) * maxStep;

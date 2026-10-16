@@ -158,6 +158,10 @@ export interface ActionDef {
   cd?: number;
   /** 스킬을 배우는 레벨 */
   lv?: number;
+  /** 스킬 최대 레벨(기본 5) */
+  max?: number;
+  /** 이 프레임들에서 마우스 방향으로 다시 돈다 */
+  aim?: number[];
   icon?: string;
   desc?: string;
 }

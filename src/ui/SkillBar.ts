@@ -1,4 +1,5 @@
 import { ACTIONS } from '../../shared/data';
+import { skillMp } from '../../shared/rules';
 import type { LocalPlayer } from '../game/LocalPlayer';
 
 const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R'];
@@ -6,7 +7,7 @@ const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R'];
 /** 화면 아래 스킬 단축키 칸: 이름, MP, 쿨타임, 배우는 레벨 */
 export class SkillBar {
   private readonly el: HTMLDivElement;
-  private slots: { el: HTMLDivElement; cd: HTMLDivElement; id: string | null }[] = [];
+  private slots: { el: HTMLDivElement; cd: HTMLDivElement; mp: HTMLDivElement; id: string | null }[] = [];
   private bound: LocalPlayer | null = null;
 
   constructor(ui: HTMLElement) {
@@ -26,7 +27,7 @@ export class SkillBar {
       el.innerHTML = `<div class="key">${k}</div><div class="nm">${def?.name ?? ''}</div><div class="mp">${def?.mp ? `MP ${def.mp}` : ''}</div><div class="cd"></div>`;
       if (def) el.title = `${def.name} — ${def.desc ?? ''}\nMP ${def.mp ?? 0} · 쿨타임 ${def.cd ?? 0}초 · Lv ${def.lv ?? 1}`;
       this.el.appendChild(el);
-      return { el, cd: el.querySelector('.cd') as HTMLDivElement, id };
+      return { el, cd: el.querySelector('.cd') as HTMLDivElement, mp: el.querySelector('.mp') as HTMLDivElement, id };
     });
   }
 
@@ -39,11 +40,13 @@ export class SkillBar {
       const def = ACTIONS[s.id];
       const left = Math.max(0, (me.cds.get(s.id) ?? 0) - now);
       const total = (def.cd ?? 0) * 1000;
-      const locked = (def.lv ?? 1) > me.self.lv;
+      const slv = me.skillLevel(s.id);
+      const locked = slv < 1;
       s.el.classList.toggle('locked', locked);
-      s.el.classList.toggle('nomp', !locked && me.self.mp < (def.mp ?? 0));
+      s.el.classList.toggle('nomp', !locked && me.self.mp < skillMp(def, slv));
       s.cd.style.background = left > 0 && total > 0 ? `conic-gradient(rgba(0,0,0,.7) ${(left / total) * 360}deg, transparent 0)` : 'none';
-      s.cd.textContent = locked ? `Lv${def.lv}` : left > 0 ? (left / 1000).toFixed(1) : '';
+      s.cd.textContent = locked ? ((def.lv ?? 1) > me.self.lv ? `Lv${def.lv}` : '미습득') : left > 0 ? (left / 1000).toFixed(1) : '';
+      s.mp.textContent = locked ? '' : `MP ${skillMp(def, slv)}`;
     }
   }
 }

@@ -1,5 +1,5 @@
 import { MoveState, type PlayerInfo, type S2C, type SelfState } from '../../shared/protocol';
-import { baseStats, type Stats } from '../../shared/rules';
+import { finalStats, type Stats } from '../../shared/rules';
 import type { ClassId } from '../../shared/types';
 import { migrateData, type CharData, type CharRow } from '../db';
 
@@ -31,6 +31,8 @@ export class PlayerSession {
   readonly cds = new Map<string, number>();
   lastHurtAt = 0;
   lastHitAt = 0;
+  /** 스킬 돌진으로 허용되는 추가 이동 거리 */
+  moveBudget = 0;
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;
@@ -46,7 +48,7 @@ export class PlayerSession {
       raw = null;
     }
     this.data = migrateData(raw, row.class, row.level);
-    this.stats = baseStats(row.class, row.level);
+    this.stats = finalStats(row.class, row.level, this.data.alloc);
     this.data.hp = Math.min(this.data.hp, this.stats.mhp);
     this.data.mp = Math.min(this.data.mp, this.stats.mmp);
     // 쓰러진 채로 나갔다면 바로 부활할 수 있는 상태로 시작
@@ -75,12 +77,15 @@ export class PlayerSession {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv, exp: this.data.exp, gold: this.data.gold,
       hp: this.data.hp, mhp: this.stats.mhp, mp: this.data.mp, mmp: this.stats.mmp, x: this.x, z: this.z,
       atk: this.stats.atk, def: this.stats.def, crit: this.stats.crit, speed: this.stats.speed,
+      alloc: { ...this.data.alloc }, statPoints: this.data.statPoints, skillPoints: this.data.skillPoints, skills: { ...this.data.skills },
     };
   }
 
   /** 레벨이 바뀌면 능력치를 다시 계산 */
   recalc(): void {
-    this.stats = baseStats(this.cls, this.lv);
+    this.stats = finalStats(this.cls, this.lv, this.data.alloc);
+    this.data.hp = Math.min(this.data.hp, this.stats.mhp);
+    this.data.mp = Math.min(this.data.mp, this.stats.mmp);
   }
 
   snap(): number[] {

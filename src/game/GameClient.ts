@@ -15,6 +15,7 @@ import { DamageNumbers } from '../ui/DamageNumbers';
 import { Hud } from '../ui/Hud';
 import { Nameplates } from '../ui/Nameplates';
 import { DeathOverlay, SkillBar } from '../ui/SkillBar';
+import { CharacterWindow, SkillWindow, Window } from '../ui/CharWindows';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
 import { Monsters } from './Monsters';
@@ -39,6 +40,8 @@ export class GameClient {
   readonly combat: CombatClient;
   private readonly skillbar: SkillBar;
   private readonly death: DeathOverlay;
+  private readonly charWin: CharacterWindow;
+  private readonly skillWin: SkillWindow;
   private readonly sun: THREE.DirectionalLight;
   private zone: ZoneScene | null = null;
   me: LocalPlayer | null = null;
@@ -81,6 +84,12 @@ export class GameClient {
     this.skillbar = new SkillBar(ui);
     this.death = new DeathOverlay(ui, () => this.net.send({ t: 'revive' }));
     new ChatBox(ui, (ch, text, to) => this.net.send({ t: 'chat', ch, text, to }));
+    const send = (m: Parameters<Connection['send']>[0]) => this.net.send(m);
+    this.charWin = new CharacterWindow(ui, send);
+    this.skillWin = new SkillWindow(ui, send);
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') Window.closeTop();
+    });
     new Audio();
     this.overlay = document.createElement('div');
     this.overlay.className = 'conn-overlay';
@@ -130,6 +139,8 @@ export class GameClient {
         for (const mo of m.monsters) this.monsters.add(mo, m.time);
         this.hud.setSelf(m.you);
         this.skillbar.bind(me);
+        this.charWin.me = me.self;
+        this.skillWin.me = me.self;
         this.death.hide();
         if (m.you.hp <= 0) me.die();
         this.portalCooldown = 1.5;
@@ -155,6 +166,8 @@ export class GameClient {
         if (this.me) {
           Object.assign(this.me.self, m.s);
           this.hud.setSelf(this.me.self);
+          this.charWin.draw();
+          this.skillWin.draw();
         }
         break;
       case 'lvup':
@@ -194,6 +207,8 @@ export class GameClient {
   private update = (dt: number, frame: number): void => {
     this.input.beginTick();
     bus.emit('tick', { frame, dt });
+    if (this.input.pressed.has('character')) this.charWin.toggle();
+    if (this.input.pressed.has('skills')) this.skillWin.toggle();
     const me = this.me, zone = this.zone;
     if (!me || !zone) return;
     // 마우스가 가리키는 땅 쪽이 공격 방향

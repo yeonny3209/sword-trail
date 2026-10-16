@@ -19,6 +19,7 @@ export class Hud {
           <div class="bar mp"><div class="fill"></div><span></span></div>
         </div>
       </div>
+      <div class="pts-badge"></div>
       <div class="zone-name"></div>
       <div class="net"></div>
       <div class="expbar"><div class="fill"></div><span></span></div>`;
@@ -55,5 +56,8 @@ export class Hud {
     const need = expToNext(m.lv);
     this.q('.expbar .fill').style.width = `${Math.min(100, (m.exp / need) * 100)}%`;
     this.q('.expbar span').textContent = `EXP ${((m.exp / need) * 100).toFixed(1)}%`;
+    const badge = [m.statPoints ? `스탯 +${m.statPoints} (U)` : '', m.skillPoints ? `스킬 +${m.skillPoints} (K)` : ''].filter(Boolean).join(' · ');
+    this.q('.pts-badge').textContent = badge;
+    this.q('.pts-badge').style.display = badge ? '' : 'none';
   }
 }

@@ -1,6 +1,6 @@
-import { CLASS_BY_ID, START_ZONE, ZONES } from '../shared/data';
+import { CLASS_BY_ID, KITS, START_ZONE, ZONES } from '../shared/data';
 import type { CharacterSummary } from '../shared/protocol';
-import { baseStats } from '../shared/rules';
+import { baseStats, emptyAlloc, SKILL_POINTS_PER_LEVEL, STAT_POINTS_PER_LEVEL, type Alloc } from '../shared/rules';
 import type { ClassId } from '../shared/types';
 import type { Env } from './env';
 
@@ -11,6 +11,10 @@ export interface CharData {
   gold: number;
   hp: number;
   mp: number;
+  alloc: Alloc;
+  statPoints: number;
+  skillPoints: number;
+  skills: Record<string, number>;
 }
 
 export interface CharRow {
@@ -30,12 +34,18 @@ export const MAX_CHARACTERS = 4;
 export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
   const s = baseStats(cls, lv);
   const d = (raw && typeof raw === 'object' ? raw : {}) as Partial<CharData>;
+  // v1 → v2: 스탯·스킬 포인트 도입. 이미 오른 레벨만큼 포인트를 돌려준다
+  const fresh = !d.alloc;
   return {
-    v: 1,
+    v: 2,
     exp: d.exp ?? 0,
     gold: d.gold ?? 100,
     hp: d.hp ?? s.mhp,
     mp: d.mp ?? s.mmp,
+    alloc: { ...emptyAlloc(), ...(d.alloc ?? {}) },
+    statPoints: fresh ? STAT_POINTS_PER_LEVEL * (lv - 1) : d.statPoints ?? 0,
+    skillPoints: fresh ? SKILL_POINTS_PER_LEVEL * (lv - 1) : d.skillPoints ?? 0,
+    skills: { [KITS[cls].skills[0]]: 1, ...(d.skills ?? {}) },
   };
 }
 

@@ -136,3 +136,29 @@ input:focus { border-color: var(--gold); }
 .death { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse, rgba(60,0,0,.35), rgba(0,0,0,.7)); pointer-events: auto; }
 .death h2 { font-family: var(--title); font-weight: 400; font-size: 44px; color: #e05a4a; margin: 0 0 18px; letter-spacing: 6px; text-align: center; }
 .death .box { text-align: center; }
+
+/* 창 */
+.win { position: absolute; top: 90px; right: 30px; width: 340px; max-height: calc(100vh - 140px); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 8px 30px rgba(0,0,0,.5); pointer-events: auto; }
+.win-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); cursor: move; color: var(--gold); font-weight: 700; }
+.win-head small { color: #888; font-weight: 400; margin-right: auto; }
+.win-head .x { background: none; border: 0; color: #aaa; cursor: pointer; font-size: 15px; }
+.win-head .x:hover { color: #fff; }
+.win-body { padding: 10px 12px; overflow-y: auto; }
+.win hr { border: 0; border-top: 1px solid #333; margin: 8px 0; }
+.win .kv { display: flex; justify-content: space-between; padding: 2px 0; font-size: 13px; }
+.win .kv span { color: #aaa; }
+.win .grid2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+.win .pts { margin-bottom: 6px; color: #ccc; } .win .pts b { color: #ffd780; font-size: 16px; }
+.win .row.end { justify-content: flex-end; margin-top: 8px; }
+.char-head { border-left: 4px solid var(--c); padding-left: 8px; margin-bottom: 8px; } .char-head b { font-size: 17px; color: #fff; } .char-head span { color: #ccc; }
+.stat-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+.stat-row .k { flex: 1; } .stat-row .k small { color: #ffd780; } .stat-row b { width: 30px; text-align: right; }
+.skill-win { width: 420px; right: auto; left: 24px; top: 110px; }
+.skill-row { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
+.skill-row .key { width: 30px; height: 30px; border: 1px solid var(--gold); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 700; flex: none; }
+.skill-row .info { flex: 1; } .skill-row .nm { color: #fff; } .skill-row .nm small { color: #ffd780; }
+.skill-row .desc { font-size: 12px; color: #bbb; margin: 2px 0; } .skill-row .meta { font-size: 11px; color: #888; }
+.skill-row.unlearned .nm { color: #aaa; } .skill-row.locked { opacity: .55; }
+.skill-row .ult { font-size: 10px; color: #ff9070; border: 1px solid #ff9070; border-radius: 6px; padding: 0 5px; }
+.hud .pts-badge { position: absolute; left: 76px; top: 64px; font-size: 12px; color: #ffe08a; background: rgba(0,0,0,.55); padding: 2px 8px; border-radius: 10px; text-shadow: 0 0 3px #000; animation: pulse 1s infinite alternate; }
+@keyframes pulse { from { opacity: .6; } to { opacity: 1; } }

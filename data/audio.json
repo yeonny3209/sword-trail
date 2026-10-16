@@ -405,6 +405,58 @@
           "gain": 0.5
         }
       ]
+    },
+    "charge": {
+      "path": "sfx/charge.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sawtooth",
+          "freq": [
+            180,
+            620
+          ],
+          "dur": 0.4,
+          "gain": 0.08
+        },
+        {
+          "type": "noise",
+          "filter": "bandpass",
+          "freq": [
+            600,
+            2400
+          ],
+          "q": 3,
+          "dur": 0.4,
+          "gain": 0.12
+        }
+      ]
+    },
+    "flash": {
+      "path": "sfx/flash.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "highpass",
+          "freq": [
+            6000,
+            1500
+          ],
+          "q": 0.7,
+          "dur": 0.18,
+          "gain": 0.4
+        },
+        {
+          "type": "metal",
+          "freqs": [
+            1800,
+            2600,
+            3900
+          ],
+          "dur": 0.4,
+          "gain": 0.12
+        }
+      ]
     }
   }
 }

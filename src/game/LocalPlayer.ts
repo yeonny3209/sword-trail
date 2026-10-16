@@ -5,6 +5,7 @@ import { applyReaction, disabled, newBody, stepBody, type Body } from '../../sha
 import { resolveCircle } from '../../shared/geom';
 import { ACTIONS, CLASS_BY_ID, KITS } from '../../shared/data';
 import { MoveState, type SelfState } from '../../shared/protocol';
+import { skillMp } from '../../shared/rules';
 import type { ActionDef, ClassKit, HitDef, ZoneDef } from '../../shared/types';
 import type { Action, Input } from '../input/Input';
 import { CharacterModel } from './CharacterModel';
@@ -69,8 +70,13 @@ export class LocalPlayer {
     return this.pstate === 'dead' || !!this.action?.invul() || (this.pstate === 'hurt' && this.body.getup > 0) || this.body.getup > 0;
   }
 
+  skillLevel(id: string): number {
+    return this.self.skills?.[id] ?? 0;
+  }
+
   skillReady(def: ActionDef): boolean {
-    return (def.lv ?? 1) <= this.self.lv && this.self.mp >= (def.mp ?? 0) && performance.now() >= (this.cds.get(def.id) ?? 0);
+    const slv = this.skillLevel(def.id);
+    return slv >= 1 && this.self.mp >= skillMp(def, slv) && performance.now() >= (this.cds.get(def.id) ?? 0);
   }
 
   private take(...acts: Action[]): Action | null {
@@ -130,9 +136,9 @@ export class LocalPlayer {
     this.pstate = 'action';
     if (!def.back) this.yaw = this.aimYaw;
     if (!def.air) this.vel.set(0, 0);
-    if (def.mp || def.cd) {
+    if (this.kit.skills.includes(def.id)) {
       this.cds.set(def.id, performance.now() + (def.cd ?? 0) * 1000);
-      this.self.mp -= def.mp ?? 0;
+      this.self.mp -= skillMp(def, this.skillLevel(def.id));
     }
     this.dashing = false;
     this.onAction(def, this.action.instance);
@@ -171,6 +177,7 @@ export class LocalPlayer {
     const def = a.def;
     const vy = a.vyNow();
     if (vy !== null) this.vy = vy;
+    if (def.aim?.includes(a.frame)) this.yaw = this.aimYaw;
     const wasAir = this.air;
     this.fall(dt);
     const sp = a.moveSpeed();

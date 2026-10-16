@@ -1,8 +1,8 @@
 import { applyReaction, expFactor, isBackAttack, rollDamage } from '../../shared/combat';
-import { actionOf } from '../../shared/data';
+import { actionOf, isSkill } from '../../shared/data';
 import { dist2 } from '../../shared/geom';
 import { MonState, type C2S, type S2C } from '../../shared/protocol';
-import { expToNext, MAX_LEVEL } from '../../shared/rules';
+import { actionTravel, expToNext, MAX_LEVEL, SKILL_POINTS_PER_LEVEL, skillMp, skillMul, STAT_POINTS_PER_LEVEL } from '../../shared/rules';
 import type { ZoneDef } from '../../shared/types';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
@@ -28,16 +28,19 @@ export class Combat {
     const a = actionOf(p.cls, String(m.a));
     if (!a) return;
     const now = Date.now();
-    if (a.mp || a.cd) {
+    if (isSkill(p.cls, a.id)) {
+      const slv = p.data.skills[a.id] ?? 0;
+      const cost = skillMp(a, slv);
       const ready = p.cds.get(a.id) ?? 0;
-      if (now < ready - 150 || p.data.mp + 0.5 < (a.mp ?? 0) || (a.lv ?? 1) > p.lv) {
+      if (slv < 1 || now < ready - 150 || p.data.mp + 0.5 < cost) {
         p.send({ t: 'cdfail', a: a.id });
         return;
       }
-      p.data.mp -= a.mp ?? 0;
+      p.data.mp -= cost;
       p.cds.set(a.id, now + (a.cd ?? 0) * 1000);
       p.send({ t: 'me', s: { mp: p.data.mp } });
     }
+    p.moveBudget = Math.min(30, p.moveBudget + actionTravel(a) * 1.3 + 1);
     p.acts.set(m.i | 0, { a: a.id, start: now, hits: new Map() });
     if (p.acts.size > 24) p.acts.delete(p.acts.keys().next().value!);
     this.host.broadcast({ t: 'act', id: p.id, a: a.id, f: Number(m.f) || 0 }, p);
@@ -67,7 +70,8 @@ export class Combat {
     const crit = Math.random() < p.stats.crit;
     const back = !mon.def.boss && isBackAttack(mon.f, p.x, p.z, mon.body.x, mon.body.z);
     const counter = mon.state === MonState.Windup || mon.state === MonState.Attack;
-    const n = rollDamage(p.stats.atk, hit.dmg, mon.def.def, Math.random(), { crit, critMul: 1.5, back, counter });
+    const mult = hit.dmg * (isSkill(p.cls, a.id) ? skillMul(p.data.skills[a.id] ?? 1) : 1);
+    const n = rollDamage(p.stats.atk, mult, mon.def.def, Math.random(), { crit, critMul: 1.5, back, counter });
     mon.hp -= n;
     mon.lastAttacker = p.id;
     mon.target = p;
@@ -101,11 +105,14 @@ export class Combat {
     while (p.lv < MAX_LEVEL && p.data.exp >= expToNext(p.lv)) {
       p.data.exp -= expToNext(p.lv);
       p.lv++;
+      p.data.statPoints += STAT_POINTS_PER_LEVEL;
+      p.data.skillPoints += SKILL_POINTS_PER_LEVEL;
       leveled = true;
     }
     if (leveled) {
       p.recalc();
       p.data.hp = p.stats.mhp;
+      p.send({ t: 'sys', text: `레벨 ${p.lv}! 스탯 포인트 ${STAT_POINTS_PER_LEVEL}, 스킬 포인트 ${SKILL_POINTS_PER_LEVEL}을 얻었습니다. (U: 캐릭터, K: 스킬)` });
       p.data.mp = p.stats.mmp;
       this.host.broadcast({ t: 'lvup', id: p.id, lv: p.lv });
       p.send({ t: 'me', s: p.self() });

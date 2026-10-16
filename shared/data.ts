@@ -22,10 +22,18 @@ export const START_ZONE = 'town';
 /** 직업별 기술 세트 */
 export const KITS = { swordsman, berserker, blademaster, spellblade } as unknown as Record<ClassId, ClassKit>;
 
+// 자세 키프레임은 프레임 순서로 정렬해 둔다
+for (const k of Object.values(KITS)) for (const a of k.actions) a.pose.sort((x, y) => x[0] - y[0]);
+
 /** 모든 행동(id → 정의) */
 export const ACTIONS: Record<string, ActionDef> = Object.fromEntries(
   Object.values(KITS).flatMap((k) => k.actions.map((a) => [a.id, a])),
 );
+
+/** 스킬(단축키로 쓰는 기술)인가 */
+export function isSkill(cls: ClassId, id: string): boolean {
+  return KITS[cls].skills.includes(id);
+}
 
 /** 행동이 그 직업의 것인가 */
 export function actionOf(cls: ClassId, id: string): ActionDef | null {

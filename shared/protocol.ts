@@ -1,3 +1,4 @@
+import type { Alloc, StatKey } from './rules';
 import type { ClassId } from './types';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
@@ -47,6 +48,11 @@ export interface SelfState {
   def: number;
   crit: number;
   speed: number;
+  alloc: Alloc;
+  statPoints: number;
+  skillPoints: number;
+  /** 스킬 id → 레벨(0 = 안 배움) */
+  skills: Record<string, number>;
 }
 
 /** 이동 상태 코드(원격 애니메이션용) */
@@ -83,6 +89,12 @@ export type C2S =
   /** 몬스터 m의 k번째 공격에 내가 맞았다 */
   | { t: 'hurt'; m: number; k: number }
   | { t: 'revive' }
+  /** 스탯 포인트 1 올리기 */
+  | { t: 'stat'; s: StatKey }
+  /** 스킬 배우기·레벨 올리기 */
+  | { t: 'skill'; a: string }
+  /** 스탯·스킬 초기화 */
+  | { t: 'reset' }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
