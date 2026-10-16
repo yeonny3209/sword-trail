@@ -803,6 +803,210 @@
    "price": 20,
    "stack": 999,
    "desc": "녹을 벗기면 쓸 만하다."
+  },
+  {
+   "id": "mat_spear",
+   "name": "부러진 창날",
+   "kind": "material",
+   "lv": 7,
+   "price": 27,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_feather",
+   "name": "깃털 화살깃",
+   "kind": "material",
+   "lv": 8,
+   "price": 30,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_crest1",
+   "name": "대장의 휘장",
+   "kind": "material",
+   "lv": 11,
+   "price": 39,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_cloth",
+   "name": "검은 천",
+   "kind": "material",
+   "lv": 13,
+   "price": 45,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_shield",
+   "name": "방패 조각",
+   "kind": "material",
+   "lv": 15,
+   "price": 51,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_ecto",
+   "name": "망령의 정수",
+   "kind": "material",
+   "lv": 17,
+   "price": 57,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_crest2",
+   "name": "문지기의 문장",
+   "kind": "material",
+   "lv": 20,
+   "price": 66,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_rune",
+   "name": "룬 조각",
+   "kind": "material",
+   "lv": 24,
+   "price": 78,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_core",
+   "name": "골렘 핵",
+   "kind": "material",
+   "lv": 26,
+   "price": 84,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_hide",
+   "name": "거한의 가죽",
+   "kind": "material",
+   "lv": 22,
+   "price": 72,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_shard",
+   "name": "첫 번째 검의 조각",
+   "kind": "material",
+   "lv": 30,
+   "price": 96,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "ore_1",
+   "name": "철광석",
+   "kind": "material",
+   "lv": 1,
+   "price": 9,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "ore_2",
+   "name": "은광석",
+   "kind": "material",
+   "lv": 10,
+   "price": 36,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "ore_3",
+   "name": "미스릴 광석",
+   "kind": "material",
+   "lv": 20,
+   "price": 66,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "herb_1",
+   "name": "약초",
+   "kind": "material",
+   "lv": 1,
+   "price": 9,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "herb_2",
+   "name": "푸른 약초",
+   "kind": "material",
+   "lv": 10,
+   "price": 36,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "herb_3",
+   "name": "달빛꽃",
+   "kind": "material",
+   "lv": 20,
+   "price": 66,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "wood_1",
+   "name": "단단한 나무",
+   "kind": "material",
+   "lv": 1,
+   "price": 9,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "wood_2",
+   "name": "검은 나무",
+   "kind": "material",
+   "lv": 10,
+   "price": 36,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "wood_3",
+   "name": "고목 조각",
+   "kind": "material",
+   "lv": 20,
+   "price": 66,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "pot_hp_l",
+   "name": "큰 HP 물약",
+   "kind": "potion",
+   "lv": 20,
+   "heal": {
+    "hp": 0.7
+   },
+   "price": 220,
+   "stack": 99,
+   "desc": "최대 HP의 70%를 회복한다."
+  },
+  {
+   "id": "pot_mp_l",
+   "name": "큰 MP 물약",
+   "kind": "potion",
+   "lv": 20,
+   "heal": {
+    "mp": 0.7
+   },
+   "price": 260,
+   "stack": 99,
+   "desc": "최대 MP의 70%를 회복한다."
   }
  ]
 }

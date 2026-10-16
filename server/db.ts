@@ -3,6 +3,7 @@ import type { CharacterSummary } from '../shared/protocol';
 import { baseStats, emptyAlloc, SKILL_POINTS_PER_LEVEL, STAT_POINTS_PER_LEVEL, type Alloc } from '../shared/rules';
 import type { ClassId } from '../shared/types';
 import { makeItem, type Equip, type Item } from '../shared/items';
+import { emptyQuests, type QuestState } from '../shared/quests';
 import type { Env } from './env';
 
 /** 캐릭터의 진행 정보(JSON 한 칸에 저장). 필드를 추가하면 migrateData에 기본값을 넣는다 */
@@ -18,6 +19,9 @@ export interface CharData {
   skills: Record<string, number>;
   inv: Item[];
   equip: Equip;
+  quests: QuestState;
+  /** 채집 숙련도 */
+  gather: { lv: number; exp: number };
 }
 
 export function newUid(): string {
@@ -44,7 +48,7 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
   // v1 → v2: 스탯·스킬 포인트 도입. 이미 오른 레벨만큼 포인트를 돌려준다
   const fresh = !d.alloc;
   return {
-    v: 3,
+    v: 4,
     exp: d.exp ?? 0,
     gold: d.gold ?? 100,
     hp: d.hp ?? s.mhp,
@@ -56,6 +60,9 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
     // v2 → v3: 아이템. 처음이면 기본 무기와 물약을 준다
     inv: d.inv ?? [makeItem('pot_hp_s', 5, newUid()), makeItem('pot_mp_s', 3, newUid())],
     equip: d.equip ?? { weapon: makeItem(`w_${cls}_0`, 1, newUid(), 0, () => 0) },
+    // v3 → v4: 퀘스트·채집
+    quests: d.quests ?? emptyQuests(),
+    gather: d.gather ?? { lv: 1, exp: 0 },
   };
 }
 

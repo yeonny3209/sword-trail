@@ -35,6 +35,8 @@ export class PlayerSession {
   /** 스킬 돌진으로 허용되는 추가 이동 거리 */
   moveBudget = 0;
   lastPotAt = 0;
+  /** 채집 중인 노드 */
+  gathering: { i: number; start: number } | null = null;
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;

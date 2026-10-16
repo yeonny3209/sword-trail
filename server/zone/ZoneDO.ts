@@ -10,6 +10,8 @@ import { Monster } from './Monster';
 import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
 import { onInventory, syncInv } from './Inventory';
+import { QuestSystem } from './Quests';
+import { GatherSystem, onCraft } from './Gather';
 
 const PLAYER_RADIUS = 0.4;
 const SAVE_EVERY_MS = 30_000;
@@ -29,6 +31,8 @@ export class ZoneDO extends DurableObject<Env> {
   private lastStep = Date.now();
   readonly monsters = new Map<number, Monster>();
   private combat: Combat | null = null;
+  private quests: QuestSystem | null = null;
+  private gather: GatherSystem | null = null;
 
   /** 존을 처음 열 때 몬스터를 배치한다 */
   private init(zoneId: string): boolean {
@@ -45,7 +49,12 @@ export class ZoneDO extends DurableObject<Env> {
       }
     }
     const self = this;
-    this.combat = new Combat({ zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e) });
+    this.combat = new Combat({
+      zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e),
+      onKill: (p, id) => self.quests?.onKill(p, id),
+    });
+    this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
+    this.gather = new GatherSystem(z, (m) => self.broadcast(m));
     return true;
   }
 
@@ -76,6 +85,9 @@ export class ZoneDO extends DurableObject<Env> {
       monsters: [...this.monsters.values()].filter((m) => !m.dead).map((m) => m.info()),
     });
     syncInv(p);
+    this.quests!.send(p);
+    this.quests!.onEnterZone(p);
+    p.send({ t: 'nodes', down: this.gather!.downList() });
     if (p.dead) p.send({ t: 'died', wait: 0 });
     this.broadcast({ t: 'join', p: p.info() }, p);
     this.broadcast({ t: 'sys', text: `${p.name}님이 ${z.name}에 들어왔습니다.` }, p);
@@ -113,6 +125,12 @@ export class ZoneDO extends DurableObject<Env> {
       case 'enhance':
       case 'discard':
         return onInventory(p, msg, this.zone!);
+      case 'qaccept': return this.quests?.onAccept(p, String(msg.id));
+      case 'qturnin': return this.quests?.onTurnin(p, String(msg.id));
+      case 'qabandon': return this.quests?.onAbandon(p, String(msg.id));
+      case 'gather': return this.gather?.onStart(p, msg.i | 0);
+      case 'gatherdone': return this.gather?.onDone(p, msg.i | 0);
+      case 'craft': return onCraft(p, this.zone!, String(msg.id));
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });
@@ -272,7 +290,10 @@ export class ZoneDO extends DurableObject<Env> {
         m: [...this.monsters.values()].filter((m) => !m.dead).map((m) => m.snap()),
       });
     }
-    if (this.tickCount % ZONE_HZ === 0) for (const p of this.players.values()) this.combat?.regen(p);
+    if (this.tickCount % ZONE_HZ === 0) {
+      for (const p of this.players.values()) this.combat?.regen(p);
+      this.gather?.update(now);
+    }
     if (now - this.lastSave > SAVE_EVERY_MS) {
       this.lastSave = now;
       for (const p of this.players.values()) if (p.dirty && !p.leaving) void this.save(p);

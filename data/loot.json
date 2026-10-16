@@ -90,10 +90,163 @@
     "item": "pot_hp_s",
     "chance": 0.08
    }
+  ],
+  "spearman": [
+   {
+    "item": "mat_spear",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_s",
+    "chance": 0.08
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.05
+   }
+  ],
+  "archer": [
+   {
+    "item": "mat_feather",
+    "chance": 0.45
+   },
+   {
+    "item": "pot_mp_s",
+    "chance": 0.08
+   }
+  ],
+  "recruit_chief": [
+   {
+    "item": "mat_crest1",
+    "chance": 1,
+    "n": 2
+   },
+   {
+    "item": "enh_stone",
+    "chance": 1,
+    "n": 3
+   }
+  ],
+  "bandit": [
+   {
+    "item": "mat_cloth",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_m",
+    "chance": 0.06
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.06
+   }
+  ],
+  "shieldman": [
+   {
+    "item": "mat_shield",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_m",
+    "chance": 0.06
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.07
+   }
+  ],
+  "wraith": [
+   {
+    "item": "mat_ecto",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_mp_m",
+    "chance": 0.07
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.07
+   }
+  ],
+  "gatekeeper": [
+   {
+    "item": "mat_crest2",
+    "chance": 1,
+    "n": 3
+   },
+   {
+    "item": "enh_stone",
+    "chance": 1,
+    "n": 8
+   }
+  ],
+  "brute": [
+   {
+    "item": "mat_hide",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_l",
+    "chance": 0.05
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.08
+   }
+  ],
+  "talisman": [
+   {
+    "item": "mat_rune",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_mp_l",
+    "chance": 0.05
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.08
+   }
+  ],
+  "golem": [
+   {
+    "item": "mat_core",
+    "chance": 0.35
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.1
+   }
+  ],
+  "guardian": [
+   {
+    "item": "mat_shard",
+    "chance": 1,
+    "n": 3
+   },
+   {
+    "item": "enh_stone",
+    "chance": 1,
+    "n": 15
+   }
   ]
  },
  "equipChance": {
   "default": 0.06,
   "boss": 1.0
+ },
+ "gather": {
+  "seconds": 1.6,
+  "respawn": 45,
+  "range": 2.6,
+  "tiers": {
+   "field1": 1,
+   "field2": 1,
+   "field3": 2,
+   "field4": 3
+  },
+  "doubleChancePerLevel": 0.04,
+  "expPerLevel": 40
  }
 }

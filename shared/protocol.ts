@@ -1,6 +1,7 @@
 import type { Alloc, StatKey } from './rules';
 import type { ClassId } from './types';
 import type { Equip, Item, Slot } from './items';
+import type { QuestState } from './quests';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -105,6 +106,13 @@ export type C2S =
   | { t: 'sell'; uid: string; n: number }
   | { t: 'enhance'; uid: string }
   | { t: 'discard'; uid: string }
+  | { t: 'qaccept'; id: string }
+  | { t: 'qturnin'; id: string }
+  | { t: 'qabandon'; id: string }
+  /** 채집 시작·완료(노드 번호) */
+  | { t: 'gather'; i: number }
+  | { t: 'gatherdone'; i: number }
+  | { t: 'craft'; id: string }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -134,6 +142,14 @@ export type S2C =
   /** 얻은 아이템 알림 */
   | { t: 'loot'; items: { id: string; n: number; rar?: number }[] }
   | { t: 'enh'; ok: boolean; uid: string; enh: number; broke?: boolean }
+  | { t: 'quests'; q: QuestState }
+  /** 채집 노드 상태: 지금 쓸 수 없는 노드 번호들 */
+  | { t: 'nodes'; down: number[] }
+  | { t: 'node'; i: number; up: boolean }
+  | { t: 'gathered'; id: string; n: number; lv: number }
+  | { t: 'crafted'; id: string; n: number; rar?: number }
+  /** 퀘스트 완료 연출 */
+  | { t: 'qdone'; id: string }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
   | { t: 'pos'; x: number; z: number }

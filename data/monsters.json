@@ -7,7 +7,7 @@
    "hp": 70,
    "atk": 9,
    "def": 2,
-   "exp": 14,
+   "exp": 13,
    "gold": [
     2,
     5
@@ -53,7 +53,7 @@
    "hp": 100,
    "atk": 12,
    "def": 4,
-   "exp": 22,
+   "exp": 19,
    "gold": [
     3,
     7
@@ -159,6 +159,809 @@
     }
    },
    "hitMat": "metal"
+  },
+  {
+   "id": "spearman",
+   "name": "창병",
+   "lv": 7,
+   "hp": 320,
+   "atk": 22,
+   "def": 12,
+   "exp": 100,
+   "gold": [
+    11,
+    24
+   ],
+   "speed": 3.0,
+   "radius": 0.42,
+   "height": 1.9,
+   "weight": 1.1,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "찌르기",
+     "windup": 0.65,
+     "active": 0.22,
+     "recover": 0.8,
+     "range": 3.4,
+     "shape": {
+      "type": "box",
+      "range": 3.4,
+      "width": 0.9
+     },
+     "dmg": 1.2,
+     "kx": 5,
+     "stun": 22,
+     "cd": 2.2,
+     "lunge": 5
+    },
+    {
+     "name": "휘두르기",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.8,
+      "width": 150
+     },
+     "dmg": 1.3,
+     "kx": 6,
+     "stun": 24,
+     "cd": 3.5
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#4f6a5a",
+    "scale": 1,
+    "weapon": {
+     "kind": "sword",
+     "length": 2.0,
+     "width": 0.6,
+     "color": "#b8a77a"
+    }
+   },
+   "hitMat": "metal"
+  },
+  {
+   "id": "archer",
+   "name": "궁수",
+   "lv": 8,
+   "hp": 230,
+   "atk": 24,
+   "def": 8,
+   "exp": 127,
+   "gold": [
+    13,
+    27
+   ],
+   "speed": 3.2,
+   "radius": 0.4,
+   "height": 1.75,
+   "weight": 0.9,
+   "aggro": 11,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "화살",
+     "windup": 0.9,
+     "active": 0.15,
+     "recover": 0.7,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 11,
+      "width": 0.7
+     },
+     "dmg": 1.1,
+     "kx": 3,
+     "stun": 18,
+     "cd": 2.4,
+     "fx": "arrow"
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#6b5a7a",
+    "scale": 1,
+    "weapon": {
+     "kind": "sword",
+     "length": 0.7,
+     "width": 0.6,
+     "color": "#7a5a3a"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "recruit_chief",
+   "name": "정예 수련병 대장",
+   "lv": 11,
+   "hp": 2600,
+   "atk": 32,
+   "def": 18,
+   "exp": 229,
+   "gold": [
+    17,
+    36
+   ],
+   "speed": 3.3,
+   "radius": 0.6,
+   "height": 2.3,
+   "weight": 2.2,
+   "aggro": 10,
+   "leash": 20,
+   "respawn": 180,
+   "attacks": [
+    {
+     "name": "내려치기",
+     "windup": 0.75,
+     "active": 0.22,
+     "recover": 0.9,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.8,
+      "width": 100
+     },
+     "dmg": 1.3,
+     "kx": 6,
+     "stun": 24,
+     "cd": 2.2
+    },
+    {
+     "name": "휩쓸기",
+     "windup": 0.85,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 2.8,
+     "shape": {
+      "type": "arc",
+      "range": 3.0,
+      "width": 200
+     },
+     "dmg": 1.2,
+     "kx": 7,
+     "stun": 24,
+     "cd": 3.0
+    },
+    {
+     "name": "붉은 돌진",
+     "windup": 1.0,
+     "active": 0.3,
+     "recover": 1.2,
+     "range": 6,
+     "shape": {
+      "type": "box",
+      "range": 6.5,
+      "width": 1.4
+     },
+     "dmg": 2.0,
+     "kx": 9,
+     "stun": 30,
+     "cd": 6,
+     "lunge": 13,
+     "heavy": true,
+     "kz": 8
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#9a3b2c",
+    "scale": 1.3,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 1.5,
+     "width": 1.4,
+     "color": "#b0a090"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true
+  },
+  {
+   "id": "bandit",
+   "name": "쌍검 도적",
+   "lv": 13,
+   "hp": 560,
+   "atk": 34,
+   "def": 16,
+   "exp": 316,
+   "gold": [
+    20,
+    42
+   ],
+   "speed": 4.2,
+   "radius": 0.42,
+   "height": 1.8,
+   "weight": 0.95,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "연속 베기",
+     "windup": 0.45,
+     "active": 0.25,
+     "recover": 0.6,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.3,
+      "width": 140
+     },
+     "dmg": 1.0,
+     "kx": 3,
+     "stun": 16,
+     "cd": 1.6
+    },
+    {
+     "name": "파고들기",
+     "windup": 0.6,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 4.5,
+     "shape": {
+      "type": "box",
+      "range": 4.5,
+      "width": 1.0
+     },
+     "dmg": 1.3,
+     "kx": 5,
+     "stun": 22,
+     "cd": 3.2,
+     "lunge": 10
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#3a3a48",
+    "scale": 1,
+    "weapon": {
+     "kind": "dual",
+     "length": 0.75,
+     "width": 0.8,
+     "color": "#e6e0c8"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "shieldman",
+   "name": "방패병",
+   "lv": 15,
+   "hp": 900,
+   "atk": 36,
+   "def": 34,
+   "exp": 417,
+   "gold": [
+    23,
+    48
+   ],
+   "speed": 2.6,
+   "radius": 0.55,
+   "height": 2.0,
+   "weight": 1.7,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "방패 밀치기",
+     "windup": 0.7,
+     "active": 0.2,
+     "recover": 0.9,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.2,
+      "width": 120
+     },
+     "dmg": 1.1,
+     "kx": 9,
+     "stun": 28,
+     "cd": 2.4
+    },
+    {
+     "name": "내려치기",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.6,
+      "width": 90
+     },
+     "dmg": 1.5,
+     "kx": 5,
+     "stun": 26,
+     "cd": 3.4
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#5a6470",
+    "scale": 1.1,
+    "weapon": {
+     "kind": "sword",
+     "length": 1.0,
+     "width": 1.0,
+     "color": "#c0c4ca"
+    }
+   },
+   "hitMat": "metal"
+  },
+  {
+   "id": "wraith",
+   "name": "망령 검사",
+   "lv": 17,
+   "hp": 720,
+   "atk": 46,
+   "def": 20,
+   "exp": 532,
+   "gold": [
+    26,
+    54
+   ],
+   "speed": 4.4,
+   "radius": 0.45,
+   "height": 1.9,
+   "weight": 0.8,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "망령 베기",
+     "windup": 0.55,
+     "active": 0.22,
+     "recover": 0.7,
+     "range": 2.4,
+     "shape": {
+      "type": "arc",
+      "range": 2.6,
+      "width": 150
+     },
+     "dmg": 1.2,
+     "kx": 5,
+     "stun": 22,
+     "cd": 1.9
+    },
+    {
+     "name": "붉은 순간 돌진",
+     "windup": 0.95,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 7,
+     "shape": {
+      "type": "box",
+      "range": 7.5,
+      "width": 1.2
+     },
+     "dmg": 1.9,
+     "kx": 8,
+     "stun": 28,
+     "cd": 5,
+     "lunge": 18,
+     "heavy": true
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#5a4a7a",
+    "scale": 1,
+    "weapon": {
+     "kind": "sword",
+     "length": 1.2,
+     "width": 0.8,
+     "color": "#c8b8ff"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "gatekeeper",
+   "name": "문지기 기사",
+   "lv": 20,
+   "hp": 14000,
+   "atk": 58,
+   "def": 30,
+   "exp": 732,
+   "gold": [
+    31,
+    63
+   ],
+   "speed": 2.8,
+   "radius": 0.85,
+   "height": 3.0,
+   "weight": 4,
+   "aggro": 12,
+   "leash": 24,
+   "respawn": 420,
+   "attacks": [
+    {
+     "name": "내려치기",
+     "windup": 0.85,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 3.3,
+     "shape": {
+      "type": "arc",
+      "range": 3.4,
+      "width": 90
+     },
+     "dmg": 1.4,
+     "kx": 8,
+     "stun": 30,
+     "cd": 2.4
+    },
+    {
+     "name": "휩쓸기",
+     "windup": 0.8,
+     "active": 0.3,
+     "recover": 1.0,
+     "range": 3.4,
+     "shape": {
+      "type": "arc",
+      "range": 3.6,
+      "width": 220
+     },
+     "dmg": 1.3,
+     "kx": 8,
+     "stun": 30,
+     "cd": 3.0
+    },
+    {
+     "name": "붉은 돌진",
+     "windup": 1.0,
+     "active": 0.35,
+     "recover": 1.3,
+     "range": 8,
+     "shape": {
+      "type": "box",
+      "range": 8.5,
+      "width": 1.8
+     },
+     "dmg": 2.0,
+     "kx": 10,
+     "stun": 34,
+     "cd": 6,
+     "lunge": 16,
+     "heavy": true,
+     "kz": 9
+    },
+    {
+     "name": "붉은 회전베기",
+     "windup": 1.1,
+     "active": 0.4,
+     "recover": 1.3,
+     "range": 3.8,
+     "shape": {
+      "type": "circle",
+      "range": 4.0,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 1.8,
+     "kx": 10,
+     "stun": 34,
+     "cd": 8,
+     "heavy": true,
+     "kz": 8
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#5d6470",
+    "scale": 1.6,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 1.9,
+     "width": 1.9,
+     "color": "#d0d4da"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true
+  },
+  {
+   "id": "brute",
+   "name": "대검 거한",
+   "lv": 22,
+   "hp": 1600,
+   "atk": 58,
+   "def": 32,
+   "exp": 883,
+   "gold": [
+    34,
+    69
+   ],
+   "speed": 2.5,
+   "radius": 0.75,
+   "height": 2.6,
+   "weight": 2.2,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "대검 휩쓸기",
+     "windup": 0.9,
+     "active": 0.3,
+     "recover": 1.1,
+     "range": 3.2,
+     "shape": {
+      "type": "arc",
+      "range": 3.4,
+      "width": 180
+     },
+     "dmg": 1.4,
+     "kx": 8,
+     "stun": 28,
+     "cd": 2.8
+    },
+    {
+     "name": "붉은 내려찍기",
+     "windup": 1.2,
+     "active": 0.25,
+     "recover": 1.3,
+     "range": 3.0,
+     "shape": {
+      "type": "circle",
+      "range": 2.8,
+      "width": 0,
+      "offset": 1.5
+     },
+     "dmg": 2.0,
+     "kx": 6,
+     "stun": 34,
+     "cd": 5,
+     "heavy": true,
+     "kz": 9
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#7a6048",
+    "scale": 1.4,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 1.7,
+     "width": 1.8,
+     "color": "#9a8c78"
+    }
+   },
+   "hitMat": "flesh",
+   "superArmor": true
+  },
+  {
+   "id": "talisman",
+   "name": "부적술사",
+   "lv": 24,
+   "hp": 980,
+   "atk": 62,
+   "def": 24,
+   "exp": 1048,
+   "gold": [
+    37,
+    75
+   ],
+   "speed": 3.2,
+   "radius": 0.42,
+   "height": 1.8,
+   "weight": 0.9,
+   "aggro": 11,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "부적 날리기",
+     "windup": 1.0,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 9,
+     "shape": {
+      "type": "box",
+      "range": 10,
+      "width": 1.4
+     },
+     "dmg": 1.3,
+     "kx": 4,
+     "stun": 22,
+     "cd": 2.6,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#a08a4a",
+    "scale": 1,
+    "weapon": {
+     "kind": "runeblade",
+     "length": 1.0,
+     "width": 0.8,
+     "color": "#ffe090"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "golem",
+   "name": "돌 골렘",
+   "lv": 26,
+   "hp": 2400,
+   "atk": 66,
+   "def": 48,
+   "exp": 1228,
+   "gold": [
+    40,
+    81
+   ],
+   "speed": 2.2,
+   "radius": 0.85,
+   "height": 2.8,
+   "weight": 3,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "돌주먹",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.8,
+      "width": 120
+     },
+     "dmg": 1.4,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.6
+    },
+    {
+     "name": "붉은 지면 강타",
+     "windup": 1.2,
+     "active": 0.3,
+     "recover": 1.3,
+     "range": 3.5,
+     "shape": {
+      "type": "circle",
+      "range": 3.6,
+      "width": 0,
+      "offset": 0.5
+     },
+     "dmg": 1.9,
+     "kx": 7,
+     "stun": 34,
+     "cd": 6,
+     "heavy": true,
+     "kz": 9
+    }
+   ],
+   "model": {
+    "shape": "golem",
+    "color": "#8a8478",
+    "scale": 1
+   },
+   "hitMat": "stone"
+  },
+  {
+   "id": "guardian",
+   "name": "첫 번째 검의 수호자",
+   "lv": 30,
+   "hp": 36000,
+   "atk": 92,
+   "def": 50,
+   "exp": 1632,
+   "gold": [
+    46,
+    93
+   ],
+   "speed": 3.0,
+   "radius": 0.9,
+   "height": 3.2,
+   "weight": 5,
+   "aggro": 13,
+   "leash": 26,
+   "respawn": 900,
+   "attacks": [
+    {
+     "name": "수호의 일격",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 3.4,
+     "shape": {
+      "type": "arc",
+      "range": 3.6,
+      "width": 120
+     },
+     "dmg": 1.5,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.2
+    },
+    {
+     "name": "검기 방출",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 11,
+      "width": 1.6
+     },
+     "dmg": 1.4,
+     "kx": 6,
+     "stun": 28,
+     "cd": 3.5,
+     "fx": "wave"
+    },
+    {
+     "name": "붉은 대회전",
+     "windup": 1.2,
+     "active": 0.45,
+     "recover": 1.3,
+     "range": 4.5,
+     "shape": {
+      "type": "circle",
+      "range": 4.8,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.0,
+     "kx": 11,
+     "stun": 36,
+     "cd": 7,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "붉은 돌진",
+     "windup": 1.0,
+     "active": 0.35,
+     "recover": 1.2,
+     "range": 9,
+     "shape": {
+      "type": "box",
+      "range": 9.5,
+      "width": 2.0
+     },
+     "dmg": 2.2,
+     "kx": 11,
+     "stun": 36,
+     "cd": 8,
+     "lunge": 18,
+     "heavy": true,
+     "kz": 10
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#d8c890",
+    "scale": 1.75,
+    "weapon": {
+     "kind": "sword",
+     "length": 2.2,
+     "width": 2.0,
+     "color": "#fff4c0"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true
   }
  ]
 }

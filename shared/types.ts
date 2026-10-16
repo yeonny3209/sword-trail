@@ -193,6 +193,8 @@ export interface MonsterAttackDef {
   /** 강한 공격(붉은 빛) */
   heavy?: boolean;
   cd: number;
+  /** 화면 연출(화살·검기) */
+  fx?: 'arrow' | 'wave';
 }
 
 export interface MonsterDef {

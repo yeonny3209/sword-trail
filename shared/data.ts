@@ -4,6 +4,9 @@ import monstersJson from '../data/monsters.json';
 import town from '../data/zones/town.json';
 import field1 from '../data/zones/field1.json';
 import arena from '../data/zones/arena.json';
+import field2 from '../data/zones/field2.json';
+import field3 from '../data/zones/field3.json';
+import field4 from '../data/zones/field4.json';
 import swordsman from '../data/kits/swordsman.json';
 import berserker from '../data/kits/berserker.json';
 import blademaster from '../data/kits/blademaster.json';
@@ -14,7 +17,7 @@ export const CLASSES = classesJson.list as ClassDef[];
 export const CLASS_BY_ID = Object.fromEntries(CLASSES.map((c) => [c.id, c])) as Record<ClassId, ClassDef>;
 
 export const ZONES: Record<string, ZoneDef> = Object.fromEntries(
-  ([town, field1, arena] as unknown as ZoneDef[]).map((z) => [z.id, z]),
+  ([town, field1, field2, field3, field4, arena] as unknown as ZoneDef[]).map((z) => [z.id, z]),
 );
 
 export const START_ZONE = 'town';

@@ -1,0 +1,481 @@
+{
+ "list": [
+  {
+   "id": "m1",
+   "name": "산기슭의 위협",
+   "giver": "elder",
+   "lv": 1,
+   "desc": "바람 언덕에 슬라임이 넘쳐난다. 마을로 내려오기 전에 줄여 주게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "slime",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 150,
+    "gold": 100,
+    "items": [
+     [
+      "pot_hp_s",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m2",
+   "name": "들개 소탕",
+   "giver": "elder",
+   "lv": 2,
+   "req": "m1",
+   "desc": "들개 떼가 여행자를 덮친다는군.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "wolf",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 400,
+    "gold": 150,
+    "items": [
+     [
+      "enh_stone",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m3",
+   "name": "녹슨 병사들",
+   "giver": "elder",
+   "lv": 4,
+   "req": "m2",
+   "desc": "언덕 동쪽에 옛 전쟁의 병사들이 다시 일어났다.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "recruit",
+     "n": 6
+    }
+   ],
+   "reward": {
+    "exp": 900,
+    "gold": 250,
+    "items": [
+     [
+      "enh_stone",
+      2
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m4",
+   "name": "버려진 성채로",
+   "giver": "elder",
+   "lv": 5,
+   "req": "m3",
+   "desc": "바람 언덕 동쪽 너머의 성채를 살펴보고 오게.",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "field2",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 700,
+    "gold": 200
+   }
+  },
+  {
+   "id": "m5",
+   "name": "창과 화살",
+   "giver": "elder",
+   "lv": 6,
+   "req": "m4",
+   "desc": "성채를 지키던 창병과 궁수들이 아직 싸우고 있다.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "spearman",
+     "n": 8
+    },
+    {
+     "type": "kill",
+     "target": "archer",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 3500,
+    "gold": 600,
+    "items": [
+     [
+      "pot_hp_m",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m6",
+   "name": "성채의 대장",
+   "giver": "elder",
+   "lv": 9,
+   "req": "m5",
+   "desc": "성채 안쪽에 정예 수련병 대장이 있다. 동료와 함께 가게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "recruit_chief",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 8000,
+    "gold": 1500,
+    "equip": {
+     "lv": 10,
+     "rar": 2
+    }
+   }
+  },
+  {
+   "id": "m7",
+   "name": "검의 숲",
+   "giver": "elder",
+   "lv": 12,
+   "req": "m6",
+   "desc": "성채 북쪽, 검이 나무처럼 꽂힌 숲이 있다.",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "field3",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 3000,
+    "gold": 500
+   }
+  },
+  {
+   "id": "m8",
+   "name": "숲의 도적들",
+   "giver": "elder",
+   "lv": 13,
+   "req": "m7",
+   "desc": "숲길을 막은 도적과 방패병을 몰아내게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "bandit",
+     "n": 10
+    },
+    {
+     "type": "kill",
+     "target": "shieldman",
+     "n": 6
+    }
+   ],
+   "reward": {
+    "exp": 16000,
+    "gold": 2000,
+    "items": [
+     [
+      "enh_stone",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m9",
+   "name": "망령의 울음",
+   "giver": "elder",
+   "lv": 16,
+   "req": "m8",
+   "desc": "밤마다 숲에서 망령 검사의 울음이 들린다.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "wraith",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "exp": 24000,
+    "gold": 2500,
+    "items": [
+     [
+      "pot_hp_m",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m10",
+   "name": "문지기",
+   "giver": "elder",
+   "lv": 18,
+   "req": "m9",
+   "desc": "숲 끝에서 정상으로 가는 길을 문지기 기사가 막고 있다.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "gatekeeper",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 60000,
+    "gold": 8000,
+    "equip": {
+     "lv": 20,
+     "rar": 3
+    }
+   }
+  },
+  {
+   "id": "m11",
+   "name": "정상 사원",
+   "giver": "elder",
+   "lv": 20,
+   "req": "m10",
+   "desc": "드디어 정상 사원이다. 조심해서 둘러보게.",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "field4",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 20000,
+    "gold": 3000
+   }
+  },
+  {
+   "id": "m12",
+   "name": "사원의 파수꾼",
+   "giver": "elder",
+   "lv": 22,
+   "req": "m11",
+   "desc": "거한과 골렘이 사원을 지키고 있다.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "brute",
+     "n": 10
+    },
+    {
+     "type": "kill",
+     "target": "golem",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 90000,
+    "gold": 10000,
+    "items": [
+     [
+      "enh_stone",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m13",
+   "name": "첫 번째 검",
+   "giver": "elder",
+   "lv": 28,
+   "req": "m12",
+   "desc": "산 정상의 첫 번째 검. 그 수호자를 넘어서게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "guardian",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 250000,
+    "gold": 30000,
+    "equip": {
+     "lv": 30,
+     "rar": 4
+    }
+   }
+  },
+  {
+   "id": "s1",
+   "name": "약초 채집",
+   "giver": "captain",
+   "lv": 1,
+   "desc": "바람 언덕의 약초를 캐 오게. 스페이스나 클릭으로 채집한다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "herb_1",
+     "n": 5
+    }
+   ],
+   "reward": {
+    "exp": 200,
+    "gold": 80,
+    "items": [
+     [
+      "pot_hp_s",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s2",
+   "name": "광석 캐기",
+   "giver": "captain",
+   "lv": 2,
+   "desc": "철광석을 캐 오면 강화석으로 바꿔 주지.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "ore_1",
+     "n": 5
+    }
+   ],
+   "reward": {
+    "exp": 300,
+    "items": [
+     [
+      "enh_stone",
+      2
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s3",
+   "name": "젤리 모으기",
+   "giver": "captain",
+   "lv": 1,
+   "desc": "슬라임 젤리는 물약 재료로 그만이다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_jelly",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "exp": 300,
+    "gold": 150
+   }
+  },
+  {
+   "id": "s4",
+   "name": "가죽 수집",
+   "giver": "captain",
+   "lv": 3,
+   "desc": "들개 가죽으로 경비대 장비를 만들려 한다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_pelt",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 700,
+    "gold": 200,
+    "equip": {
+     "lv": 5,
+     "rar": 1
+    }
+   }
+  },
+  {
+   "id": "s5",
+   "name": "창날 회수",
+   "giver": "captain",
+   "lv": 7,
+   "req": "s4",
+   "desc": "성채의 부러진 창날을 모아 오게.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_spear",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "exp": 3000,
+    "gold": 600,
+    "items": [
+     [
+      "enh_stone",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s6",
+   "name": "은빛 광맥",
+   "giver": "captain",
+   "lv": 12,
+   "req": "s5",
+   "desc": "검의 숲에서 은광석이 난다고 하네.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "ore_2",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 9000,
+    "gold": 1200,
+    "items": [
+     [
+      "enh_stone",
+      4
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s7",
+   "name": "망령의 정수",
+   "giver": "captain",
+   "lv": 17,
+   "req": "s6",
+   "desc": "망령의 정수는 강한 물약의 재료다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_ecto",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "exp": 20000,
+    "gold": 2000,
+    "items": [
+     [
+      "pot_hp_m",
+      10
+     ]
+    ]
+   }
+  }
+ ]
+}

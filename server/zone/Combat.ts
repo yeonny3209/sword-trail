@@ -13,6 +13,8 @@ export interface CombatHost {
   zone: ZoneDef;
   monsters: Map<number, Monster>;
   broadcast(msg: S2C, except?: PlayerSession): void;
+  /** 처치 알림(퀘스트 진행) */
+  onKill(p: PlayerSession, monsterId: string): void;
 }
 
 const SLACK_RANGE = 3;
@@ -99,6 +101,7 @@ export class Combat {
     killer.send({ t: 'reward', exp, gold, name: mon.def.name });
     this.gainExp(killer, exp);
     rollLoot(killer, mon.def);
+    this.host.onKill(killer, mon.def.id);
   }
 
   gainExp(p: PlayerSession, exp: number): void {
@@ -140,6 +143,7 @@ export class Combat {
   }
 
   damagePlayer(p: PlayerSession, n: number, by: number): void {
+    p.gathering = null;
     p.data.hp = Math.max(0, p.data.hp - n);
     p.lastHurtAt = Date.now();
     p.dirty = true;

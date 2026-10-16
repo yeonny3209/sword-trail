@@ -54,11 +54,11 @@ function takeItem(p: PlayerSession, uid: string, n = 1): Item | null {
   return { ...s, n };
 }
 
-function countItem(p: PlayerSession, id: string): number {
+export function countItem(p: PlayerSession, id: string): number {
   return p.data.inv.filter((s) => s.id === id).reduce((a, s) => a + s.n, 0);
 }
 
-function removeById(p: PlayerSession, id: string, n: number): void {
+export function removeById(p: PlayerSession, id: string, n: number): void {
   for (const s of [...p.data.inv]) {
     if (s.id !== id || n <= 0) continue;
     const k = Math.min(n, s.n);

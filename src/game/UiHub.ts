@@ -7,6 +7,8 @@ import type { Input } from '../input/Input';
 import { CharacterWindow, SkillWindow, Window } from '../ui/CharWindows';
 import { InventoryWindow } from '../ui/InventoryWindow';
 import { ShopWindow, SmithWindow } from '../ui/NpcWindows';
+import { QuestUi } from '../ui/QuestUi';
+import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
 import type { NpcView } from './ZoneScene';
 
@@ -22,6 +24,7 @@ export class UiHub {
   readonly invWin: InventoryWindow;
   readonly shopWin: ShopWindow;
   readonly smithWin: SmithWindow;
+  readonly quests: QuestUi;
   /** NPC를 만났을 때 처리할 역할(이후 단계: 퀘스트·경매장·길드·우편 등) */
   readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
   private readonly ray = new THREE.Raycaster();
@@ -36,6 +39,9 @@ export class UiHub {
     this.smithWin = new SmithWindow(ui, send, this.invWin);
     this.npcHandlers.shop = (n) => this.shopWin.openShop(n.id, n.ref ?? 'general');
     this.npcHandlers.smith = () => this.smithWin.openSmith();
+    this.quests = new QuestUi(ui, send);
+    this.quests.count = (id) => this.invWin.count(id);
+    this.npcHandlers.quest = (n) => this.quests.openGiver(n.id, n.name);
     this.potBar = document.createElement('div');
     this.potBar.className = 'potbar';
     ui.appendChild(this.potBar);
@@ -49,11 +55,21 @@ export class UiHub {
     this.me = me;
     this.charWin.me = me.self;
     this.skillWin.me = me.self;
+    this.quests.lv = me.self.lv;
   }
 
   private onNet(m: S2C): void {
     switch (m.t) {
+      case 'quests':
+        this.quests.set(m.q);
+        break;
+      case 'qdone':
+        this.say(`<b>퀘스트 완료: ${QUESTS[m.id]?.name ?? m.id}</b>`);
+        bus.emit('sfx', { key: 'gate' });
+        break;
       case 'me':
+        if (this.me && m.s.lv) this.quests.lv = m.s.lv;
+        this.quests.refresh();
         this.charWin.draw();
         this.skillWin.draw();
         if (m.s.gold !== undefined) {
@@ -66,6 +82,7 @@ export class UiHub {
         this.invWin.set(m.inv, m.equip, m.gold);
         this.smithWin.draw();
         this.drawPots();
+        this.quests.refresh();
         break;
       case 'loot':
         for (const it of m.items) {
@@ -97,6 +114,7 @@ export class UiHub {
     if (input.pressed.has('character')) this.charWin.toggle();
     if (input.pressed.has('skills')) this.skillWin.toggle();
     if (input.pressed.has('inventory')) this.invWin.toggle();
+    if (input.pressed.has('quests')) this.quests.win.toggle();
     if (input.pressed.has('pot1')) this.send({ t: 'pot', k: 1 });
     if (input.pressed.has('pot2')) this.send({ t: 'pot', k: 2 });
     const me = this.me;
