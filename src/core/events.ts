@@ -67,6 +67,8 @@ export interface GameEvents {
   transition: { seconds: number };
   /** 게임 논리 일시정지(메뉴, 포인터 잠금 해제) */
   pause: { paused: boolean; reason: string };
+  bossSpawned: { fighter: Fighter };
+  bossPhase: { fighter: Fighter; phase: number };
   /** 투사체 발사(궁수 등) */
   fireProjectile: {
     owner: Fighter; attack: AttackData; spec: ProjectileSpec;

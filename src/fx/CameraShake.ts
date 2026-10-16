@@ -25,6 +25,7 @@ export class CameraShake {
       else if (e.target.team === 'player') this.add(d.playerHit);
     });
     bus.on('parrySuccess', () => this.add(d.parry));
+    bus.on('bossPhase', () => this.add(d.finisher));
     bus.on('postureBreak', (e) => e.guardBreak && this.add(d.guardBreak));
   }
 

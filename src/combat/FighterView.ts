@@ -20,7 +20,7 @@ export class FighterView {
   readonly bodyMat: THREE.MeshStandardMaterial;
   readonly sword: THREE.Mesh;
   readonly swordMat: THREE.MeshStandardMaterial;
-  private readonly baseColor: THREE.Color;
+  private baseColor: THREE.Color;
   private tintColor = new THREE.Color();
   private tintTime = 0;
   private tintDuration = 0;
@@ -58,6 +58,11 @@ export class FighterView {
     this.sword = new THREE.Mesh(new THREE.BoxGeometry(0.035 * w, 1, 0.09 * w), this.swordMat);
     this.sword.castShadow = true;
     scene.add(this.root, this.sword);
+  }
+
+  /** 기본 몸 색 변경(보스 페이즈 등) */
+  setColor(color: string): void {
+    this.baseColor.set(color);
   }
 
   /** 잠깐 색을 바꾼다(피격 표시 등) */

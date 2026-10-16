@@ -46,3 +46,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-f
 .fade { position: absolute; inset: 0; background: #000; opacity: 0; }
 .help-panel { position: absolute; right: 14px; bottom: 14px; background: rgba(0,0,0,.6); padding: 10px 14px; border-radius: 4px; }
 .help-panel .controls { margin: 0; font-size: 12px; } .help-panel .rules { margin: 6px 0 0; font-size: 12px; }
+.boss-bar { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); width: min(640px, 70vw); }
+.boss-bar .name { font-size: 16px; letter-spacing: 3px; color: #f0e2c0; text-shadow: 0 0 4px #000; margin-bottom: 4px; }
+.boss-bar .hp { height: 12px; background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.25); position: relative; }
+.boss-bar .hp .fill, .boss-bar .hp .lag { position: absolute; left: 0; top: 0; bottom: 0; }
+.boss-bar .hp .fill { background: #b8302a; } .boss-bar .hp .lag { background: #f0d080; }
+.boss-bar .po { height: 5px; margin-top: 3px; display: flex; justify-content: center; background: rgba(0,0,0,.45); }
+.boss-bar .po div { height: 100%; background: #f2b33d; }
+.boss-bar.broken .po div { background: #ff40ff; animation: pulse .25s infinite alternate; }

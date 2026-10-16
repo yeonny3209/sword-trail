@@ -122,7 +122,7 @@ export class MeleeBrain implements Brain {
     }
   }
 
-  private choose(e: Enemy, dist: number): EnemyAttack | null {
+  protected choose(e: Enemy, dist: number): EnemyAttack | null {
     const opts = e.data.attacks.filter(
       (a) => !a.minRange || dist >= a.minRange,
     ).filter((a) => !a.phase || a.phase <= e.phase);

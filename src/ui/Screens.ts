@@ -66,6 +66,7 @@ export class Screens {
     });
     bus.on('waveStarted', (e) => e.total > 1 && this.showToast(`웨이브 ${e.index} / ${e.total}`));
     bus.on('gateOpened', () => this.showToast('출구가 열렸다'));
+    bus.on('bossPhase', (e) => this.showBanner(`${e.fighter.name}가 검을 고쳐 잡는다`, '연속 공격과 붉은 빛 회전베기에 주의'));
     bus.on('transition', ({ seconds }) => {
       this.fade.style.transition = `opacity ${seconds / 2}s`;
       this.fade.style.opacity = '1';

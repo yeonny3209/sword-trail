@@ -15,6 +15,7 @@ import { Hud } from '../ui/Hud';
 import { EnemyBars } from '../ui/EnemyBars';
 import { ThreatIndicator } from '../ui/ThreatIndicator';
 import { Screens } from '../ui/Screens';
+import { BossBar } from '../ui/BossBar';
 import { CombatSystem } from '../combat/CombatSystem';
 import { EnemyManager } from '../enemies/EnemyManager';
 import { FxSystem } from '../fx/FxSystem';
@@ -47,6 +48,7 @@ export class Game {
   private enemyBars!: EnemyBars;
   private threats!: ThreatIndicator;
   private screens!: Screens;
+  private bossBar!: BossBar;
   private fx!: FxSystem;
   audio!: Audio;
   /** 히트스톱 남은 프레임 */
@@ -89,6 +91,7 @@ export class Game {
     this.enemies = new EnemyManager(this.scene, this.physics);
     this.run = new RunManager(this.scene, this.physics);
     this.screens = new Screens(this.ui);
+    this.bossBar = new BossBar(this.ui);
     bus.on('hitstop', ({ frames }) => (this.freeze = Math.max(this.freeze, frames)));
     bus.on('pause', ({ paused, reason }) => this.setPaused(paused, reason));
     this.player = new Player(this.scene, this.physics);
@@ -158,6 +161,7 @@ export class Game {
     this.enemyBars.render(realDt);
     this.threats.render();
     this.screens.render(realDt);
+    this.bossBar.render(realDt);
     this.fps.update(realDt);
     this.renderer.render(this.scene, this.camera);
   };

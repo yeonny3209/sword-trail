@@ -10,7 +10,7 @@ import type { EnemyAttack, EnemyData } from './types';
 
 export type EnemyState =
   | 'idle' | 'approach' | 'circle' | 'engage' | 'attack' | 'recover'
-  | 'retreat' | 'hitstun' | 'parried' | 'broken' | 'dead';
+  | 'retreat' | 'hitstun' | 'parried' | 'broken' | 'phaseShift' | 'dead';
 
 /** 적 행동 결정(상태 기계). 일반 적은 MeleeBrain, 보스는 BossBrain */
 export interface Brain {
@@ -89,6 +89,8 @@ export class Enemy {
       bus.on('parrySuccess', (e) => {
         if (e.attacker !== me || !me.alive || me.isBroken()) return;
         if (Math.hypot(e.defender.pos.x - me.pos.x, e.defender.pos.z - me.pos.z) > 4) return;
+        // 강인한 적(보스)의 연속기는 마지막 타를 패링해야 끊긴다
+        if (me.superArmor && (e.attack as EnemyAttack).next) return;
         this.interrupt();
         this.knockFrom(e.defender.pos, 0.6);
         this.stunFrames = this.data.parriedFrames;

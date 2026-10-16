@@ -17,15 +17,13 @@ export class EnemyBars {
   private time = 0;
   private readonly tmp = new THREE.Vector3();
   private readonly marker: HTMLDivElement;
-  /** 화면 아래 큰 바로 따로 그리는 대상(보스) */
-  private readonly skip = new Set<string>();
 
   constructor(ui: HTMLElement, private readonly camera: THREE.Camera) {
     this.marker = document.createElement('div');
     this.marker.className = 'lock-marker';
     ui.appendChild(this.marker);
     bus.on('fighterSpawned', ({ fighter }) => {
-      if (fighter.team !== 'enemy' || this.skip.has(fighter.kind)) return;
+      if (fighter.team !== 'enemy') return;
       const el = document.createElement('div');
       el.className = 'enemy-bar';
       el.innerHTML = '<div class="name"></div><div class="hp"><div></div></div><div class="po"><div></div></div>';
@@ -49,10 +47,11 @@ export class EnemyBars {
     bus.on('hit', (e) => show(e.target));
     bus.on('parrySuccess', (e) => show(e.attacker));
     bus.on('lockChanged', ({ target }) => (this.lock = target));
-  }
-
-  skipKind(kind: string): void {
-    this.skip.add(kind);
+    // 보스는 화면 아래 큰 바(BossBar)로 표시
+    bus.on('bossSpawned', ({ fighter }) => {
+      this.bars.get(fighter.id)?.el.remove();
+      this.bars.delete(fighter.id);
+    });
   }
 
   render(realDt: number): void {

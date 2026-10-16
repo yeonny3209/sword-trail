@@ -6,6 +6,7 @@ import type { Fighter } from '../combat/Fighter';
 import { Dummy } from './Dummy';
 import { Enemy, type Brain } from './Enemy';
 import { MeleeBrain } from './MeleeBrain';
+import { BossBrain } from './BossBrain';
 import { TokenManager } from './TokenManager';
 import type { EnemyData } from './types';
 
@@ -19,6 +20,7 @@ export class EnemyManager {
 
   constructor(private readonly scene: THREE.Scene, private readonly physics: Physics) {
     this.registerBrain('melee', () => new MeleeBrain());
+    this.registerBrain('boss', () => new BossBrain());
     bus.on('fighterSpawned', ({ fighter }) => {
       if (fighter.team === 'player') this.player = fighter;
     });
@@ -39,6 +41,7 @@ export class EnemyManager {
     const make = this.brains.get(data.brain ?? 'melee') ?? this.brains.get('melee')!;
     const e = new Enemy(this.scene, this.physics, type, data, x, z, yaw, this.tokens, make());
     this.enemies.push(e);
+    if (data.boss) bus.emit('bossSpawned', { fighter: e.fighter });
   }
 
   update(dt: number): void {
