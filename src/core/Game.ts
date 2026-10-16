@@ -65,7 +65,7 @@ export class Game {
     this.arena = new Arena(this.scene, this.physics);
     this.input = new Input(this.renderer.domElement);
     this.renderer.domElement.addEventListener('click', () => this.input.requestLock());
-    this.combat = new CombatSystem();
+    this.combat = new CombatSystem(this.scene, this.physics);
     this.debug = new Debug(this.scene, this.camera, this.ui);
     this.hud = new Hud(this.ui);
     this.enemyBars = new EnemyBars(this.ui, this.camera);
@@ -115,6 +115,7 @@ export class Game {
     this.player.render(alpha, realDt);
     for (const d of this.dummies) d.render(alpha, realDt);
     this.enemies.render(alpha, realDt);
+    this.combat.projectiles.render(alpha);
 
     const t = this.lockOn.target;
     if (t) {

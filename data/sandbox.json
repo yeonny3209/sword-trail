@@ -1,7 +1,7 @@
 {
   "enemies": [
     { "type": "recruit", "x": -4, "z": 12 },
-    { "type": "recruit", "x": 0, "z": 14 },
-    { "type": "recruit", "x": 4, "z": 12 }
+    { "type": "spearman", "x": 0, "z": 14 },
+    { "type": "archer", "x": 5, "z": 16 }
   ]
 }

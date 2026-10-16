@@ -88,6 +88,7 @@ export class Enemy {
       }),
       bus.on('parrySuccess', (e) => {
         if (e.attacker !== me || !me.alive || me.isBroken()) return;
+        if (Math.hypot(e.defender.pos.x - me.pos.x, e.defender.pos.z - me.pos.z) > 4) return;
         this.interrupt();
         this.knockFrom(e.defender.pos, 0.6);
         this.stunFrames = this.data.parriedFrames;

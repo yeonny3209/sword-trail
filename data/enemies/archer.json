@@ -1,0 +1,40 @@
+{
+  "name": "궁수",
+  "shape": "capsule",
+  "radius": 0.38,
+  "height": 1.75,
+  "color": "#6b5a7a",
+  "hitColor": "#ffffff",
+  "swordColor": "#7a5a3a",
+  "swordWidth": 0.6,
+  "hp": 55,
+  "posture": 45,
+  "postureRegenDelay": 2.0,
+  "postureRegen": 12,
+  "sword": { "length": 0.7, "shoulderHeight": 1.25, "rest": [-30, -40], "guard": [60, 10] },
+  "moveSpeed": 3.4,
+  "circleSpeed": 1.8,
+  "turnSpeed": 6,
+  "trackTurnSpeed": 4,
+  "aggroRange": 22,
+  "keepDistance": [7, 11],
+  "retreatDistance": 5,
+  "attackCooldown": [1.4, 2.6],
+  "engageTimeout": 2.0,
+  "recoverFrames": 30,
+  "hitstunFrames": 20,
+  "parriedFrames": 45,
+  "knockback": 0.7,
+  "deathSinkSeconds": 1.5,
+  "attacks": [
+    {
+      "id": "archer_volley", "weight": 1, "range": 15, "minRange": 3,
+      "startup": 32, "active": 24, "recovery": 26, "cancelFrame": 82,
+      "damage": 8, "posture": 10, "advance": 0, "hitstop": 2, "knockback": 0.4,
+      "glow": "white", "melee": false, "sfx": "telegraph", "hitSfx": "slash",
+      "arc": { "from": [0, 5], "to": [0, 5] },
+      "projectile": { "speed": 17, "radius": 0.12, "length": 0.8, "life": 1.6, "count": 3, "interval": 10, "color": "#e0c890", "height": 1.25 }
+    }
+  ],
+  "shards": [3, 5]
+}

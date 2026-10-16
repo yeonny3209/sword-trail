@@ -34,6 +34,8 @@ export interface AttackData {
   /** 강인함: 맞아도 경직되지 않음 */
   superArmor?: boolean;
   blockStamina?: number;
+  /** false면 검 판정 없음(투사체만) */
+  melee?: boolean;
 }
 
 export interface Segment {

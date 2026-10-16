@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { bus } from '../core/bus';
 import { getData } from '../core/config';
+import type { Physics } from '../core/Physics';
 import type { Fighter } from './Fighter';
+import { Projectiles } from './Projectiles';
 import { sweepCapsule } from './sweep';
 import type { HitSource } from './types';
 
@@ -28,8 +30,10 @@ export class CombatSystem {
   readonly fighters: Fighter[] = [];
   private frame = 0;
   private readonly point = new THREE.Vector3();
+  readonly projectiles: Projectiles;
 
-  constructor() {
+  constructor(scene: THREE.Scene, physics: Physics) {
+    this.projectiles = new Projectiles(scene, physics);
     bus.on('fighterSpawned', ({ fighter }) => this.fighters.push(fighter));
     bus.on('fighterRemoved', ({ fighter }) => {
       const i = this.fighters.indexOf(fighter);
@@ -41,8 +45,13 @@ export class CombatSystem {
     this.frame = frame;
     for (const f of this.fighters) this.updatePosture(f, dt);
 
+    this.projectiles.update(dt);
     const sources: HitSource[] = [];
-    for (const f of this.fighters) if (f.alive && f.attack?.isActive()) sources.push(f.attack);
+    for (const f of this.fighters) {
+      // melee=false 공격(활 쏘기)은 검 판정이 없다
+      if (f.alive && f.attack?.isActive() && f.attack.data.melee !== false) sources.push(f.attack);
+    }
+    for (const p of this.projectiles.list) if (p.isActive()) sources.push(p);
 
     for (const src of sources) {
       for (const target of this.fighters) {
@@ -55,6 +64,7 @@ export class CombatSystem {
         }
       }
     }
+    this.projectiles.sweep();
   }
 
   /** 무적 → 회피, 막기 시작 직후 → 패링, 막기 중 → 막기, 그 외 → 피격 */
