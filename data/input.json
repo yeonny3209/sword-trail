@@ -1,0 +1,20 @@
+{
+  "bindings": {
+    "moveForward": ["KeyW"],
+    "moveBack": ["KeyS"],
+    "moveLeft": ["KeyA"],
+    "moveRight": ["KeyD"],
+    "attack": ["Mouse0"],
+    "block": ["Mouse2"],
+    "dodge": ["Space"],
+    "lockOn": ["Mouse1", "Tab"],
+    "heal": ["KeyE"],
+    "skill": ["KeyQ"],
+    "interact": ["KeyF"],
+    "debug": ["F1", "Backquote"]
+  },
+  "attackTapMs": 200,
+  "heavyChargeMs": 400,
+  "bufferMs": 150,
+  "mouseSensitivity": 0.0022
+}

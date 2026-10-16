@@ -4,7 +4,9 @@ import { GameLoop } from './GameLoop';
 import { Physics } from './Physics';
 import { bus } from './bus';
 import { Arena } from '../world/Arena';
-import { PlayerVisual } from '../player/PlayerVisual';
+import { Input } from '../input/Input';
+import { Player } from '../player/Player';
+import { CameraRig } from '../player/CameraRig';
 import { FpsCounter } from '../ui/FpsCounter';
 
 interface CameraData { fov: number; near: number; far: number }
@@ -17,6 +19,11 @@ export class Game {
   readonly physics = new Physics();
   private loop!: GameLoop;
   private fps!: FpsCounter;
+  private input!: Input;
+  private player!: Player;
+  private rig!: CameraRig;
+  private arena!: Arena;
+  private renderPos = new THREE.Vector3();
 
   constructor(private readonly mount: HTMLElement, private readonly ui: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -32,22 +39,30 @@ export class Game {
 
   async start(): Promise<void> {
     await this.physics.init();
-    new Arena(this.scene, this.physics);
-    const player = new PlayerVisual(0.4, 1.8, '#e8b04a');
-    this.scene.add(player.root);
-    this.camera.position.set(0, 4, -7);
-    this.camera.lookAt(0, 1, 0);
+    this.arena = new Arena(this.scene, this.physics);
+    this.input = new Input(this.renderer.domElement);
+    this.renderer.domElement.addEventListener('click', () => this.input.requestLock());
+    this.player = new Player(this.scene, this.physics);
+    this.rig = new CameraRig(this.camera, this.physics);
     this.fps = new FpsCounter(this.ui);
     this.loop = new GameLoop(60, this.update, this.render);
     this.loop.start();
   }
 
   private update = (dt: number, frame: number): void => {
+    this.input.beginTick();
+    this.player.update(dt, this.input, this.rig.yaw);
     bus.emit('tick', { frame, dt });
     this.physics.step(dt);
   };
 
-  private render = (_alpha: number, realDt: number): void => {
+  private render = (alpha: number, realDt: number): void => {
+    const m = this.input.consumeMouse();
+    this.rig.rotate(m.dx, m.dy);
+    this.player.render(alpha);
+    this.renderPos.copy(this.player.visual.root.position);
+    this.rig.update(this.renderPos, realDt);
+    this.arena.follow(this.renderPos.x, this.renderPos.z);
     this.fps.update(realDt);
     this.renderer.render(this.scene, this.camera);
   };

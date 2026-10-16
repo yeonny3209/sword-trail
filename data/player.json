@@ -1,0 +1,25 @@
+{
+  "radius": 0.4,
+  "height": 1.8,
+  "color": "#e8b04a",
+  "moveSpeed": 5.2,
+  "lockMoveSpeed": 4.2,
+  "acceleration": 40,
+  "deceleration": 30,
+  "turnSpeed": 14,
+  "spawn": [0, 0],
+  "camera": {
+    "distance": 5.5,
+    "pivotHeight": 1.7,
+    "defaultPitch": 0.32,
+    "pitchMin": -0.3,
+    "pitchMax": 1.1,
+    "followSharpness": 14,
+    "lockPitch": 0.3,
+    "lockYawSharpness": 7,
+    "lockMaxRange": 18,
+    "lockSwitchFlick": 0.12,
+    "collisionPadding": 0.25,
+    "minDistance": 1.2
+  }
+}
