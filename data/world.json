@@ -1,0 +1,8 @@
+{
+  "background": "#1c2028",
+  "fog": { "near": 30, "far": 70 },
+  "floor": { "size": 60, "color": "#7a7a7a" },
+  "ambient": { "color": "#9aa6c0", "intensity": 0.55 },
+  "sun": { "color": "#fff1dc", "intensity": 2.2, "position": [12, 22, 8], "shadowMapSize": 1024, "shadowExtent": 20 },
+  "camera": { "fov": 60, "near": 0.1, "far": 200 }
+}

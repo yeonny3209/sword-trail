@@ -1,0 +1,5 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif; color: #eee; }
+#app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#ui { position: fixed; inset: 0; pointer-events: none; user-select: none; }
+.fps { position: absolute; top: 8px; right: 10px; font: 12px/1 monospace; color: #9f9; background: rgba(0,0,0,.45); padding: 4px 6px; border-radius: 3px; }
