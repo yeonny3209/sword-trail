@@ -95,6 +95,8 @@ export interface GameEvents {
   selectSword: { id: string };
   saveChanged: { save: SaveData };
   settingsChanged: { settings: Settings };
+  /** 기술이 건 임시 강화 */
+  skillBuff: { fighter: Fighter; seconds: number; parryWindowBonusMs: number; attackSpeed: number };
   bossSpawned: { fighter: Fighter };
   bossPhase: { fighter: Fighter; phase: number };
   /** 투사체 발사(궁수 등) */

@@ -41,6 +41,9 @@
     "heavyModifier": [
       "ShiftLeft",
       "ShiftRight"
+    ],
+    "skill2": [
+      "KeyR"
     ]
   },
   "bufferMs": 150,

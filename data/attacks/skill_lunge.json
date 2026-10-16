@@ -1,0 +1,37 @@
+{
+  "name": "월광 찌르기",
+  "spirit": 50,
+  "attack": {
+    "startup": 7,
+    "active": 7,
+    "recovery": 20,
+    "cancelFrame": 24,
+    "damage": 28,
+    "posture": 34,
+    "advance": 5.5,
+    "hitstop": 6,
+    "stamina": 0,
+    "knockback": 1.0,
+    "sfx": "swingHeavy",
+    "hitSfx": "slashHeavy",
+    "hitRadius": 0.16,
+    "id": "skill_lunge",
+    "name": "월광 찌르기",
+    "moveCancelFrame": 30,
+    "shake": 0.2,
+    "iframes": [
+      0,
+      12
+    ],
+    "arc": {
+      "from": [
+        0,
+        -2
+      ],
+      "to": [
+        0,
+        -8
+      ]
+    }
+  }
+}

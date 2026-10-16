@@ -1,0 +1,35 @@
+{
+  "name": "광풍 가르기",
+  "spirit": 70,
+  "attack": {
+    "startup": 18,
+    "active": 8,
+    "recovery": 28,
+    "cancelFrame": 38,
+    "damage": 36,
+    "posture": 45,
+    "advance": 0.6,
+    "hitstop": 8,
+    "stamina": 0,
+    "knockback": 1.0,
+    "sfx": "swingHeavy",
+    "hitSfx": "slashHeavy",
+    "hitRadius": 0.26,
+    "id": "skill_sweep",
+    "name": "광풍 가르기",
+    "moveCancelFrame": 44,
+    "shake": 0.35,
+    "heavy": true,
+    "superArmor": true,
+    "arc": {
+      "from": [
+        -110,
+        5
+      ],
+      "to": [
+        115,
+        -8
+      ]
+    }
+  }
+}

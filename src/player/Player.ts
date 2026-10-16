@@ -44,6 +44,7 @@ export interface SwordDef {
   light: string;
   heavy: string;
   skill: string;
+  skill2?: string;
   length: number;
   width: number;
   color: string;
@@ -60,6 +61,8 @@ export class Player {
   heavy!: AttackData;
   skill!: AttackData;
   skillCost = 50;
+  skill2: AttackData | null = null;
+  skill2Cost = 70;
   readonly fighter: Fighter;
   readonly view: FighterView;
   readonly body: CharacterBody;
@@ -112,6 +115,11 @@ export class Player {
     const skill = getData<{ attack: AttackData; spirit: number }>(sw.skill);
     this.skill = skill.attack;
     this.skillCost = skill.spirit;
+    if (sw.skill2) {
+      const s2 = getData<{ attack: AttackData; spirit: number }>(sw.skill2);
+      this.skill2 = s2.attack;
+      this.skill2Cost = s2.spirit;
+    } else this.skill2 = null;
     this.fighter.sword.length = sw.length;
     this.view.sword.scale.x = this.view.sword.scale.z = sw.width;
     this.view.swordMat.color.set(sw.color);

@@ -1,0 +1,38 @@
+{
+  "name": "명경지수",
+  "spirit": 60,
+  "attack": {
+    "startup": 10,
+    "active": 1,
+    "recovery": 14,
+    "cancelFrame": 16,
+    "damage": 0,
+    "posture": 0,
+    "advance": 0,
+    "hitstop": 0,
+    "stamina": 0,
+    "knockback": 1.0,
+    "sfx": "heal",
+    "hitSfx": "slashHeavy",
+    "hitRadius": 0.2,
+    "id": "skill_focus",
+    "name": "명경지수",
+    "moveCancelFrame": 18,
+    "melee": false,
+    "buff": {
+      "seconds": 5,
+      "parryWindowBonusMs": 200,
+      "attackSpeed": 0.25
+    },
+    "arc": {
+      "from": [
+        0,
+        30
+      ],
+      "to": [
+        0,
+        30
+      ]
+    }
+  }
+}

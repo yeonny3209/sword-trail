@@ -7,7 +7,7 @@ const CONTROLS = `
     <div><b>WASD</b> 이동</div><div><b>마우스</b> 시점</div>
     <div><b>왼쪽 클릭</b> 약공격 (3타)</div><div><b>Shift+클릭</b> 강공격</div>
     <div><b>오른쪽 유지</b> 막기 · 누르는 순간 패링</div><div><b>스페이스</b> 구르기</div>
-    <div><b>휠 클릭 / Tab</b> 적 고정</div><div><b>Q</b> 검 기술 · <b>E</b> 회복약</div>
+    <div><b>휠 클릭 / Tab</b> 적 고정</div><div><b>Q · R</b> 검 기술 · <b>E</b> 회복약</div>
     <div><b>F</b> 상호작용</div><div><b>F1</b> 디버그 · <b>H</b> 조작법</div>
   </div>
   <div class="rules">흰 빛 = 패링 가능 · <span style="color:#ff5a4a">붉은 빛 = 회피만</span></div>`;

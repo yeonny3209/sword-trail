@@ -4,7 +4,7 @@ import { getData } from '../core/config';
 export type Action =
   | 'moveForward' | 'moveBack' | 'moveLeft' | 'moveRight'
   | 'attack' | 'heavy' | 'block' | 'dodge' | 'lockOn'
-  | 'heal' | 'skill' | 'interact' | 'debug' | 'heavyModifier';
+  | 'heal' | 'skill' | 'skill2' | 'interact' | 'debug' | 'heavyModifier';
 
 interface InputData {
   bindings: Record<string, string[]>;

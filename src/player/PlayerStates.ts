@@ -1,4 +1,5 @@
 import { bus } from '../core/bus';
+import type { AttackData } from '../combat/types';
 import { wrapAngle } from '../core/math';
 import type { Player } from './Player';
 
@@ -32,7 +33,12 @@ function tryActions(p: Player): boolean {
   }
   if (b.peek(['skill'], p.frame) && p.fighter.vitals.spirit >= p.skillCost) {
     b.consume(['skill'], p.frame);
-    startSkill(p);
+    startSkill(p, p.skill, p.skillCost);
+    return true;
+  }
+  if (p.skill2 && b.peek(['skill2'], p.frame) && p.fighter.vitals.spirit >= p.skill2Cost) {
+    b.consume(['skill2'], p.frame);
+    startSkill(p, p.skill2, p.skill2Cost);
     return true;
   }
   if (p.potions > 0 && b.consume(['heal'], p.frame)) {
@@ -71,12 +77,16 @@ function startHeavy(p: Player): void {
 }
 
 /** 검 고유 기술(Q): 기력을 쓴다 */
-function startSkill(p: Player): void {
+function startSkill(p: Player, data: AttackData, cost: number): void {
   p.combo = 0;
   p.interrupt();
-  p.fighter.vitals.spirit -= p.skillCost;
-  p.startAttack(p.skill);
+  p.fighter.vitals.spirit -= cost;
+  p.startAttack(data);
   p.setState('attack');
+  if (data.buff) {
+    const b = data.buff;
+    bus.emit('skillBuff', { fighter: p.fighter, seconds: b.seconds, parryWindowBonusMs: b.parryWindowBonusMs ?? 0, attackSpeed: b.attackSpeed ?? 0 });
+  }
 }
 
 /** 회복약(E): 사용 중 이동이 느려지고, 중간 프레임에 회복 */

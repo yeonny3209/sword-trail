@@ -1,14 +1,46 @@
 {
   "list": [
     {
-      "id": "trainee", "name": "수련생의 검", "desc": "균형형. 3타 콤보, Q: 짧은 돌진 베기(무적)",
-      "cost": 0, "light": "attacks/light", "heavy": "attacks/heavy", "skill": "attacks/skill_dash",
-      "length": 1.1, "width": 1.0, "color": "#d8dde6", "memory": "산기슭에 꽂혀 있던 평범한 검. 주인은 첫 번째 문을 넘지 못했다."
+      "id": "trainee",
+      "name": "수련생의 검",
+      "desc": "균형형. 3타 콤보 · Q 돌진 베기 · R 회전 베기",
+      "cost": 0,
+      "light": "attacks/light",
+      "heavy": "attacks/heavy",
+      "skill": "attacks/skill_dash",
+      "length": 1.1,
+      "width": 1.0,
+      "color": "#d8dde6",
+      "memory": "산기슭에 꽂혀 있던 평범한 검. 주인은 첫 번째 문을 넘지 못했다.",
+      "skill2": "attacks/skill_spin"
     },
     {
-      "id": "odachi", "name": "무거운 장도", "desc": "느리지만 강함. 2타, 자세 피해 큼. Q: 땅 내려찍기 충격파",
-      "cost": 60, "light": "attacks/odachi_light", "heavy": "attacks/odachi_heavy", "skill": "attacks/skill_slam",
-      "length": 1.55, "width": 1.5, "color": "#c9b89a", "memory": "거한의 손에 들려 있던 장도. 한 번 휘두를 때마다 땅이 울렸다."
+      "id": "odachi",
+      "name": "무거운 장도",
+      "desc": "느리지만 강함. 2타 · Q 땅 내려찍기 · R 광풍 가르기(강인함)",
+      "cost": 60,
+      "light": "attacks/odachi_light",
+      "heavy": "attacks/odachi_heavy",
+      "skill": "attacks/skill_slam",
+      "length": 1.55,
+      "width": 1.5,
+      "color": "#c9b89a",
+      "memory": "거한의 손에 들려 있던 장도. 한 번 휘두를 때마다 땅이 울렸다.",
+      "skill2": "attacks/skill_sweep"
+    },
+    {
+      "id": "moonblade",
+      "name": "달빛 세검",
+      "desc": "패링 특화. 빠른 3연 찌르기 · Q 월광 찌르기 · R 명경지수(5초간 패링 창 +200ms, 공격 속도↑)",
+      "cost": 80,
+      "light": "attacks/moon_light",
+      "heavy": "attacks/moon_heavy",
+      "skill": "attacks/skill_lunge",
+      "skill2": "attacks/skill_focus",
+      "length": 1.4,
+      "width": 0.6,
+      "color": "#bfe0ff",
+      "memory": "달빛 아래에서만 빛나던 가는 검. 주인은 한 번도 먼저 베지 않았다."
     }
   ]
 }

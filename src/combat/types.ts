@@ -53,6 +53,8 @@ export interface AttackData {
   blockStamina?: number;
   /** false면 검 판정 없음(투사체만) */
   melee?: boolean;
+  /** 사용 시 걸리는 임시 강화(기술 전용) */
+  buff?: { seconds: number; parryWindowBonusMs?: number; attackSpeed?: number };
   /** 판정 시작 시(또는 간격마다) 발사하는 투사체 */
   projectile?: ProjectileSpec;
 }

@@ -47,6 +47,9 @@ export class Engravings {
   private dodgeCrit = 0;
   private haste = 0;
   private rage = false;
+  private buffTime = 0;
+  private buffParry = 0;
+  private buffSpeed = 0;
   private parryTimes: number[] = [];
   private time = 0;
 
@@ -78,7 +81,7 @@ export class Engravings {
 
   private clear(): void {
     this.owned = [];
-    this.dodgeCrit = this.haste = 0;
+    this.dodgeCrit = this.haste = this.buffTime = 0;
     this.rage = false;
     this.parryTimes = [];
     this.recompute();
@@ -151,6 +154,10 @@ export class Engravings {
     if (dc && this.dodgeCrit > 0) m.nextHitMul += dc.mul ?? 0;
     const hs = this.has('parry_haste');
     if (hs && this.haste > 0) m.attackSpeed += hs.attackSpeed ?? 0;
+    if (this.buffTime > 0) {
+      m.parryWindowBonusMs += this.buffParry;
+      m.attackSpeed += this.buffSpeed;
+    }
 
     Object.assign(p.mods, m);
     const v = p.vitals;
@@ -167,6 +174,7 @@ export class Engravings {
       let dirty = false;
       if (this.dodgeCrit > 0 && (this.dodgeCrit -= dt) <= 0) dirty = true;
       if (this.haste > 0 && (this.haste -= dt) <= 0) dirty = true;
+      if (this.buffTime > 0 && (this.buffTime -= dt) <= 0) dirty = true;
       const rage = this.has('rage');
       const p = this.prog.player;
       if (rage && p) {
@@ -206,6 +214,13 @@ export class Engravings {
           bus.emit('sfx', { key: 'heal' });
         }
       }
+    });
+    bus.on('skillBuff', (e) => {
+      if (!isMe(e.fighter)) return;
+      this.buffTime = e.seconds;
+      this.buffParry = e.parryWindowBonusMs;
+      this.buffSpeed = e.attackSpeed;
+      this.recompute();
     });
     bus.on('dodgeStarted', (e) => {
       const dc = this.has('dodge_crit');

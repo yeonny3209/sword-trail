@@ -2,7 +2,7 @@ import { bus } from '../core/bus';
 import { getData } from '../core/config';
 import type { Fighter } from '../combat/Fighter';
 
-interface SwordRef { id: string; name: string; skill: string }
+interface SwordRef { id: string; name: string; skill: string; skill2?: string }
 
 /** 플레이어 체력·스태미나·기력·자세 바, 회복약·파편·각인 표시, 상호작용 안내 */
 export class Hud {
@@ -14,6 +14,8 @@ export class Hud {
   private spirit: HTMLDivElement;
   private posture: HTMLDivElement;
   private skill: HTMLDivElement;
+  private skill2: HTMLDivElement;
+  private skill2Cost = 70;
   private info: HTMLDivElement;
   private engr: HTMLDivElement;
   private hint: HTMLDivElement;
@@ -32,6 +34,7 @@ export class Hud {
       <div class="bar st"><div class="fill"></div></div>
       <div class="bar sp"><div class="fill"></div></div>
       <div class="skill">Q</div>
+      <div class="skill s2">R</div>
       <div class="posture"><div class="fill"></div></div>
       <div class="engr"></div>
       <div class="hint"></div>`;
@@ -41,7 +44,8 @@ export class Hud {
     this.hpLag = q('.hp .lag');
     this.stamina = q('.st .fill');
     this.spirit = q('.sp .fill');
-    this.skill = q('.skill');
+    this.skill = q('.skill:not(.s2)');
+    this.skill2 = q('.skill.s2');
     this.posture = q('.posture .fill');
     this.info = q('.info');
     this.engr = q('.engr');
@@ -59,7 +63,10 @@ export class Hud {
     });
     bus.on('equipSword', ({ id }) => {
       const sw = getData<{ list: SwordRef[] }>('swords').list.find((s) => s.id === id);
-      if (sw) this.skillCost = getData<{ spirit: number }>(sw.skill).spirit;
+      if (!sw) return;
+      this.skillCost = getData<{ spirit: number }>(sw.skill).spirit;
+      this.skill2Cost = sw.skill2 ? getData<{ spirit: number }>(sw.skill2).spirit : 1e9;
+      this.skill2.style.display = sw.skill2 ? '' : 'none';
     });
     bus.on('engravingGained', (e) => {
       this.engravings.push(e);
@@ -103,6 +110,7 @@ export class Hud {
     this.stamina.style.width = `${(v.stamina / Math.max(1, v.maxStamina)) * 100}%`;
     this.spirit.style.width = `${(v.spirit / Math.max(1, v.maxSpirit)) * 100}%`;
     this.skill.classList.toggle('ready', v.spirit >= this.skillCost);
+    this.skill2.classList.toggle('ready', v.spirit >= this.skill2Cost);
     // 자세 게이지: 가운데에서 양쪽으로 차오름
     this.posture.style.width = `${(v.posture / v.maxPosture) * 100}%`;
     this.posture.classList.toggle('broken', p.isBroken());

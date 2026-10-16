@@ -79,3 +79,4 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-f
 .btn:disabled { opacity: .4; cursor: default; }
 .settings { display: flex; gap: 22px; margin: 4px 0 20px; font-size: 13px; color: #ccc; align-items: center; flex-wrap: wrap; justify-content: center; }
 .settings input[type=range] { vertical-align: middle; width: 120px; }
+.hud .skill.s2 { left: 372px; }
