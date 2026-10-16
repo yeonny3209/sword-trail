@@ -1,5 +1,31 @@
+import type * as THREE from 'three';
+import type { Fighter } from '../combat/Fighter';
+import type { AttackData } from '../combat/types';
+
+export interface HitEvent {
+  attacker: Fighter;
+  target: Fighter;
+  attack: AttackData;
+  damage: number;
+  postureDamage: number;
+  point: THREE.Vector3;
+  /** 자세 붕괴 상태에서 맞은 결정타 */
+  finisher: boolean;
+}
+
 /** 게임 전체 이벤트 목록. 새 이벤트는 여기에 추가한다. */
 export interface GameEvents {
   /** 고정 시간 단계 한 번 */
   tick: { frame: number; dt: number };
+  debugToggle: Record<string, never>;
+
+  fighterSpawned: { fighter: Fighter };
+  fighterRemoved: { fighter: Fighter };
+  attackStarted: { fighter: Fighter; attack: AttackData };
+  /** 판정 구간 첫 프레임(휘두름 소리 시점) */
+  attackActive: { fighter: Fighter; attack: AttackData };
+  hit: HitEvent;
+  death: { fighter: Fighter; killer: Fighter | null };
+  postureBreak: { fighter: Fighter; guardBreak: boolean };
+  postureRecovered: { fighter: Fighter };
 }

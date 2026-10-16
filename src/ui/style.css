@@ -3,3 +3,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-f
 #app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 #ui { position: fixed; inset: 0; pointer-events: none; user-select: none; }
 .fps { position: absolute; top: 8px; right: 10px; font: 12px/1 monospace; color: #9f9; background: rgba(0,0,0,.45); padding: 4px 6px; border-radius: 3px; }
+.debug-panel { position: absolute; top: 8px; left: 10px; width: 400px; font: 12px/1.45 monospace; background: rgba(0,0,0,.6); padding: 8px 10px; border-radius: 4px; color: #ddd; }
+.debug-panel hr { border: 0; border-top: 1px solid #555; margin: 4px 0; }
+.debug-label { position: absolute; left: 0; top: 0; font: 11px/1.2 monospace; color: #fff; background: rgba(0,0,0,.55); padding: 2px 5px; border-radius: 3px; white-space: nowrap; }
+.ev-hit { color: #ff8a65; } .ev-finisher { color: #ff4081; font-weight: bold; } .ev-break { color: #e040fb; } .ev-death { color: #aaa; }
+.ev-parry { color: #ffee58; font-weight: bold; } .ev-block { color: #4fc3f7; } .ev-dodge { color: #81c784; }

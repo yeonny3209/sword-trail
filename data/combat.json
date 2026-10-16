@@ -1,0 +1,18 @@
+{
+  "hitRadius": 0.14,
+  "parryWindowMs": 150,
+  "blockAngleDeg": 100,
+  "blockDamageMul": 0,
+  "blockPostureMul": 0.6,
+  "blockStaminaDefault": 15,
+  "parryPostureDamage": 25,
+  "parryPostureMul": 1.0,
+  "finisherMultiplier": 4,
+  "postureBreakSeconds": 1.5,
+  "knockback": 0.35,
+  "glowColors": {
+    "white": "#ffffff",
+    "red": "#ff2a1a",
+    "purple": "#b040ff"
+  }
+}

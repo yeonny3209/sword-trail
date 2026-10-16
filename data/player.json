@@ -7,7 +7,10 @@
   "acceleration": 40,
   "deceleration": 30,
   "turnSpeed": 14,
-  "spawn": [0, 0],
+  "spawn": [
+    0,
+    0
+  ],
   "camera": {
     "distance": 5.5,
     "pivotHeight": 1.7,
@@ -21,5 +24,22 @@
     "lockSwitchFlick": 0.12,
     "collisionPadding": 0.25,
     "minDistance": 1.2
-  }
+  },
+  "sword": {
+    "length": 1.1,
+    "shoulderHeight": 1.25,
+    "rest": [
+      -25,
+      -55
+    ],
+    "guard": [
+      75,
+      18
+    ],
+    "color": "#d8dde6"
+  },
+  "hp": 100,
+  "posture": 100,
+  "postureRegenDelay": 1.2,
+  "postureRegen": 25
 }

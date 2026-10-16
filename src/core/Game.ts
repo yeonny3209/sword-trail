@@ -8,6 +8,9 @@ import { Input } from '../input/Input';
 import { Player } from '../player/Player';
 import { CameraRig } from '../player/CameraRig';
 import { FpsCounter } from '../ui/FpsCounter';
+import { Debug } from '../ui/Debug';
+import { CombatSystem } from '../combat/CombatSystem';
+import { Dummy } from '../enemies/Dummy';
 
 interface CameraData { fov: number; near: number; far: number }
 
@@ -24,6 +27,9 @@ export class Game {
   private rig!: CameraRig;
   private arena!: Arena;
   private renderPos = new THREE.Vector3();
+  private combat!: CombatSystem;
+  private debug!: Debug;
+  private dummies: Dummy[] = [];
 
   constructor(private readonly mount: HTMLElement, private readonly ui: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -42,7 +48,12 @@ export class Game {
     this.arena = new Arena(this.scene, this.physics);
     this.input = new Input(this.renderer.domElement);
     this.renderer.domElement.addEventListener('click', () => this.input.requestLock());
+    this.combat = new CombatSystem();
+    this.debug = new Debug(this.scene, this.camera, this.ui);
     this.player = new Player(this.scene, this.physics);
+    for (const [x, z, yaw] of getData<{ positions: number[][] }>('enemies/dummy').positions) {
+      this.dummies.push(new Dummy(this.scene, this.physics, x, z, yaw));
+    }
     this.rig = new CameraRig(this.camera, this.physics);
     this.fps = new FpsCounter(this.ui);
     this.loop = new GameLoop(60, this.update, this.render);
@@ -51,18 +62,23 @@ export class Game {
 
   private update = (dt: number, frame: number): void => {
     this.input.beginTick();
-    this.player.update(dt, this.input, this.rig.yaw);
+    if (this.input.pressed.has('debug')) bus.emit('debugToggle', {});
     bus.emit('tick', { frame, dt });
+    this.player.update(dt, frame, this.input, this.rig.yaw);
+    for (const d of this.dummies) d.update();
+    this.combat.update(frame, dt);
     this.physics.step(dt);
   };
 
   private render = (alpha: number, realDt: number): void => {
     const m = this.input.consumeMouse();
     this.rig.rotate(m.dx, m.dy);
-    this.player.render(alpha);
-    this.renderPos.copy(this.player.visual.root.position);
+    this.player.render(alpha, realDt);
+    for (const d of this.dummies) d.render(alpha, realDt);
+    this.renderPos.copy(this.player.view.root.position);
     this.rig.update(this.renderPos, realDt);
     this.arena.follow(this.renderPos.x, this.renderPos.z);
+    this.debug.render();
     this.fps.update(realDt);
     this.renderer.render(this.scene, this.camera);
   };

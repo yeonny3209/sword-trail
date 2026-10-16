@@ -1,0 +1,14 @@
+{
+  "name": "허수아비",
+  "radius": 0.5,
+  "height": 1.9,
+  "color": "#8c7b5e",
+  "hitColor": "#ff5040",
+  "hitFlashSeconds": 0.15,
+  "hp": 99999,
+  "posture": 120,
+  "postureRegenDelay": 2.0,
+  "postureRegen": 30,
+  "sword": { "length": 1.2, "shoulderHeight": 1.3, "rest": [0, -30], "guard": [0, 0] },
+  "positions": [[0, 6, 3.14159]]
+}
