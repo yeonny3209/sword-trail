@@ -1,0 +1,36 @@
+{
+  "list": [
+    {
+      "id": "swordsman", "name": "검사", "role": "균형", "color": "#4a8fd8",
+      "desc": "한 손 검을 다루는 균형 잡힌 검사. 빠른 콤보와 띄우기로 적을 몰아친다.",
+      "weapon": { "kind": "sword", "length": 1.1, "width": 1.0, "color": "#d8dde6" },
+      "base": { "hp": 220, "mp": 120, "atk": 22, "def": 10, "crit": 0.08, "speed": 5.6 },
+      "growth": { "hp": 26, "mp": 8, "atk": 3.2, "def": 1.4 },
+      "mainStat": "str"
+    },
+    {
+      "id": "berserker", "name": "광검사", "role": "강인함", "color": "#c8452e",
+      "desc": "거대한 대검을 휘두르는 전사. 느리지만 한 방이 무겁고 맞아도 끊기지 않는다.",
+      "weapon": { "kind": "greatsword", "length": 1.65, "width": 1.8, "color": "#b9b2a6" },
+      "base": { "hp": 280, "mp": 100, "atk": 26, "def": 13, "crit": 0.05, "speed": 5.2 },
+      "growth": { "hp": 34, "mp": 6, "atk": 3.6, "def": 1.8 },
+      "mainStat": "str"
+    },
+    {
+      "id": "blademaster", "name": "쌍검사", "role": "속도", "color": "#3fae6a",
+      "desc": "두 자루 단검으로 쉴 새 없이 베는 암살자. 치명타와 백어택에 강하다.",
+      "weapon": { "kind": "dual", "length": 0.75, "width": 0.8, "color": "#e6e0c8" },
+      "base": { "hp": 190, "mp": 130, "atk": 19, "def": 8, "crit": 0.16, "speed": 6.1 },
+      "growth": { "hp": 22, "mp": 9, "atk": 3.0, "def": 1.1 },
+      "mainStat": "dex"
+    },
+    {
+      "id": "spellblade", "name": "마검사", "role": "검기", "color": "#8a5ad8",
+      "desc": "마력을 실은 룬검으로 검기를 날리는 마법 검사. 거리를 두고 싸운다.",
+      "weapon": { "kind": "runeblade", "length": 1.2, "width": 1.0, "color": "#c4b0ff" },
+      "base": { "hp": 180, "mp": 200, "atk": 21, "def": 8, "crit": 0.08, "speed": 5.5 },
+      "growth": { "hp": 20, "mp": 16, "atk": 3.3, "def": 1.0 },
+      "mainStat": "int"
+    }
+  ]
+}

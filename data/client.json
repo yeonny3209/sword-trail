@@ -1,0 +1,13 @@
+{
+  "camera": { "fov": 40, "height": 17, "back": 12.5, "zoomMin": 0.6, "zoomMax": 1.5, "zoomStep": 0.1, "follow": 9 },
+  "player": {
+    "radius": 0.4,
+    "acceleration": 70,
+    "dashMul": 1.6,
+    "jumpVelocity": 8.5,
+    "gravity": 26,
+    "turnSpeed": 18
+  },
+  "net": { "interpDelayMs": 140 },
+  "light": { "sun": 2.3, "ambient": 0.65, "shadowSize": 2048, "shadowExtent": 26 }
+}

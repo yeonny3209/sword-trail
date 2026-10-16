@@ -1,0 +1,28 @@
+{
+  // 검의 궤적 온라인 — Cloudflare Worker 설정
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sword-trail-online",
+  "main": "server/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/ws"]
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ZONE", "class_name": "ZoneDO" },
+      { "name": "SOCIAL", "class_name": "SocialDO" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ZoneDO", "SocialDO"] }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sword-trail-online",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "server/migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

@@ -1,22 +1,27 @@
 {
-  "name": "geom-ui-gwejeok",
+  "name": "sword-trail-online",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "test": "vitest run"
+    "dev": "node scripts/dev.mjs",
+    "dev:client": "vite",
+    "dev:server": "wrangler dev --port 8787 --local",
+    "db:migrate": "wrangler d1 migrations apply sword-trail-online --local",
+    "check": "tsc --noEmit -p . && tsc --noEmit -p server",
+    "build": "npm run check && vite build",
+    "test": "vitest run",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
-    "@dimforge/rapier3d-compat": "^0.14.0",
     "three": "^0.169.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261016.1",
     "@types/three": "^0.169.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.4",
+    "wrangler": "^4.151.1"
   }
 }

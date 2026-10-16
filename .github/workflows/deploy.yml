@@ -1,8 +1,7 @@
 name: GitHub Pages 배포
 
+# 온라인 버전은 Cloudflare로 배포한다(npm run deploy). 이 정적 배포는 수동 실행만 남겨 둔다
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

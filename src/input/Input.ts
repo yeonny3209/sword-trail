@@ -2,137 +2,120 @@ import { bus } from '../core/bus';
 import { getData } from '../core/config';
 
 export type Action =
-  | 'moveForward' | 'moveBack' | 'moveLeft' | 'moveRight'
-  | 'attack' | 'heavy' | 'block' | 'dodge' | 'lockOn'
-  | 'heal' | 'skill' | 'skill2' | 'interact' | 'debug' | 'heavyModifier';
+  | 'up' | 'down' | 'left' | 'right' | 'attack' | 'jump' | 'back' | 'dash'
+  | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 'pot1' | 'pot2'
+  | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'debug';
 
 interface InputData {
   bindings: Record<string, string[]>;
-  mouseSensitivity: number;
+  doubleTapMs: number;
 }
 
 /**
- * 키·마우스 입력을 행동 이름으로 바꾸는 계층.
- * 왼쪽 버튼은 누르는 순간 "attack", Shift를 누른 채면 "heavy"로 바꾼다.
+ * 키·마우스 → 행동 이름. 같은 방향을 빠르게 두 번 누르면 'dash'.
+ * 채팅 입력 중이거나 창이 열려 있으면 게임 입력을 막는다.
  */
 export class Input {
   readonly data = getData<InputData>('input');
-  /** 이번 고정 단계에서 눌린 행동 */
   pressed = new Set<Action>();
+  /** 이번 단계에서 대시가 시작된 방향(화면 기준) */
+  dashDir: { x: number; y: number } | null = null;
   private queued: Action[] = [];
-  private codesDown = new Set<string>();
-  private codeToAction = new Map<string, Action>();
-  mouseDX = 0;
-  mouseDY = 0;
-  locked = false;
-  /** 메뉴가 열려 있을 때는 게임 입력을 막는다 */
+  private queuedDash: { x: number; y: number } | null = null;
+  private codes = new Set<string>();
+  private codeToActions = new Map<string, Action[]>();
+  private lastTap: Record<string, number> = {};
+  /** 화면 좌표(px) */
+  mouseX = 0;
+  mouseY = 0;
+  wheel = 0;
   enabled = true;
-  /** 설정의 마우스 감도 배율 */
-  sensitivity = 1;
 
   constructor(private readonly canvas: HTMLElement) {
-    bus.on('settingsChanged', ({ settings }) => (this.sensitivity = settings.mouseSensitivity));
     for (const [action, codes] of Object.entries(this.data.bindings)) {
-      for (const code of codes) this.codeToAction.set(code, action as Action);
+      for (const c of codes) this.codeToActions.set(c, [...(this.codeToActions.get(c) ?? []), action as Action]);
     }
-    window.addEventListener('keydown', this.onKeyDown);
-    window.addEventListener('keyup', this.onKeyUp);
-    window.addEventListener('mousedown', this.onMouseDown);
-    window.addEventListener('mouseup', this.onMouseUp);
-    window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('contextmenu', (e) => e.preventDefault());
-    window.addEventListener('blur', () => this.releaseAll());
-    document.addEventListener('pointerlockchange', () => {
-      this.locked = document.pointerLockElement === this.canvas;
-      if (!this.locked) this.releaseAll();
+    const typingTarget = (e: Event) => {
+      const t = e.target as HTMLElement | null;
+      return !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+    };
+    window.addEventListener('keydown', (e) => {
+      if (typingTarget(e) || e.ctrlKey || e.metaKey) return;
+      if (this.codeToActions.has(e.code)) e.preventDefault();
+      if (e.repeat) return;
+      this.press(e.code);
+    });
+    window.addEventListener('keyup', (e) => this.codes.delete(e.code));
+    canvas.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      this.press(`Mouse${e.button}`);
+    });
+    window.addEventListener('mouseup', (e) => this.codes.delete(`Mouse${e.button}`));
+    window.addEventListener('mousemove', (e) => {
+      this.mouseX = e.clientX;
+      this.mouseY = e.clientY;
+    });
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.wheel += Math.sign(e.deltaY);
+    }, { passive: false });
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('blur', () => this.codes.clear());
+    bus.on('typing', ({ active }) => {
+      this.enabled = !active;
+      if (active) this.codes.clear();
     });
   }
 
-  requestLock(): void {
-    if (this.locked) return;
-    // 사용자 동작 밖이거나 Esc 직후면 거부된다 → 다음 클릭 때 다시 잠근다
-    const r = this.canvas.requestPointerLock?.() as unknown as Promise<void> | undefined;
-    r?.catch?.(() => {});
+  private press(code: string): void {
+    const actions = this.codeToActions.get(code);
+    if (!actions) return;
+    this.codes.add(code);
+    if (!this.enabled) return;
+    const now = performance.now();
+    for (const a of actions) {
+      this.queued.push(a);
+      if (a === 'up' || a === 'down' || a === 'left' || a === 'right') {
+        if (now - (this.lastTap[a] ?? -1e9) < this.data.doubleTapMs) {
+          this.queued.push('dash');
+          this.queuedDash = { x: a === 'left' ? -1 : a === 'right' ? 1 : 0, y: a === 'up' ? 1 : a === 'down' ? -1 : 0 };
+        }
+        this.lastTap[a] = now;
+      }
+    }
   }
 
-  exitLock(): void {
-    if (this.locked) document.exitPointerLock();
-  }
-
-  /** 고정 단계 시작 시 호출: 쌓인 입력을 이번 단계의 눌림으로 옮긴다. */
+  /** 고정 단계 시작: 쌓인 입력을 이번 단계의 눌림으로 */
   beginTick(): void {
     this.pressed = new Set(this.queued);
+    this.dashDir = this.queuedDash;
     this.queued = [];
+    this.queuedDash = null;
   }
 
-  isDown(action: Action): boolean {
+  isDown(a: Action): boolean {
     if (!this.enabled) return false;
-    for (const code of this.data.bindings[action] ?? []) if (this.codesDown.has(code)) return true;
+    for (const c of this.data.bindings[a] ?? []) if (this.codes.has(c)) return true;
     return false;
   }
 
-  /** 이동 입력. x: 오른쪽 +, y: 앞 + */
+  /** 화면 기준 이동 입력. x: 오른쪽 +, y: 위쪽 + (길이 1로 정규화) */
   moveAxis(): { x: number; y: number } {
-    const x = (this.isDown('moveRight') ? 1 : 0) - (this.isDown('moveLeft') ? 1 : 0);
-    const y = (this.isDown('moveForward') ? 1 : 0) - (this.isDown('moveBack') ? 1 : 0);
+    const x = (this.isDown('right') ? 1 : 0) - (this.isDown('left') ? 1 : 0);
+    const y = (this.isDown('up') ? 1 : 0) - (this.isDown('down') ? 1 : 0);
     const len = Math.hypot(x, y) || 1;
     return { x: x / len, y: y / len };
   }
 
-  consumeMouse(): { dx: number; dy: number } {
-    const k = this.data.mouseSensitivity * this.sensitivity;
-    const r = { dx: this.mouseDX * k, dy: this.mouseDY * k };
-    this.mouseDX = 0;
-    this.mouseDY = 0;
-    return r;
+  consumeWheel(): number {
+    const w = this.wheel;
+    this.wheel = 0;
+    return w;
   }
 
-  private press(code: string): void {
-    const action = this.codeToAction.get(code);
-    if (!action || !this.enabled || action === 'heavyModifier') return;
-    // 누르는 순간 바로 공격(입력 지연 0). Shift를 누르고 있으면 강공격
-    if (action === 'attack' && this.isDown('heavyModifier')) {
-      this.queued.push('heavy');
-      return;
-    }
-    this.queued.push(action);
+  /** 캔버스 기준 정규화 좌표(-1~1) */
+  mouseNdc(): { x: number; y: number } {
+    const r = this.canvas.getBoundingClientRect();
+    return { x: ((this.mouseX - r.left) / r.width) * 2 - 1, y: -((this.mouseY - r.top) / r.height) * 2 + 1 };
   }
-
-  private releaseAll(): void {
-    this.codesDown.clear();
-  }
-
-  private onKeyDown = (e: KeyboardEvent): void => {
-    if (this.codeToAction.has(e.code)) e.preventDefault();
-    if (e.repeat) return;
-    this.codesDown.add(e.code);
-    // 디버그 토글은 포인터 잠금 없이도 동작
-    if (this.codeToAction.get(e.code) === 'debug') {
-      this.queued.push('debug');
-      return;
-    }
-    this.press(e.code);
-  };
-
-  private onKeyUp = (e: KeyboardEvent): void => {
-    this.codesDown.delete(e.code);
-  };
-
-  private onMouseDown = (e: MouseEvent): void => {
-    if (e.button === 1) e.preventDefault();
-    if (!this.locked) return; // 첫 클릭은 포인터 잠금용
-    const code = `Mouse${e.button}`;
-    this.codesDown.add(code);
-    this.press(code);
-  };
-
-  private onMouseUp = (e: MouseEvent): void => {
-    this.codesDown.delete(`Mouse${e.button}`);
-  };
-
-  private onMouseMove = (e: MouseEvent): void => {
-    if (!this.locked || !this.enabled) return;
-    this.mouseDX += e.movementX;
-    this.mouseDY += e.movementY;
-  };
 }

@@ -1,0 +1,205 @@
+import * as THREE from 'three';
+import { bus } from '../core/bus';
+import { getData } from '../core/config';
+import { GameLoop } from '../core/GameLoop';
+import { dist2 } from '../../shared/geom';
+import { ZONES } from '../../shared/data';
+import { MOVE_SEND_HZ, type S2C } from '../../shared/protocol';
+import { Input } from '../input/Input';
+import { Connection } from '../net/Connection';
+import { ChatBox } from '../ui/ChatBox';
+import { Hud } from '../ui/Hud';
+import { Nameplates } from '../ui/Nameplates';
+import { LocalPlayer } from './LocalPlayer';
+import { QuarterCamera } from './QuarterCamera';
+import { RemotePlayers } from './RemotePlayers';
+import { ZoneScene } from './ZoneScene';
+
+interface LightData { sun: number; ambient: number; shadowSize: number; shadowExtent: number }
+
+/** 게임 화면의 조립 지점: 렌더러·카메라·네트워크·내 캐릭터·원격 개체·UI */
+export class GameClient {
+  readonly scene = new THREE.Scene();
+  readonly renderer: THREE.WebGLRenderer;
+  readonly camera = new THREE.PerspectiveCamera(40, 1, 0.5, 300);
+  readonly cam: QuarterCamera;
+  readonly net = new Connection();
+  readonly input: Input;
+  readonly plates: Nameplates;
+  readonly hud: Hud;
+  readonly remotes: RemotePlayers;
+  private readonly sun: THREE.DirectionalLight;
+  private readonly hemi: THREE.HemisphereLight;
+  private zone: ZoneScene | null = null;
+  me: LocalPlayer | null = null;
+  private loop: GameLoop;
+  private lastSend = 0;
+  private lastSentKey = '';
+  private portalCooldown = 0;
+  private interpDelay = getData<{ net: { interpDelayMs: number } }>('client').net.interpDelayMs;
+  private readonly overlay: HTMLDivElement;
+
+  constructor(private readonly mount: HTMLElement, ui: HTMLElement, private readonly onExit: () => void) {
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    mount.appendChild(this.renderer.domElement);
+    const L = getData<{ light: LightData }>('client').light;
+    this.hemi = new THREE.HemisphereLight('#dfe8ff', '#5a5040', L.ambient);
+    this.sun = new THREE.DirectionalLight('#fff2dc', L.sun);
+    this.sun.castShadow = true;
+    this.sun.shadow.mapSize.set(L.shadowSize, L.shadowSize);
+    Object.assign(this.sun.shadow.camera, { left: -L.shadowExtent, right: L.shadowExtent, top: L.shadowExtent, bottom: -L.shadowExtent, near: 1, far: 90 });
+    this.sun.shadow.bias = -0.0006;
+    this.scene.add(this.hemi, this.sun, this.sun.target);
+    this.cam = new QuarterCamera(this.camera);
+    this.input = new Input(this.renderer.domElement);
+    this.plates = new Nameplates(ui, this.camera);
+    this.hud = new Hud(ui);
+    this.remotes = new RemotePlayers(this.scene, this.plates);
+    new ChatBox(ui, (ch, text, to) => this.net.send({ t: 'chat', ch, text, to }));
+    this.overlay = document.createElement('div');
+    this.overlay.className = 'conn-overlay';
+    ui.appendChild(this.overlay);
+    window.addEventListener('resize', this.resize);
+    this.resize();
+    bus.on('net', (m) => this.onNet(m));
+    bus.on('connection', ({ state, reason }) => {
+      this.overlay.style.display = state === 'open' ? 'none' : '';
+      this.overlay.innerHTML = state === 'connecting' ? '<div>접속 중…</div>'
+        : `<div>${reason ?? '연결이 끊겼습니다.'}<br><button class="btn">캐릭터 선택으로</button></div>`;
+      this.overlay.querySelector('button')?.addEventListener('click', () => this.exit());
+    });
+    this.loop = new GameLoop(60, this.update, this.render);
+  }
+
+  start(charId: number): void {
+    this.net.connect(charId);
+    this.loop.start();
+  }
+
+  private exit(): void {
+    this.net.close();
+    location.reload();
+    this.onExit();
+  }
+
+  private onNet(m: S2C): void {
+    switch (m.t) {
+      case 'welcome': {
+        this.loadZone(m.zone);
+        this.remotes.clear();
+        if (this.me) {
+          this.scene.remove(this.me.model.root);
+          this.me.model.dispose();
+        }
+        this.me = new LocalPlayer(m.you);
+        this.scene.add(this.me.model.root);
+        this.plates.add('self', this.me.model.root, 2.15, `${m.you.name}`, 'self');
+        this.cam.snap(m.you.x, m.you.z);
+        for (const p of m.players) this.remotes.add(p, m.time);
+        this.hud.setSelf(m.you);
+        this.portalCooldown = 1.5;
+        break;
+      }
+      case 'snap':
+        for (const row of m.p) if (row[0] !== this.me?.self.id) this.remotes.push(row, m.time);
+        break;
+      case 'join':
+        this.remotes.add(m.p, this.net.serverNow());
+        break;
+      case 'leave':
+        this.remotes.remove(m.id);
+        break;
+      case 'pos':
+        this.me?.place(m.x, m.z);
+        break;
+      case 'goto':
+        this.overlay.style.display = '';
+        this.overlay.innerHTML = `<div>${ZONES[m.zone]?.name ?? ''}(으)로 이동 중…</div>`;
+        break;
+    }
+  }
+
+  private loadZone(id: string): void {
+    if (this.zone?.def.id === id) return;
+    this.zone?.dispose();
+    this.plates.clear('npc');
+    this.plates.clear('portal');
+    const def = ZONES[id];
+    this.zone = new ZoneScene(def);
+    this.scene.add(this.zone.group);
+    this.scene.background = new THREE.Color(def.sky);
+    this.scene.fog = new THREE.Fog(def.sky, 38, 75);
+    for (const n of this.zone.npcs) {
+      this.plates.add(`npc${n.def.id}`, n.model.root, 2.15, `<span class="title">${n.def.title}</span>${n.def.name}`, 'npc');
+    }
+    for (const p of this.zone.portals) {
+      this.plates.add(`portal${p.def.id}`, p.ring, 3.4, p.def.label, 'portal', false, 80);
+    }
+    this.hud.setZone(id);
+  }
+
+  private update = (dt: number, frame: number): void => {
+    this.input.beginTick();
+    bus.emit('tick', { frame, dt });
+    const me = this.me, zone = this.zone;
+    if (!me || !zone) return;
+    me.update(dt, this.input, zone.def);
+    this.checkPortal(dt);
+    this.sendMove();
+  };
+
+  private checkPortal(dt: number): void {
+    const me = this.me!, zone = this.zone!;
+    this.portalCooldown -= dt;
+    if (this.portalCooldown > 0) return;
+    for (const p of zone.def.portals) {
+      if (dist2(me.pos.x, me.pos.z, p.x, p.z) < p.r * p.r) {
+        this.portalCooldown = 3;
+        this.sendMove(true);
+        this.net.send({ t: 'portal', id: p.id });
+        return;
+      }
+    }
+  }
+
+  /** 10Hz로 내 위치를 보낸다(변화가 없으면 1초마다) */
+  private sendMove(force = false): void {
+    const me = this.me!;
+    const now = performance.now();
+    const key = `${me.pos.x.toFixed(2)},${me.pos.z.toFixed(2)},${me.pos.y.toFixed(1)},${me.yaw.toFixed(2)},${me.state}`;
+    const interval = 1000 / MOVE_SEND_HZ;
+    if (!force && (now - this.lastSend < interval || (key === this.lastSentKey && now - this.lastSend < 1000))) return;
+    this.lastSend = now;
+    this.lastSentKey = key;
+    this.net.send({ t: 'move', x: me.pos.x, z: me.pos.z, y: me.pos.y, f: me.yaw, st: me.state });
+  }
+
+  private render = (alpha: number, dt: number): void => {
+    const me = this.me;
+    this.cam.zoomBy(this.input.consumeWheel());
+    if (me) {
+      me.render(alpha, dt);
+      this.cam.update(me.model.root.position, dt);
+      const p = me.model.root.position;
+      this.sun.position.set(p.x + 14, 26, p.z + 10);
+      this.sun.target.position.set(p.x, 0, p.z);
+    }
+    this.zone?.update(dt);
+    this.remotes.render(this.net.serverNow() - this.interpDelay, dt);
+    this.plates.render();
+    this.hud.setNet(this.net.rtt, this.remotes.list.size + 1);
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  private resize = (): void => {
+    const w = this.mount.clientWidth || window.innerWidth;
+    const h = this.mount.clientHeight || window.innerHeight;
+    this.renderer.setSize(w, h, false);
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
+  };
+}
