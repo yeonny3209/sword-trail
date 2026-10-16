@@ -12,7 +12,7 @@ describe('migrate', () => {
   });
   it('빠진 설정은 기본값으로 채운다', () => {
     const s = migrate({ shards: 5, settings: { volume: 0.3 } });
-    expect(s.settings).toEqual({ volume: 0.3, mouseSensitivity: 1, screenShake: true });
+    expect(s.settings).toEqual({ volume: 0.3, mouseSensitivity: 1, screenShake: true, difficulty: 'easy' });
   });
   it('장착 검이 해금 목록에 없으면 첫 검', () => {
     const s = migrate({ swords: ['trainee'], equipped: 'odachi' });

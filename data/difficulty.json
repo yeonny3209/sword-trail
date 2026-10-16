@@ -1,0 +1,7 @@
+{
+  "default": "easy",
+  "levels": {
+    "easy":   { "name": "쉬움", "enemyDamage": 0.55, "enemyPosture": 0.6, "enemyAttackSpeed": 0.8, "enemyCooldown": 1.6, "enemyHp": 0.8, "bossHp": 0.65 },
+    "normal": { "name": "보통", "enemyDamage": 1,    "enemyPosture": 1,   "enemyAttackSpeed": 1,   "enemyCooldown": 1,   "enemyHp": 1,   "bossHp": 1 }
+  }
+}

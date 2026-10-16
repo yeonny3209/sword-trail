@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { bus } from '../core/bus';
 import { getData } from '../core/config';
+import { difficulty } from '../core/difficulty';
 import type { Physics } from '../core/Physics';
 import type { Fighter } from './Fighter';
 import { Projectiles } from './Projectiles';
@@ -128,7 +129,9 @@ export class CombatSystem {
     let damage = atk.damage * attacker.mods.damageMul * attacker.mods.nextHitMul * target.mods.damageTakenMul;
     if (atk.heavy) damage *= attacker.mods.heavyDamageMul;
     if (finisher) damage *= this.data.finisherMultiplier;
-    const postureDamage = finisher ? 0 : atk.posture * attacker.mods.postureMul;
+    const vsPlayer = attacker.team === 'enemy' && target.team === 'player';
+    if (vsPlayer) damage *= difficulty.enemyDamage;
+    const postureDamage = finisher ? 0 : atk.posture * attacker.mods.postureMul * (vsPlayer ? difficulty.enemyPosture : 1);
     damage = Math.round(damage);
 
     const v = target.vitals;

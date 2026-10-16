@@ -1,6 +1,7 @@
 import { bus } from '../core/bus';
 import type { RunSummary } from '../progression/RunStats';
 import type { Settings } from '../progression/Save';
+import { difficultyNames } from '../core/difficulty';
 
 const CONTROLS = `
   <div class="controls">
@@ -29,7 +30,7 @@ export class Screens {
   private started = false;
   /** 현재 일시정지 이유(메뉴 등이 열려 있으면 일시정지 화면을 띄우지 않는다) */
   private readonly reasons = new Set<string>(['title']);
-  private settings: Settings = { volume: 1, mouseSensitivity: 1, screenShake: true };
+  private settings: Settings = { volume: 1, mouseSensitivity: 1, screenShake: true, difficulty: 'easy' };
 
   constructor(ui: HTMLElement) {
     const el = (cls: string, html = '') => {
@@ -54,15 +55,18 @@ export class Screens {
         <label>마우스 감도 <input type="range" class="sens" min="0.3" max="2.5" step="0.05"></label>
         <label>음량 <input type="range" class="vol" min="0" max="1" step="0.05"></label>
         <label><input type="checkbox" class="shake"> 화면 흔들림</label>
+        <label>난이도 <select class="diff">${Object.entries(difficultyNames).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>
       </div>
       <button class="btn resume">클릭하여 계속</button>`);
     this.pauseEl.style.display = 'none';
     const sens = this.pauseEl.querySelector('.sens') as HTMLInputElement;
     const vol = this.pauseEl.querySelector('.vol') as HTMLInputElement;
     const shake = this.pauseEl.querySelector('.shake') as HTMLInputElement;
+    const diff = this.pauseEl.querySelector('.diff') as HTMLSelectElement;
     const emit = () => bus.emit('settingsChanged', {
-      settings: { mouseSensitivity: Number(sens.value), volume: Number(vol.value), screenShake: shake.checked },
+      settings: { mouseSensitivity: Number(sens.value), volume: Number(vol.value), screenShake: shake.checked, difficulty: diff.value },
     });
+    diff.addEventListener('change', emit);
     sens.addEventListener('input', emit);
     vol.addEventListener('input', emit);
     shake.addEventListener('change', emit);
@@ -71,6 +75,7 @@ export class Screens {
       sens.value = String(settings.mouseSensitivity);
       vol.value = String(settings.volume);
       shake.checked = settings.screenShake;
+      diff.value = settings.difficulty;
     });
     bus.on('pause', ({ paused, reason }) => (paused ? this.reasons.add(reason) : this.reasons.delete(reason)));
     this.result = el('screen result-screen');

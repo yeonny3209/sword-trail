@@ -4,6 +4,7 @@ export interface Settings {
   volume: number;
   mouseSensitivity: number;
   screenShake: boolean;
+  difficulty: string;
 }
 
 export interface DeathRecord {
@@ -32,7 +33,7 @@ export function defaultSave(): SaveData {
     swords: ['trainee'],
     equipped: 'trainee',
     stats: { runs: 0, wins: 0, bestSeconds: 0, deaths: [] },
-    settings: { volume: 1, mouseSensitivity: 1, screenShake: true },
+    settings: { volume: 1, mouseSensitivity: 1, screenShake: true, difficulty: 'easy' },
   };
 }
 

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { bus } from '../core/bus';
+import { difficulty } from '../core/difficulty';
 import { turnTowards, yawTo, randRange } from '../core/math';
 import type { CharacterBody, Physics } from '../core/Physics';
 import { AttackRunner } from '../combat/AttackRunner';
@@ -66,7 +67,9 @@ export class Enemy {
       shape: d.shape ?? 'capsule', color: d.color, swordColor: d.swordColor, swordWidth: d.swordWidth,
     });
     this.body = physics.createCharacter(d.radius, d.height, x, z);
-    this.cooldown = randRange(d.attackCooldown[0], d.attackCooldown[1]);
+    const hpMul = d.boss ? difficulty.bossHp : difficulty.enemyHp;
+    this.fighter.vitals.maxHp = this.fighter.vitals.hp = Math.round(d.hp * hpMul);
+    this.cooldown = randRange(d.attackCooldown[0], d.attackCooldown[1]) * difficulty.enemyCooldown;
     this.listen();
     bus.emit('fighterSpawned', { fighter: this.fighter });
   }
@@ -136,7 +139,7 @@ export class Enemy {
 
   resetCooldown(mul = 1): void {
     const [a, b] = this.data.attackCooldown;
-    this.cooldown = randRange(a, b) * mul;
+    this.cooldown = randRange(a, b) * mul * difficulty.enemyCooldown;
   }
 
   private knockFrom(from: THREE.Vector3, strength: number): void {
@@ -172,7 +175,7 @@ export class Enemy {
   startAttack(atk: EnemyAttack): void {
     const f = this.fighter;
     this.choice = atk;
-    f.attack = new AttackRunner(f, atk, f.mods.attackSpeed);
+    f.attack = new AttackRunner(f, atk, f.mods.attackSpeed * difficulty.enemyAttackSpeed);
     this.setState('attack');
     bus.emit('attackStarted', { fighter: f, attack: atk });
     if (atk.glow) bus.emit('telegraph', { fighter: f, attack: atk, frames: atk.startup });
