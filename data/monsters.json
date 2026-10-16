@@ -1,0 +1,164 @@
+{
+ "list": [
+  {
+   "id": "slime",
+   "name": "흙 슬라임",
+   "lv": 1,
+   "hp": 70,
+   "atk": 9,
+   "def": 2,
+   "exp": 14,
+   "gold": [
+    2,
+    5
+   ],
+   "speed": 2.2,
+   "radius": 0.55,
+   "height": 0.9,
+   "weight": 0.9,
+   "aggro": 7,
+   "leash": 16,
+   "respawn": 8,
+   "attacks": [
+    {
+     "name": "몸통 박치기",
+     "windup": 0.7,
+     "active": 0.25,
+     "recover": 0.8,
+     "range": 1.7,
+     "shape": {
+      "type": "circle",
+      "range": 0.9,
+      "width": 0,
+      "offset": 0.7
+     },
+     "dmg": 1,
+     "kx": 4,
+     "stun": 18,
+     "lunge": 5,
+     "cd": 1.8
+    }
+   ],
+   "model": {
+    "shape": "slime",
+    "color": "#7a9a4a",
+    "scale": 1
+   },
+   "hitMat": "slime"
+  },
+  {
+   "id": "wolf",
+   "name": "들개",
+   "lv": 2,
+   "hp": 100,
+   "atk": 12,
+   "def": 4,
+   "exp": 22,
+   "gold": [
+    3,
+    7
+   ],
+   "speed": 4.0,
+   "radius": 0.5,
+   "height": 0.9,
+   "weight": 1.0,
+   "aggro": 7,
+   "leash": 20,
+   "respawn": 9,
+   "attacks": [
+    {
+     "name": "물기",
+     "windup": 0.5,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 1.9,
+     "shape": {
+      "type": "arc",
+      "range": 1.5,
+      "width": 90
+     },
+     "dmg": 1,
+     "kx": 3,
+     "stun": 16,
+     "lunge": 6,
+     "cd": 1.6
+    }
+   ],
+   "model": {
+    "shape": "beast",
+    "color": "#8a7a6a",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "recruit",
+   "name": "녹슨 수련병",
+   "lv": 4,
+   "hp": 180,
+   "atk": 16,
+   "def": 8,
+   "exp": 40,
+   "gold": [
+    6,
+    12
+   ],
+   "speed": 3.0,
+   "radius": 0.45,
+   "height": 1.8,
+   "weight": 1.1,
+   "aggro": 10,
+   "leash": 20,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "내려치기",
+     "windup": 0.7,
+     "active": 0.2,
+     "recover": 0.9,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.2,
+      "width": 90
+     },
+     "dmg": 1.2,
+     "kx": 4,
+     "stun": 22,
+     "cd": 2.2
+    },
+    {
+     "name": "찌르기",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 3.2,
+     "shape": {
+      "type": "box",
+      "range": 3.2,
+      "width": 1.0
+     },
+     "dmg": 1.6,
+     "kx": 6,
+     "kz": 7,
+     "stun": 26,
+     "lunge": 7,
+     "heavy": true,
+     "cd": 4
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#8a5a3c",
+    "scale": 1,
+    "weapon": {
+     "kind": "sword",
+     "length": 1.1,
+     "width": 1,
+     "color": "#8d7a66"
+    }
+   },
+   "hitMat": "metal"
+  }
+ ]
+}

@@ -3,22 +3,408 @@
   "pitchJitter": 0.05,
   "useFiles": false,
   "sounds": {
-    "swing":       { "path": "sfx/swing.ogg",        "layers": [{ "type": "noise", "filter": "bandpass", "freq": [2600, 700], "q": 1.4, "dur": 0.13, "gain": 0.28 }] },
-    "swingHeavy":  { "path": "sfx/swing_heavy.ogg",  "layers": [{ "type": "noise", "filter": "bandpass", "freq": [1500, 300], "q": 1.1, "dur": 0.22, "gain": 0.4 }] },
-    "slash":       { "path": "sfx/slash.ogg",        "layers": [{ "type": "noise", "filter": "lowpass", "freq": [5000, 900], "q": 0.8, "dur": 0.12, "gain": 0.45 }, { "type": "tone", "wave": "sine", "freq": [180, 60], "dur": 0.14, "gain": 0.55 }] },
-    "slashHeavy":  { "path": "sfx/slash_heavy.ogg",  "layers": [{ "type": "noise", "filter": "lowpass", "freq": [4000, 500], "q": 0.8, "dur": 0.2, "gain": 0.55 }, { "type": "tone", "wave": "sine", "freq": [140, 40], "dur": 0.25, "gain": 0.8 }] },
-    "block":       { "path": "sfx/block.ogg",        "layers": [{ "type": "metal", "freqs": [480, 1130, 1870, 2650], "dur": 0.25, "gain": 0.22 }, { "type": "noise", "filter": "highpass", "freq": [3000, 3000], "q": 0.7, "dur": 0.05, "gain": 0.3 }] },
-    "parry":       { "path": "sfx/parry.ogg",        "layers": [{ "type": "metal", "freqs": [1240, 2010, 2980, 4170, 5230], "dur": 0.7, "gain": 0.3 }, { "type": "noise", "filter": "highpass", "freq": [5000, 2000], "q": 0.7, "dur": 0.08, "gain": 0.45 }, { "type": "tone", "wave": "triangle", "freq": [220, 110], "dur": 0.2, "gain": 0.4 }] },
-    "dodge":       { "path": "sfx/dodge.ogg",        "layers": [{ "type": "noise", "filter": "lowpass", "freq": [900, 250], "q": 0.6, "dur": 0.25, "gain": 0.25 }] },
-    "postureBreak":{ "path": "sfx/posture_break.ogg","layers": [{ "type": "metal", "freqs": [196, 311, 467, 702], "dur": 0.9, "gain": 0.28 }, { "type": "tone", "wave": "sine", "freq": [90, 45], "dur": 0.4, "gain": 0.6 }] },
-    "finisher":    { "path": "sfx/finisher.ogg",     "layers": [{ "type": "tone", "wave": "sine", "freq": [110, 30], "dur": 0.5, "gain": 0.9 }, { "type": "noise", "filter": "lowpass", "freq": [6000, 400], "q": 0.7, "dur": 0.35, "gain": 0.6 }, { "type": "metal", "freqs": [880, 1320, 1980], "dur": 0.6, "gain": 0.18 }] },
-    "death":       { "path": "sfx/death.ogg",        "layers": [{ "type": "tone", "wave": "sawtooth", "freq": [160, 40], "dur": 0.6, "gain": 0.18 }, { "type": "noise", "filter": "lowpass", "freq": [1200, 100], "q": 0.5, "dur": 0.6, "gain": 0.3 }] },
-    "hurt":        { "path": "sfx/hurt.ogg",         "layers": [{ "type": "tone", "wave": "square", "freq": [300, 120], "dur": 0.15, "gain": 0.12 }] },
-    "warning":     { "path": "sfx/warning.ogg",      "layers": [{ "type": "tone", "wave": "square", "freq": [1400, 1400], "dur": 0.07, "gain": 0.12 }, { "type": "tone", "wave": "square", "freq": [1400, 1400], "dur": 0.07, "gain": 0.12, "delay": 0.11 }] },
-    "telegraph":   { "path": "sfx/telegraph.ogg",    "layers": [{ "type": "metal", "freqs": [2100, 3150], "dur": 0.35, "gain": 0.07 }] },
-    "heal":        { "path": "sfx/heal.ogg",         "layers": [{ "type": "tone", "wave": "sine", "freq": [440, 880], "dur": 0.4, "gain": 0.2 }] },
-    "pickup":      { "path": "sfx/pickup.ogg",       "layers": [{ "type": "tone", "wave": "triangle", "freq": [660, 1320], "dur": 0.18, "gain": 0.2 }] },
-    "gate":        { "path": "sfx/gate.ogg",         "layers": [{ "type": "tone", "wave": "sine", "freq": [220, 440], "dur": 0.6, "gain": 0.25 }, { "type": "metal", "freqs": [660, 990], "dur": 0.8, "gain": 0.08 }] },
-    "ui":          { "path": "sfx/ui.ogg",           "layers": [{ "type": "tone", "wave": "triangle", "freq": [900, 900], "dur": 0.06, "gain": 0.12 }] }
+    "swing": {
+      "path": "sfx/swing.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "bandpass",
+          "freq": [
+            2600,
+            700
+          ],
+          "q": 1.4,
+          "dur": 0.13,
+          "gain": 0.28
+        }
+      ]
+    },
+    "swingHeavy": {
+      "path": "sfx/swing_heavy.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "bandpass",
+          "freq": [
+            1500,
+            300
+          ],
+          "q": 1.1,
+          "dur": 0.22,
+          "gain": 0.4
+        }
+      ]
+    },
+    "slash": {
+      "path": "sfx/slash.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            5000,
+            900
+          ],
+          "q": 0.8,
+          "dur": 0.12,
+          "gain": 0.45
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            180,
+            60
+          ],
+          "dur": 0.14,
+          "gain": 0.55
+        }
+      ]
+    },
+    "slashHeavy": {
+      "path": "sfx/slash_heavy.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            4000,
+            500
+          ],
+          "q": 0.8,
+          "dur": 0.2,
+          "gain": 0.55
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            140,
+            40
+          ],
+          "dur": 0.25,
+          "gain": 0.8
+        }
+      ]
+    },
+    "block": {
+      "path": "sfx/block.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            480,
+            1130,
+            1870,
+            2650
+          ],
+          "dur": 0.25,
+          "gain": 0.22
+        },
+        {
+          "type": "noise",
+          "filter": "highpass",
+          "freq": [
+            3000,
+            3000
+          ],
+          "q": 0.7,
+          "dur": 0.05,
+          "gain": 0.3
+        }
+      ]
+    },
+    "parry": {
+      "path": "sfx/parry.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            1240,
+            2010,
+            2980,
+            4170,
+            5230
+          ],
+          "dur": 0.7,
+          "gain": 0.3
+        },
+        {
+          "type": "noise",
+          "filter": "highpass",
+          "freq": [
+            5000,
+            2000
+          ],
+          "q": 0.7,
+          "dur": 0.08,
+          "gain": 0.45
+        },
+        {
+          "type": "tone",
+          "wave": "triangle",
+          "freq": [
+            220,
+            110
+          ],
+          "dur": 0.2,
+          "gain": 0.4
+        }
+      ]
+    },
+    "dodge": {
+      "path": "sfx/dodge.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            900,
+            250
+          ],
+          "q": 0.6,
+          "dur": 0.25,
+          "gain": 0.25
+        }
+      ]
+    },
+    "postureBreak": {
+      "path": "sfx/posture_break.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            196,
+            311,
+            467,
+            702
+          ],
+          "dur": 0.9,
+          "gain": 0.28
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            90,
+            45
+          ],
+          "dur": 0.4,
+          "gain": 0.6
+        }
+      ]
+    },
+    "finisher": {
+      "path": "sfx/finisher.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            110,
+            30
+          ],
+          "dur": 0.5,
+          "gain": 0.9
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            6000,
+            400
+          ],
+          "q": 0.7,
+          "dur": 0.35,
+          "gain": 0.6
+        },
+        {
+          "type": "metal",
+          "freqs": [
+            880,
+            1320,
+            1980
+          ],
+          "dur": 0.6,
+          "gain": 0.18
+        }
+      ]
+    },
+    "death": {
+      "path": "sfx/death.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sawtooth",
+          "freq": [
+            160,
+            40
+          ],
+          "dur": 0.6,
+          "gain": 0.18
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            1200,
+            100
+          ],
+          "q": 0.5,
+          "dur": 0.6,
+          "gain": 0.3
+        }
+      ]
+    },
+    "hurt": {
+      "path": "sfx/hurt.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "square",
+          "freq": [
+            300,
+            120
+          ],
+          "dur": 0.15,
+          "gain": 0.12
+        }
+      ]
+    },
+    "warning": {
+      "path": "sfx/warning.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "square",
+          "freq": [
+            1400,
+            1400
+          ],
+          "dur": 0.07,
+          "gain": 0.12
+        },
+        {
+          "type": "tone",
+          "wave": "square",
+          "freq": [
+            1400,
+            1400
+          ],
+          "dur": 0.07,
+          "gain": 0.12,
+          "delay": 0.11
+        }
+      ]
+    },
+    "telegraph": {
+      "path": "sfx/telegraph.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            2100,
+            3150
+          ],
+          "dur": 0.35,
+          "gain": 0.07
+        }
+      ]
+    },
+    "heal": {
+      "path": "sfx/heal.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            440,
+            880
+          ],
+          "dur": 0.4,
+          "gain": 0.2
+        }
+      ]
+    },
+    "pickup": {
+      "path": "sfx/pickup.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "triangle",
+          "freq": [
+            660,
+            1320
+          ],
+          "dur": 0.18,
+          "gain": 0.2
+        }
+      ]
+    },
+    "gate": {
+      "path": "sfx/gate.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            220,
+            440
+          ],
+          "dur": 0.6,
+          "gain": 0.25
+        },
+        {
+          "type": "metal",
+          "freqs": [
+            660,
+            990
+          ],
+          "dur": 0.8,
+          "gain": 0.08
+        }
+      ]
+    },
+    "ui": {
+      "path": "sfx/ui.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "triangle",
+          "freq": [
+            900,
+            900
+          ],
+          "dur": 0.06,
+          "gain": 0.12
+        }
+      ]
+    },
+    "hitSlime": {
+      "path": "sfx/hit_slime.ogg",
+      "layers": [
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            1400,
+            300
+          ],
+          "q": 2.5,
+          "dur": 0.14,
+          "gain": 0.5
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            260,
+            90
+          ],
+          "dur": 0.16,
+          "gain": 0.5
+        }
+      ]
+    }
   }
 }

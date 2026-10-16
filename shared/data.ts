@@ -1,9 +1,14 @@
 /** 공용 게임 데이터. JSON을 정적으로 불러와 서버·클라이언트가 똑같이 쓴다. */
 import classesJson from '../data/classes.json';
+import monstersJson from '../data/monsters.json';
 import town from '../data/zones/town.json';
 import field1 from '../data/zones/field1.json';
 import arena from '../data/zones/arena.json';
-import type { ClassDef, ClassId, ZoneDef } from './types';
+import swordsman from '../data/kits/swordsman.json';
+import berserker from '../data/kits/berserker.json';
+import blademaster from '../data/kits/blademaster.json';
+import spellblade from '../data/kits/spellblade.json';
+import type { ActionDef, ClassDef, ClassId, ClassKit, MonsterDef, ZoneDef } from './types';
 
 export const CLASSES = classesJson.list as ClassDef[];
 export const CLASS_BY_ID = Object.fromEntries(CLASSES.map((c) => [c.id, c])) as Record<ClassId, ClassDef>;
@@ -13,6 +18,24 @@ export const ZONES: Record<string, ZoneDef> = Object.fromEntries(
 );
 
 export const START_ZONE = 'town';
+
+/** 직업별 기술 세트 */
+export const KITS = { swordsman, berserker, blademaster, spellblade } as unknown as Record<ClassId, ClassKit>;
+
+/** 모든 행동(id → 정의) */
+export const ACTIONS: Record<string, ActionDef> = Object.fromEntries(
+  Object.values(KITS).flatMap((k) => k.actions.map((a) => [a.id, a])),
+);
+
+/** 행동이 그 직업의 것인가 */
+export function actionOf(cls: ClassId, id: string): ActionDef | null {
+  const a = ACTIONS[id];
+  return a && KITS[cls].actions.includes(a) ? a : null;
+}
+
+export const MONSTERS: Record<string, MonsterDef> = Object.fromEntries(
+  (monstersJson.list as unknown as MonsterDef[]).map((m) => [m.id, m]),
+);
 
 export function isClassId(v: unknown): v is ClassId {
   return typeof v === 'string' && v in CLASS_BY_ID;

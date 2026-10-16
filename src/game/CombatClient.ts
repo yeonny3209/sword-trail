@@ -1,0 +1,211 @@
+import * as THREE from 'three';
+import { bus } from '../core/bus';
+import { shapeHits } from '../../shared/geom';
+import type { S2C } from '../../shared/protocol';
+import type { HitDef, MonsterAttackDef, ZoneDef } from '../../shared/types';
+import type { Effects } from '../fx/Effects';
+import type { Particles, BurstSpec } from '../fx/Particles';
+import { TrailRibbon } from '../fx/Trails';
+import type { Connection } from '../net/Connection';
+import type { DamageNumbers } from '../ui/DamageNumbers';
+import type { CharacterModel } from './CharacterModel';
+import type { ActionRunner } from './combat/ActionRunner';
+import type { LocalPlayer } from './LocalPlayer';
+import type { Monsters, MonView } from './Monsters';
+import type { QuarterCamera } from './QuarterCamera';
+import type { RemotePlayers } from './RemotePlayers';
+
+export interface CombatCtx {
+  scene: THREE.Scene;
+  net: Connection;
+  monsters: Monsters;
+  remotes: RemotePlayers;
+  cam: QuarterCamera;
+  fx: Effects;
+  particles: Particles;
+  numbers: DamageNumbers;
+  bursts: Record<string, BurstSpec>;
+  me: () => LocalPlayer | null;
+  zone: () => ZoneDef | null;
+}
+
+const FX_COLOR: Record<string, string> = { slash: '#cfe6ff', heavy: '#ffd890', pierce: '#e0f4ff', x: '#ff9070', magic: '#c4a0ff' };
+
+/**
+ * 전투 화면 처리: 내 행동의 판정 → 즉시 손맛(히트스톱·흔들림·불꽃·소리) → 서버에 보고.
+ * 몬스터 공격이 내게 닿는지도 여기서 보고, 서버의 피해·보상 메시지를 화면에 반영한다.
+ */
+export class CombatClient {
+  /** 남은 히트스톱 프레임(내 캐릭터와 내가 때린 몬스터만 멈춘다) */
+  hitstop = 0;
+  private readonly trails = new Map<CharacterModel, TrailRibbon[]>();
+  private readonly a = new THREE.Vector3();
+  private readonly b = new THREE.Vector3();
+
+  constructor(private readonly c: CombatCtx) {
+    bus.on('net', (m) => this.onNet(m));
+  }
+
+  frozen(): boolean {
+    return this.hitstop > 0;
+  }
+
+  /** 고정 단계: 히트스톱 감소, 몬스터 공격 판정 */
+  step(): void {
+    if (this.hitstop > 0) this.hitstop--;
+    const me = this.c.me(), zone = this.c.zone();
+    if (!me || !zone || me.pstate === 'dead') return;
+    this.c.monsters.checkAttacks(me.pos.x, me.pos.z, me.pos.y, me.invulnerable(), (v, atk) => this.onHurt(me, v, atk, zone));
+  }
+
+  /** 내 행동의 한 프레임(LocalPlayer가 프레임을 넘기기 직전에 부른다) */
+  onPlayerFrame(me: LocalPlayer, run: ActionRunner): void {
+    for (const key of run.sfxNow()) bus.emit('sfx', { key });
+    const fwd = (d: number) => [me.pos.x + Math.sin(me.yaw) * d, me.pos.z + Math.cos(me.yaw) * d] as const;
+    for (const [kind, arg] of run.fxNow()) {
+      const color = FX_COLOR[run.def.hits[0]?.fx ?? 'slash'] ?? '#cfe6ff';
+      if (kind === 'crescent') {
+        const [x, z] = fwd(0.8);
+        this.c.fx.crescent(x, me.pos.y + 1.2, z, me.yaw, arg ?? 1, color, -0.9);
+      } else if (kind === 'ring') {
+        const off = run.def.hits[0]?.shape.offset ?? 1.2;
+        const [x, z] = fwd(off);
+        this.c.fx.ring(x, z, arg ?? 1, color);
+        this.c.cam.addShake(0.12);
+      } else if (kind === 'wave') this.c.fx.wave(me.pos.x, me.pos.z, me.yaw, arg ?? 6, color);
+      else if (kind === 'flash') this.c.fx.flash(me.pos.x, me.pos.y + 1, me.pos.z, 2.2, color);
+    }
+    for (const hi of run.activeHits()) {
+      const hit = run.def.hits[hi];
+      for (const v of this.c.monsters.list.values()) {
+        if (v.dying || v.hp <= 0 || !run.canHit(hi, `m${v.id}`)) continue;
+        if (!shapeHits(hit.shape, me.pos.x, me.pos.z, me.yaw, v.pos.x, v.pos.z, v.def.radius, v.pos.y)) continue;
+        run.markHit(hi, `m${v.id}`);
+        this.onLocalHit(me, v, hit, hi, run);
+      }
+    }
+  }
+
+  private onLocalHit(me: LocalPlayer, v: MonView, hit: HitDef, hi: number, run: ActionRunner): void {
+    const dir = hit.shape.type === 'box' ? [Math.sin(me.yaw), Math.cos(me.yaw)] : [v.pos.x - me.pos.x, v.pos.z - me.pos.z];
+    this.c.monsters.predictHit(v, hit, dir[0], dir[1]);
+    this.c.net.send({ t: 'hit', i: run.instance, h: hi, m: v.id });
+    this.hitstop = Math.max(this.hitstop, hit.stop);
+    this.c.cam.addShake(hit.shake ?? 0.05);
+    const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.6, v.pos.z);
+    const strong = hit.stop >= 8;
+    const burst = hit.fx === 'magic' ? this.c.bursts.parry : strong ? this.c.bursts.heavyHit : this.c.bursts.hit;
+    this.c.particles.burst(at, burst, new THREE.Vector3(dir[0], 0.3, dir[1]).normalize());
+    if (strong) this.c.fx.flash(at.x, at.y, at.z, 0.9, FX_COLOR[hit.fx ?? 'heavy']);
+    const mat = v.def.hitMat ?? 'flesh';
+    bus.emit('sfx', { key: mat === 'metal' ? (strong ? 'slashHeavy' : 'block') : mat === 'slime' ? 'hitSlime' : strong ? 'slashHeavy' : 'slash' });
+    this.c.numbers.hit();
+  }
+
+  private onHurt(me: LocalPlayer, v: MonView, atk: MonsterAttackDef, zone: ZoneDef): void {
+    const hit: HitDef = { f: [0, 0], shape: atk.shape, dmg: atk.dmg, kx: atk.kx, kz: atk.kz, stun: atk.stun, stop: 4 };
+    me.hurt(hit, v.pos.x, v.pos.z, zone);
+    me.model.flash(0.15);
+    this.c.net.send({ t: 'hurt', m: v.id, k: v.atk?.k ?? 0 });
+    this.c.cam.addShake(atk.heavy ? 0.35 : 0.18);
+    this.hitstop = Math.max(this.hitstop, 3);
+    bus.emit('sfx', { key: 'hurt' });
+  }
+
+  private posOf(kind: 'm' | 'p', id: number): THREE.Vector3 | null {
+    const me = this.c.me();
+    if (kind === 'm') {
+      const v = this.c.monsters.list.get(id);
+      return v ? new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale + 0.3, v.pos.z) : null;
+    }
+    if (me && me.self.id === id) return me.pos.clone().setY(me.pos.y + 2.1);
+    const r = this.c.remotes.list.get(id);
+    return r ? r.model.root.position.clone().setY(r.model.root.position.y + 2.1) : null;
+  }
+
+  private onNet(m: S2C): void {
+    const me = this.c.me();
+    switch (m.t) {
+      case 'dmg': {
+        const pos = this.posOf(m.tk, m.id);
+        if (m.tk === 'm') {
+          const v = this.c.monsters.list.get(m.id);
+          if (v) this.c.monsters.setHp(m.id, v.hp - m.n);
+          if (m.by !== me?.self.id) v?.model.flash();
+        }
+        if (!pos) return;
+        const mine = m.by === me?.self.id;
+        const kind = m.tk === 'p' ? 'p' : !mine ? 'o' : m.crit ? 'c' : 'n';
+        const tag = mine && m.tk === 'm' ? [m.counter ? 'COUNTER' : '', m.back ? 'BACK' : ''].filter(Boolean).join(' ') : '';
+        this.c.numbers.add(pos, String(m.n), kind, tag);
+        break;
+      }
+      case 'mdie':
+        this.c.monsters.die(m.id);
+        if (m.by === me?.self.id) bus.emit('sfx', { key: 'death', volume: 0.6 });
+        break;
+      case 'matk':
+        this.c.monsters.attack(m.id, m.k);
+        break;
+      case 'mspawn':
+        this.c.monsters.add(m.m, this.c.net.serverNow());
+        break;
+      case 'reward': {
+        if (!me) return;
+        const p = me.pos.clone().setY(2.6);
+        this.c.numbers.add(p, `+${m.exp} EXP`, 'exp');
+        if (m.gold) this.c.numbers.add(p.setY(3.1), `+${m.gold} G`, 'gold');
+        bus.emit('sfx', { key: 'pickup', volume: 0.5 });
+        break;
+      }
+      case 'lvup': {
+        const pos = this.posOf('p', m.id);
+        if (pos) {
+          this.c.fx.ring(pos.x, pos.z, 1.6, '#ffe080');
+          this.c.fx.flash(pos.x, pos.y - 1, pos.z, 2, '#ffe080');
+          this.c.numbers.add(pos, `LEVEL UP! Lv${m.lv}`, 'lvup');
+        }
+        if (m.id === me?.self.id) bus.emit('sfx', { key: 'gate' });
+        break;
+      }
+      case 'act':
+        this.c.remotes.play(m.id, m.a, m.f);
+        break;
+    }
+  }
+
+  /** 렌더 프레임: 검 궤적, 연출, 파티클, 숫자 */
+  render(dt: number): void {
+    const me = this.c.me();
+    if (me) this.trail(me.model, !!me.action?.trailOn(), dt, '#cfe6ff');
+    for (const r of this.c.remotes.list.values()) this.trail(r.model, !!r.action?.trailOn(), dt, '#e0e8ff');
+    this.c.fx.update(dt);
+    this.c.particles.update(dt);
+    this.c.numbers.render(dt);
+  }
+
+  private trail(model: CharacterModel, on: boolean, dt: number, color: string): void {
+    let list = this.trails.get(model);
+    if (!list) {
+      list = model.weaponPivots.map(() => new TrailRibbon(color, 0.9));
+      for (const t of list) this.c.scene.add(t.mesh);
+      this.trails.set(model, list);
+    }
+    model.root.updateMatrixWorld(true);
+    model.weaponPivots.forEach((p, i) => {
+      model.bladeTips[i].getWorldPosition(this.b);
+      p.getWorldPosition(this.a);
+      this.a.lerp(this.b, 0.35);
+      list![i].update(dt, on, this.a, this.b);
+    });
+  }
+
+  /** 모델이 사라질 때 궤적도 지운다 */
+  forget(model: CharacterModel): void {
+    for (const t of this.trails.get(model) ?? []) {
+      this.c.scene.remove(t.mesh);
+      t.dispose();
+    }
+    this.trails.delete(model);
+  }
+}

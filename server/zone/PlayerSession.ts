@@ -23,6 +23,14 @@ export class PlayerSession {
   /** 포탈로 떠나는 중 */
   leaving = false;
   zone: string;
+  dead = false;
+  deadAt = 0;
+  /** 시작한 행동: 번호 → (행동 id, 시작 시각) */
+  readonly acts = new Map<number, { a: string; start: number; hits: Map<string, number> }>();
+  /** 스킬 쿨타임: 행동 id → 다시 쓸 수 있는 시각 */
+  readonly cds = new Map<string, number>();
+  lastHurtAt = 0;
+  lastHitAt = 0;
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;
@@ -41,6 +49,8 @@ export class PlayerSession {
     this.stats = baseStats(row.class, row.level);
     this.data.hp = Math.min(this.data.hp, this.stats.mhp);
     this.data.mp = Math.min(this.data.mp, this.stats.mmp);
+    // 쓰러진 채로 나갔다면 바로 부활할 수 있는 상태로 시작
+    if (this.data.hp <= 0) this.dead = true;
     this.x = x;
     this.z = z;
   }
@@ -64,11 +74,17 @@ export class PlayerSession {
     return {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv, exp: this.data.exp, gold: this.data.gold,
       hp: this.data.hp, mhp: this.stats.mhp, mp: this.data.mp, mmp: this.stats.mmp, x: this.x, z: this.z,
+      atk: this.stats.atk, def: this.stats.def, crit: this.stats.crit, speed: this.stats.speed,
     };
+  }
+
+  /** 레벨이 바뀌면 능력치를 다시 계산 */
+  recalc(): void {
+    this.stats = baseStats(this.cls, this.lv);
   }
 
   snap(): number[] {
     const r = (v: number) => Math.round(v * 100) / 100;
-    return [this.id, r(this.x), r(this.z), r(this.y), r(this.f), this.st];
+    return [this.id, r(this.x), r(this.z), r(this.y), r(this.f), this.st, Math.round(this.data.hp)];
   }
 }

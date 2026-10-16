@@ -499,6 +499,37 @@
   }
  ],
  "npcs": [],
- "spawns": [],
+ "spawns": [
+  {
+   "monster": "slime",
+   "count": 8,
+   "area": {
+    "x": -26,
+    "z": 0,
+    "w": 22,
+    "d": 40
+   }
+  },
+  {
+   "monster": "wolf",
+   "count": 6,
+   "area": {
+    "x": 6,
+    "z": -6,
+    "w": 22,
+    "d": 34
+   }
+  },
+  {
+   "monster": "recruit",
+   "count": 5,
+   "area": {
+    "x": 32,
+    "z": 10,
+    "w": 18,
+    "d": 30
+   }
+  }
+ ],
  "nodes": []
 }

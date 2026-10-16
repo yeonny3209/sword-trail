@@ -105,3 +105,34 @@ input:focus { border-color: var(--gold); }
 
 .conn-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.55); font-size: 18px; text-align: center; pointer-events: auto; }
 .conn-overlay .btn { margin-top: 14px; }
+
+/* 스킬 칸 */
+.skillbar { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; }
+.skillbar .slot { position: relative; width: 58px; height: 58px; background: rgba(10,10,14,.8); border: 1px solid #6a5a40; border-radius: 6px; overflow: hidden; }
+.skillbar .slot.empty { opacity: .35; }
+.skillbar .slot .key { position: absolute; left: 4px; top: 2px; font-size: 11px; color: var(--gold); font-weight: 700; }
+.skillbar .slot .nm { position: absolute; inset: 14px 2px 14px; font-size: 10px; text-align: center; color: #eee; line-height: 1.15; display: flex; align-items: center; justify-content: center; }
+.skillbar .slot .mp { position: absolute; bottom: 2px; left: 0; right: 0; text-align: center; font-size: 9px; color: #7fb0ff; }
+.skillbar .slot .cd { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; text-shadow: 0 0 3px #000; }
+.skillbar .slot.locked { filter: grayscale(1) brightness(.6); }
+.skillbar .slot.nomp .nm { color: #7f8aa8; }
+
+/* 데미지 숫자·콤보 */
+.dmg-layer { position: absolute; inset: 0; overflow: hidden; }
+.dmg { position: absolute; left: 0; top: 0; font-family: var(--title); font-size: 22px; color: #fff; text-shadow: 0 0 3px #000, 0 2px 0 #000; white-space: nowrap; text-align: center; }
+.dmg small { display: block; font-family: var(--font); font-size: 10px; color: #8fd8ff; font-weight: 700; }
+.dmg.c { color: #ffb030; font-size: 30px; }
+.dmg.p { color: #ff5a4a; font-size: 20px; }
+.dmg.o { color: #c8c8c8; font-size: 15px; }
+.dmg.exp { color: #b8f080; font-size: 15px; font-family: var(--font); font-weight: 700; }
+.dmg.gold { color: #ffd760; font-size: 15px; font-family: var(--font); font-weight: 700; }
+.dmg.lvup { color: #ffe080; font-size: 26px; }
+.combo { position: absolute; right: 8%; top: 32%; font-family: var(--title); font-size: 22px; color: #ffe8b0; text-shadow: 0 0 8px rgba(255,150,40,.8), 0 2px 0 #000; opacity: 0; transition: opacity .3s; }
+.combo b { font-size: 56px; color: #fff; margin-right: 4px; }
+.combo.pop { animation: comboPop .18s ease-out; }
+@keyframes comboPop { from { transform: scale(1.35); } to { transform: scale(1); } }
+
+/* 사망 */
+.death { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse, rgba(60,0,0,.35), rgba(0,0,0,.7)); pointer-events: auto; }
+.death h2 { font-family: var(--title); font-weight: 400; font-size: 44px; color: #e05a4a; margin: 0 0 18px; letter-spacing: 6px; text-align: center; }
+.death .box { text-align: center; }

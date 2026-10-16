@@ -1,10 +1,12 @@
 import { DurableObject } from 'cloudflare:workers';
-import { ZONES } from '../../shared/data';
+import { MONSTERS, ZONES } from '../../shared/data';
 import { dist2, resolveCircle } from '../../shared/geom';
 import { SNAP_HZ, ZONE_HZ, type C2S, type S2C } from '../../shared/protocol';
 import type { ZoneDef } from '../../shared/types';
 import { loadCharacter, saveCharacter } from '../db';
 import type { Env } from '../env';
+import { Combat } from './Combat';
+import { Monster } from './Monster';
 import { PlayerSession } from './PlayerSession';
 
 const PLAYER_RADIUS = 0.4;
@@ -22,12 +24,33 @@ export class ZoneDO extends DurableObject<Env> {
   private timer: ReturnType<typeof setInterval> | null = null;
   private tickCount = 0;
   private lastSave = Date.now();
+  private lastStep = Date.now();
+  readonly monsters = new Map<number, Monster>();
+  private combat: Combat | null = null;
+
+  /** 존을 처음 열 때 몬스터를 배치한다 */
+  private init(zoneId: string): boolean {
+    if (this.zone) return true;
+    const z = ZONES[zoneId];
+    if (!z) return false;
+    this.zone = z;
+    for (const s of z.spawns) {
+      const def = MONSTERS[s.monster];
+      if (!def) continue;
+      for (let i = 0; i < s.count; i++) {
+        const m = new Monster(def, s.area, z);
+        this.monsters.set(m.id, m);
+      }
+    }
+    const self = this;
+    this.combat = new Combat({ zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e) });
+    return true;
+  }
 
   async fetch(req: Request): Promise<Response> {
     const zoneId = req.headers.get('X-Zone') ?? '';
     const charId = Number(req.headers.get('X-Char-Id'));
-    if (!this.zone) this.zone = ZONES[zoneId] ?? null;
-    if (!this.zone) return new Response('unknown zone', { status: 404 });
+    if (!this.init(zoneId) || !this.zone) return new Response('unknown zone', { status: 404 });
     // 같은 캐릭터가 이미 접속 중이면 이전 연결을 끊고(저장 후) 다시 불러온다
     const old = this.players.get(charId);
     if (old) await this.remove(old, '다른 곳에서 접속했습니다.');
@@ -48,8 +71,9 @@ export class ZoneDO extends DurableObject<Env> {
     p.send({
       t: 'welcome', you: p.self(), zone: z.id, time: Date.now(),
       players: [...this.players.values()].filter((o) => o !== p).map((o) => o.info()),
-      monsters: [],
+      monsters: [...this.monsters.values()].filter((m) => !m.dead).map((m) => m.info()),
     });
+    if (p.dead) p.send({ t: 'died', wait: 0 });
     this.broadcast({ t: 'join', p: p.info() }, p);
     this.broadcast({ t: 'sys', text: `${p.name}님이 ${z.name}에 들어왔습니다.` }, p);
     this.start();
@@ -70,7 +94,10 @@ export class ZoneDO extends DurableObject<Env> {
     }
     switch (msg.t) {
       case 'move': return this.onMove(p, msg);
-      case 'act': return this.broadcast({ t: 'act', id: p.id, a: String(msg.a).slice(0, 32), f: Number(msg.f) || 0 }, p);
+      case 'act': return this.combat?.onAct(p, msg);
+      case 'hit': return this.combat?.onHit(p, msg);
+      case 'hurt': return this.combat?.onHurt(p, msg);
+      case 'revive': return this.combat?.onRevive(p);
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });
@@ -87,7 +114,7 @@ export class ZoneDO extends DurableObject<Env> {
   }
 
   private onMove(p: PlayerSession, m: Extract<C2S, { t: 'move' }>): void {
-    if (p.leaving || !this.zone) return;
+    if (p.leaving || p.dead || !this.zone) return;
     const now = Date.now();
     const dt = Math.min(1, Math.max(0.05, (now - p.lastMoveAt) / 1000));
     p.lastMoveAt = now;
@@ -182,13 +209,53 @@ export class ZoneDO extends DurableObject<Env> {
     this.timer = null;
   }
 
-  /** 20Hz 진행 */
+  /** 몬스터끼리 겹치지 않게 살짝 밀어낸다(띄워진 몬스터는 제외) */
+  private separate(): void {
+    const list = [...this.monsters.values()].filter((m) => !m.dead && !m.body.air);
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const a = list[i].body, b = list[j].body;
+        const min = list[i].def.radius + list[j].def.radius;
+        const dx = b.x - a.x, dz = b.z - a.z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 >= min * min || d2 < 1e-6) continue;
+        const d = Math.sqrt(d2), push = (min - d) / 2;
+        a.x -= (dx / d) * push;
+        a.z -= (dz / d) * push;
+        b.x += (dx / d) * push;
+        b.z += (dz / d) * push;
+      }
+    }
+  }
+
+  /** 20Hz 진행: 몬스터 → 스냅샷 → 회복·저장 */
   private step(): void {
     this.tickCount++;
-    if (this.tickCount % (ZONE_HZ / SNAP_HZ) === 0) {
-      this.broadcast({ t: 'snap', time: Date.now(), p: [...this.players.values()].map((p) => p.snap()), m: [] });
-    }
     const now = Date.now();
+    const dt = Math.min(0.1, (now - this.lastStep) / 1000);
+    this.lastStep = now;
+    const z = this.zone!;
+    const emit = (msg: S2C) => this.broadcast(msg);
+    for (const m of this.monsters.values()) {
+      if (m.dead) {
+        m.respawnT -= dt;
+        if (m.respawnT <= 0) {
+          m.respawn(z);
+          this.broadcast({ t: 'mspawn', m: m.info() });
+        }
+        continue;
+      }
+      m.update(dt, z, this.players.values(), emit);
+    }
+    this.separate();
+    if (this.tickCount % (ZONE_HZ / SNAP_HZ) === 0) {
+      this.broadcast({
+        t: 'snap', time: now,
+        p: [...this.players.values()].map((p) => p.snap()),
+        m: [...this.monsters.values()].filter((m) => !m.dead).map((m) => m.snap()),
+      });
+    }
+    if (this.tickCount % ZONE_HZ === 0) for (const p of this.players.values()) this.combat?.regen(p);
     if (now - this.lastSave > SAVE_EVERY_MS) {
       this.lastSave = now;
       for (const p of this.players.values()) if (p.dirty && !p.leaving) void this.save(p);

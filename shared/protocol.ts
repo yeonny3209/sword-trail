@@ -43,6 +43,10 @@ export interface SelfState {
   mmp: number;
   x: number;
   z: number;
+  atk: number;
+  def: number;
+  crit: number;
+  speed: number;
 }
 
 /** 이동 상태 코드(원격 애니메이션용) */
@@ -57,20 +61,52 @@ export enum MoveState {
   Act = 7,
 }
 
+/** 몬스터 상태 코드 */
+export enum MonState {
+  Idle = 0,
+  Move = 1,
+  Windup = 2,
+  Attack = 3,
+  Recover = 4,
+  Hit = 5,
+  Air = 6,
+  Down = 7,
+  Dead = 8,
+}
+
 export type C2S =
   | { t: 'move'; x: number; z: number; y: number; f: number; st: MoveState }
-  | { t: 'act'; a: string; f: number }
+  /** 행동 시작. i: 이 행동의 고유 번호(타격 보고에 씀) */
+  | { t: 'act'; a: string; f: number; i: number }
+  /** 내가 몬스터(m)를 맞혔다: 행동 번호 i의 h번째 판정 */
+  | { t: 'hit'; i: number; h: number; m: number }
+  /** 몬스터 m의 k번째 공격에 내가 맞았다 */
+  | { t: 'hurt'; m: number; k: number }
+  | { t: 'revive' }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
 
 export type S2C =
   | { t: 'welcome'; you: SelfState; zone: string; time: number; players: PlayerInfo[]; monsters: MonsterInfo[] }
-  /** p: [id, x, z, y, f, st], m: [id, x, z, y, f, st, hp] */
+  /** p: [id, x, z, y, f, st, hp], m: [id, x, z, y, f, st, hp] */
   | { t: 'snap'; time: number; p: number[][]; m: number[][] }
   | { t: 'join'; p: PlayerInfo }
   | { t: 'leave'; id: number }
   | { t: 'act'; id: number; a: string; f: number }
+  /** 피해 숫자. tk: 'm' 몬스터 / 'p' 플레이어 */
+  | { t: 'dmg'; tk: 'm' | 'p'; id: number; n: number; crit?: boolean; back?: boolean; counter?: boolean; by: number }
+  /** 내 상태 일부 갱신 */
+  | { t: 'me'; s: Partial<SelfState> }
+  | { t: 'mspawn'; m: MonsterInfo }
+  | { t: 'mdie'; id: number; by: number }
+  /** 몬스터 공격 시작(예고). k: 공격 번호 */
+  | { t: 'matk'; id: number; k: number; f: number }
+  /** 다른 플레이어가 맞아서 반응(밀림·띄움) — 보간에 반영되므로 연출용 */
+  | { t: 'reward'; exp: number; gold: number; name: string }
+  | { t: 'lvup'; id: number; lv: number }
+  | { t: 'died'; wait: number }
+  | { t: 'cdfail'; a: string }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
   | { t: 'pos'; x: number; z: number }
