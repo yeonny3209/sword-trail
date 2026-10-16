@@ -1,0 +1,31 @@
+{
+  "name": "강공격",
+  "attack": {
+    "id": "heavy",
+    "startup": 10,
+    "active": 5,
+    "recovery": 24,
+    "cancelFrame": 30,
+    "damage": 30,
+    "posture": 40,
+    "advance": 0.9,
+    "hitstop": 7,
+    "stamina": 25,
+    "shake": 0.35,
+    "heavy": true,
+    "knockback": 1.0,
+    "sfx": "swingHeavy",
+    "hitSfx": "slashHeavy",
+    "hitRadius": 0.18,
+    "arc": {
+      "from": [
+        -15,
+        75
+      ],
+      "to": [
+        20,
+        -50
+      ]
+    }
+  }
+}

@@ -35,6 +35,9 @@ export class Debug {
       this.push(`${e.finisher ? '결정타' : '피격'}: ${e.attacker.name} → ${e.target.name} (${e.damage} / 자세 ${Math.round(e.postureDamage)})`, e.finisher ? 'finisher' : 'hit'),
     );
     bus.on('postureBreak', (e) => this.push(`자세 붕괴: ${e.fighter.name}${e.guardBreak ? ' (가드 브레이크)' : ''}`, 'break'));
+    bus.on('parrySuccess', (e) => this.push(`패링 성공: ${e.defender.name} ← ${e.attacker.name} (${e.attack.id})`, 'parry'));
+    bus.on('blocked', (e) => this.push(`막기: ${e.defender.name} ← ${e.attacker.name}${e.guardBreak ? ' → 가드 브레이크' : ''}`, 'block'));
+    bus.on('dodged', (e) => this.push(`회피(무적): ${e.defender.name} ← ${e.attacker.name}`, 'dodge'));
     bus.on('death', (e) => this.push(`사망: ${e.fighter.name}`, 'death'));
   }
 

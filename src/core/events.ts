@@ -28,4 +28,11 @@ export interface GameEvents {
   death: { fighter: Fighter; killer: Fighter | null };
   postureBreak: { fighter: Fighter; guardBreak: boolean };
   postureRecovered: { fighter: Fighter };
+  /** 막기 시작 직후 맞음 → 패링 성공. attacker는 패링당한 쪽 */
+  parrySuccess: { attacker: Fighter; defender: Fighter; attack: AttackData; point: THREE.Vector3 };
+  blocked: { attacker: Fighter; defender: Fighter; attack: AttackData; point: THREE.Vector3; guardBreak: boolean };
+  /** 무적 시간으로 공격을 피함 */
+  dodged: { attacker: Fighter; defender: Fighter; attack: AttackData };
+  dodgeStarted: { fighter: Fighter };
+  blockStarted: { fighter: Fighter };
 }

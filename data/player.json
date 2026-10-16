@@ -41,5 +41,32 @@
   "hp": 100,
   "posture": 100,
   "postureRegenDelay": 1.2,
-  "postureRegen": 25
+  "postureRegen": 25,
+  "stamina": {
+    "max": 100,
+    "regenDelay": 1.0,
+    "regenRate": 30,
+    "blockRegenMul": 0.4
+  },
+  "dodge": {
+    "frames": 24,
+    "distance": 4.0,
+    "iframeStartFrame": 1,
+    "iframeMs": 200,
+    "stamina": 20,
+    "cancelFrame": 18
+  },
+  "block": {
+    "moveSpeed": 2.2
+  },
+  "charge": {
+    "moveSpeed": 1.5,
+    "pose": [
+      -15,
+      75
+    ]
+  },
+  "hitstunFrames": 20,
+  "blockstunFrames": 8,
+  "knockback": 0.6
 }

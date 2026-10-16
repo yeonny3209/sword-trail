@@ -9,6 +9,7 @@ import { Player } from '../player/Player';
 import { CameraRig } from '../player/CameraRig';
 import { FpsCounter } from '../ui/FpsCounter';
 import { Debug } from '../ui/Debug';
+import { Hud } from '../ui/Hud';
 import { CombatSystem } from '../combat/CombatSystem';
 import { Dummy } from '../enemies/Dummy';
 
@@ -29,6 +30,7 @@ export class Game {
   private renderPos = new THREE.Vector3();
   private combat!: CombatSystem;
   private debug!: Debug;
+  private hud!: Hud;
   private dummies: Dummy[] = [];
 
   constructor(private readonly mount: HTMLElement, private readonly ui: HTMLElement) {
@@ -50,6 +52,7 @@ export class Game {
     this.renderer.domElement.addEventListener('click', () => this.input.requestLock());
     this.combat = new CombatSystem();
     this.debug = new Debug(this.scene, this.camera, this.ui);
+    this.hud = new Hud(this.ui);
     this.player = new Player(this.scene, this.physics);
     for (const [x, z, yaw] of getData<{ positions: number[][] }>('enemies/dummy').positions) {
       this.dummies.push(new Dummy(this.scene, this.physics, x, z, yaw));
@@ -79,6 +82,7 @@ export class Game {
     this.rig.update(this.renderPos, realDt);
     this.arena.follow(this.renderPos.x, this.renderPos.z);
     this.debug.render();
+    this.hud.render(realDt);
     this.fps.update(realDt);
     this.renderer.render(this.scene, this.camera);
   };

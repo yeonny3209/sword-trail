@@ -9,6 +9,48 @@
   "posture": 120,
   "postureRegenDelay": 2.0,
   "postureRegen": 30,
-  "sword": { "length": 1.2, "shoulderHeight": 1.3, "rest": [0, -30], "guard": [0, 0] },
-  "positions": [[0, 6, 3.14159]]
+  "sword": {
+    "length": 1.2,
+    "shoulderHeight": 1.3,
+    "rest": [
+      0,
+      -30
+    ],
+    "guard": [
+      0,
+      0
+    ]
+  },
+  "positions": [
+    [
+      0,
+      6,
+      3.14159
+    ]
+  ],
+  "attackInterval": 3.0,
+  "attack": {
+    "id": "dummy_strike",
+    "startup": 30,
+    "active": 5,
+    "recovery": 25,
+    "cancelFrame": 60,
+    "damage": 10,
+    "posture": 20,
+    "advance": 0,
+    "hitstop": 4,
+    "glow": "white",
+    "sfx": "swing",
+    "hitSfx": "slash",
+    "arc": {
+      "from": [
+        0,
+        75
+      ],
+      "to": [
+        0,
+        -40
+      ]
+    }
+  }
 }

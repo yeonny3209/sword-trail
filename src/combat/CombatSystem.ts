@@ -57,8 +57,57 @@ export class CombatSystem {
     }
   }
 
+  /** 무적 → 회피, 막기 시작 직후 → 패링, 막기 중 → 막기, 그 외 → 피격 */
   private resolve(src: HitSource, target: Fighter, point: THREE.Vector3): void {
+    const atk = src.data;
+    const attacker = src.owner;
+    if (target.iframe) {
+      bus.emit('dodged', { attacker, defender: target, attack: atk });
+      return;
+    }
+    if (target.blocking && atk.blockable !== false && this.facing(target, src.origin())) {
+      const windowMs = this.data.parryWindowMs + target.mods.parryWindowBonusMs;
+      const inWindow = this.frame - target.blockStartFrame <= Math.round((windowMs / 1000) * 60);
+      if (src.consumeOnContact) src.consumed = true;
+      if (inWindow && atk.parryable !== false) this.parry(src, target, point);
+      else this.block(src, target, point);
+      return;
+    }
     this.applyHit(src, target, point);
+  }
+
+  private facing(target: Fighter, from: THREE.Vector3): boolean {
+    const dx = from.x - target.pos.x, dz = from.z - target.pos.z;
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-4) return true;
+    const dot = (Math.sin(target.yaw) * dx + Math.cos(target.yaw) * dz) / len;
+    return dot >= Math.cos((this.data.blockAngleDeg * Math.PI) / 180);
+  }
+
+  private parry(src: HitSource, defender: Fighter, point: THREE.Vector3): void {
+    const attacker = src.owner;
+    const v = attacker.vitals;
+    if (!attacker.isBroken()) {
+      v.posture = Math.min(v.maxPosture, v.posture + this.data.parryPostureDamage + src.data.posture * this.data.parryPostureMul);
+      attacker.lastPostureHitFrame = this.frame;
+    }
+    bus.emit('parrySuccess', { attacker, defender, attack: src.data, point });
+    if (attacker.alive && v.posture >= v.maxPosture) this.breakPosture(attacker, false);
+  }
+
+  private block(src: HitSource, defender: Fighter, point: THREE.Vector3): void {
+    const atk = src.data;
+    const v = defender.vitals;
+    if (v.maxStamina > 0) v.stamina = Math.max(0, v.stamina - (atk.blockStamina ?? this.data.blockStaminaDefault));
+    v.hp = Math.max(1, v.hp - Math.round(atk.damage * this.data.blockDamageMul));
+    v.posture = Math.min(v.maxPosture, v.posture + atk.posture * this.data.blockPostureMul);
+    defender.lastPostureHitFrame = this.frame;
+    const guardBreak = (v.maxStamina > 0 && v.stamina <= 0) || v.posture >= v.maxPosture;
+    bus.emit('blocked', { attacker: src.owner, defender, attack: atk, point, guardBreak });
+    if (guardBreak) {
+      defender.blocking = false;
+      this.breakPosture(defender, true);
+    }
   }
 
   private applyHit(src: HitSource, target: Fighter, point: THREE.Vector3): void {
