@@ -102,6 +102,15 @@ export class Player {
       this.setState('broken');
     });
     bus.on('lockChanged', ({ target }) => (this.lockTarget = target));
+    bus.on('teleportPlayer', ({ x, z, yaw }) => {
+      this.body.teleport(x, z);
+      me.pos.set(x, 0, z);
+      me.yaw = yaw;
+      this.push.set(0, 0);
+      this.vel.set(0, 0);
+      me.snap();
+    });
+    bus.on('resetPlayer', () => this.reset());
     bus.on('death', (e) => {
       if (e.fighter !== me) return;
       this.interrupt();
@@ -113,6 +122,20 @@ export class Player {
     const dx = this.fighter.pos.x - from.x, dz = this.fighter.pos.z - from.z;
     const len = Math.hypot(dx, dz) || 1;
     this.push.set((dx / len) * strength * 10, (dz / len) * strength * 10);
+  }
+
+  /** 완전 회복(새 런, 야영지 귀환) */
+  reset(): void {
+    const f = this.fighter;
+    this.interrupt();
+    f.alive = true;
+    f.brokenFrames = 0;
+    const v = f.vitals;
+    v.hp = v.maxHp;
+    v.stamina = v.maxStamina;
+    v.posture = 0;
+    this.stunFrames = 0;
+    this.setState('idle');
   }
 
   /** 진행 중인 행동을 끊는다 */

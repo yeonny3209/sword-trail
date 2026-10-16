@@ -3,6 +3,7 @@ import { bus } from '../core/bus';
 import { getData } from '../core/config';
 import type { Physics } from '../core/Physics';
 import type { Fighter } from '../combat/Fighter';
+import { Dummy } from './Dummy';
 import { Enemy, type Brain } from './Enemy';
 import { MeleeBrain } from './MeleeBrain';
 import { TokenManager } from './TokenManager';
@@ -11,6 +12,7 @@ import type { EnemyData } from './types';
 /** 적 생성·갱신·제거. 'spawnEnemy' 이벤트로 적을 만든다. */
 export class EnemyManager {
   readonly enemies: Enemy[] = [];
+  readonly dummies: Dummy[] = [];
   readonly tokens = new TokenManager();
   private player: Fighter | null = null;
   private readonly brains = new Map<string, () => Brain>();
@@ -28,15 +30,19 @@ export class EnemyManager {
     this.brains.set(name, make);
   }
 
-  spawn(type: string, x: number, z: number, yaw: number): Enemy {
+  spawn(type: string, x: number, z: number, yaw: number): void {
+    if (type === 'dummy') {
+      this.dummies.push(new Dummy(this.scene, this.physics, x, z, yaw));
+      return;
+    }
     const data = getData<EnemyData & { brain?: string }>(`enemies/${type}`);
     const make = this.brains.get(data.brain ?? 'melee') ?? this.brains.get('melee')!;
     const e = new Enemy(this.scene, this.physics, type, data, x, z, yaw, this.tokens, make());
     this.enemies.push(e);
-    return e;
   }
 
   update(dt: number): void {
+    for (const d of this.dummies) d.update();
     for (const e of this.enemies) e.update(dt, this.player);
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       if (this.enemies[i].removed) {
@@ -47,12 +53,15 @@ export class EnemyManager {
   }
 
   render(alpha: number, realDt: number): void {
+    for (const d of this.dummies) d.render(alpha, realDt);
     for (const e of this.enemies) e.render(alpha, realDt);
   }
 
   clear(): void {
     for (const e of this.enemies) e.dispose();
+    for (const d of this.dummies) d.dispose();
     this.enemies.length = 0;
+    this.dummies.length = 0;
     this.tokens.clear();
   }
 

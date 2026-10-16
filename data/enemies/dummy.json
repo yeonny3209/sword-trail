@@ -21,13 +21,6 @@
       0
     ]
   },
-  "positions": [
-    [
-      0,
-      6,
-      3.14159
-    ]
-  ],
   "attackInterval": 3.0,
   "attack": {
     "id": "dummy_strike",

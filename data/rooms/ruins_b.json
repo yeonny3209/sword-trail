@@ -1,0 +1,16 @@
+{
+  "id": "ruins_b", "name": "안개 낀 마당", "type": "combat",
+  "size": [28, 24],
+  "palette": { "floor": "#666a66", "wall": "#4f534f", "pillar": "#767b76" },
+  "playerStart": [0, -9, 0],
+  "exit": [0, 12],
+  "pillars": [
+    { "x": -6, "z": 4, "w": 1.4, "d": 1.4, "h": 2.0 },
+    { "x": 6, "z": 4, "w": 1.4, "d": 1.4, "h": 2.0 },
+    { "x": 0, "z": 0, "w": 3.0, "d": 0.8, "h": 1.0 }
+  ],
+  "waves": [
+    [{ "type": "spearman", "x": -2, "z": 6 }, { "type": "recruit", "x": 3, "z": 5 }],
+    [{ "type": "archer", "x": 8, "z": 9 }, { "type": "recruit", "x": -4, "z": 8 }]
+  ]
+}

@@ -2,6 +2,7 @@ import type * as THREE from 'three';
 import type { Fighter } from '../combat/Fighter';
 import type { AttackData } from '../combat/types';
 import type { ProjectileSpec } from '../enemies/types';
+import type { RunSummary } from '../progression/RunStats';
 
 export interface HitEvent {
   attacker: Fighter;
@@ -48,6 +49,24 @@ export interface GameEvents {
   spawnEnemy: { type: string; x: number; z: number; yaw?: number };
   /** 모든 적 제거 요청(방 전환) */
   clearEnemies: Record<string, never>;
+  /** 런·방 진행 */
+  teleportPlayer: { x: number; z: number; yaw: number };
+  /** 플레이어 완전 회복(새 런 시작, 야영지 귀환) */
+  resetPlayer: Record<string, never>;
+  roomEntered: { name: string; zone: string; index: number; total: number; type: string };
+  waveStarted: { index: number; total: number };
+  roomCleared: { type: string; roomId: string };
+  gateOpened: Record<string, never>;
+  runStarted: { seed: number };
+  /** 런 종료(승리/사망). 결과 화면 표시 */
+  runEnded: { victory: boolean };
+  returnToCamp: Record<string, never>;
+  /** 런 결과 요약(결과 화면용) */
+  runSummary: { summary: RunSummary };
+  /** 화면 전환 페이드 */
+  transition: { seconds: number };
+  /** 게임 논리 일시정지(메뉴, 포인터 잠금 해제) */
+  pause: { paused: boolean; reason: string };
   /** 투사체 발사(궁수 등) */
   fireProjectile: {
     owner: Fighter; attack: AttackData; spec: ProjectileSpec;

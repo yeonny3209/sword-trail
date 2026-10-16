@@ -1,0 +1,10 @@
+{
+  "id": "ruins_rest", "name": "꺼져 가는 모닥불", "type": "rest",
+  "size": [20, 20],
+  "palette": { "floor": "#57524a", "wall": "#45413b", "pillar": "#6a645a", "accent": "#e09040" },
+  "playerStart": [0, -7, 0],
+  "exit": [0, 10],
+  "pillars": [],
+  "props": [{ "kind": "bonfire", "x": 0, "z": 1 }],
+  "waves": []
+}

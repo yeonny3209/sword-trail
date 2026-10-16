@@ -1,0 +1,60 @@
+{
+  "name": "정예 수련병",
+  "shape": "capsule",
+  "radius": 0.5,
+  "height": 2.1,
+  "color": "#9a3b2c",
+  "hitColor": "#ffffff",
+  "swordColor": "#b0a090",
+  "swordWidth": 1.3,
+  "hp": 200,
+  "posture": 110,
+  "postureRegenDelay": 2.0,
+  "postureRegen": 14,
+  "sword": { "length": 1.35, "shoulderHeight": 1.45, "rest": [-20, -50], "guard": [70, 15] },
+  "moveSpeed": 3.2,
+  "circleSpeed": 1.6,
+  "turnSpeed": 6,
+  "trackTurnSpeed": 3,
+  "aggroRange": 20,
+  "keepDistance": [3.4, 4.8],
+  "attackCooldown": [0.6, 1.4],
+  "engageTimeout": 3.0,
+  "recoverFrames": 34,
+  "hitstunFrames": 12,
+  "parriedFrames": 40,
+  "knockback": 0.3,
+  "deathSinkSeconds": 1.6,
+  "attacks": [
+    {
+      "id": "elite_overhead", "weight": 2, "range": 2.4,
+      "startup": 34, "active": 5, "recovery": 26, "cancelFrame": 65,
+      "damage": 20, "posture": 24, "advance": 0.8, "hitstop": 5, "knockback": 1.0,
+      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy",
+      "arc": { "from": [0, 80], "to": [0, -45] }
+    },
+    {
+      "id": "elite_combo1", "weight": 2, "range": 2.4, "next": "elite_combo2",
+      "startup": 28, "active": 4, "recovery": 8, "cancelFrame": 40,
+      "damage": 14, "posture": 16, "advance": 0.6, "hitstop": 4,
+      "glow": "white", "sfx": "swing", "hitSfx": "slash",
+      "arc": { "from": [-80, 10], "to": [85, -5] }
+    },
+    {
+      "id": "elite_combo2", "weight": 0, "range": 2.6,
+      "startup": 18, "active": 4, "recovery": 30, "cancelFrame": 52,
+      "damage": 16, "posture": 18, "advance": 0.8, "hitstop": 4,
+      "glow": "white", "sfx": "swing", "hitSfx": "slash",
+      "arc": { "from": [80, 15], "to": [-85, -5] }
+    },
+    {
+      "id": "elite_lunge", "weight": 1, "range": 5.0, "minRange": 3.0,
+      "startup": 40, "active": 8, "recovery": 36, "cancelFrame": 84,
+      "damage": 26, "posture": 30, "advance": 4.0, "hitstop": 6, "knockback": 1.4,
+      "glow": "red", "parryable": false, "blockable": false, "superArmor": true,
+      "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.2,
+      "arc": { "from": [5, 0], "to": [0, -10] }
+    }
+  ],
+  "shards": [10, 14]
+}

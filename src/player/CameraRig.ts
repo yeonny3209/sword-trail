@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getData } from '../core/config';
 import { clamp, damp, lerpAngle, yawTo } from '../core/math';
 import type { Physics } from '../core/Physics';
+import { bus } from '../core/bus';
 
 export interface CameraData {
   distance: number;
@@ -34,6 +35,10 @@ export class CameraRig {
   constructor(private readonly camera: THREE.PerspectiveCamera, private readonly physics: Physics) {
     this.pitch = this.data.defaultPitch;
     this.dist = this.data.distance;
+    bus.on('teleportPlayer', ({ x, z, yaw }) => {
+      this.snapBehind(yaw);
+      this.pivot.set(x, this.data.pivotHeight, z);
+    });
   }
 
   /** 마우스 회전. 고정 중에는 수평 회전 대신 대상 전환에 쓰이므로 무시 */

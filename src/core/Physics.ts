@@ -29,6 +29,12 @@ export class Physics {
     return c;
   }
 
+  removeCollider(c: RAPIER.Collider): void {
+    const i = this.statics.indexOf(c);
+    if (i >= 0) this.statics.splice(i, 1);
+    this.world.removeCollider(c, false);
+  }
+
   clearStatics(): void {
     for (const c of this.statics) this.world.removeCollider(c, false);
     this.statics = [];

@@ -35,7 +35,7 @@ export class Dummy {
   constructor(private readonly scene: THREE.Scene, physics: Physics, x: number, z: number, yaw: number) {
     const d = this.data;
     this.fighter = new Fighter({
-      team: 'enemy', name: d.name, radius: d.radius, height: d.height, sword: d.sword,
+      team: 'enemy', name: d.name, kind: 'dummy', radius: d.radius, height: d.height, sword: d.sword,
       hp: d.hp, posture: d.posture, postureRegenDelay: d.postureRegenDelay, postureRegen: d.postureRegen,
     });
     this.fighter.pos.set(x, 0, z);
