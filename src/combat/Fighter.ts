@@ -14,6 +14,8 @@ export interface SwordSpec {
 export interface FighterOptions {
   team: Team;
   name: string;
+  /** 종류 키(예: 'recruit') */
+  kind?: string;
   radius: number;
   height: number;
   sword: SwordSpec;
@@ -37,6 +39,7 @@ export class Fighter {
   readonly id = Fighter.nextId++;
   readonly team: Team;
   readonly name: string;
+  readonly kind: string;
   readonly radius: number;
   readonly height: number;
   readonly sword: SwordSpec;
@@ -73,6 +76,7 @@ export class Fighter {
   constructor(o: FighterOptions) {
     this.team = o.team;
     this.name = o.name;
+    this.kind = o.kind ?? o.team;
     this.radius = o.radius;
     this.height = o.height;
     this.sword = o.sword;

@@ -101,6 +101,7 @@ export class Player {
       this.interrupt();
       this.setState('broken');
     });
+    bus.on('lockChanged', ({ target }) => (this.lockTarget = target));
     bus.on('death', (e) => {
       if (e.fighter !== me) return;
       this.interrupt();

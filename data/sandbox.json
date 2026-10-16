@@ -1,0 +1,7 @@
+{
+  "enemies": [
+    { "type": "recruit", "x": -4, "z": 12 },
+    { "type": "recruit", "x": 0, "z": 14 },
+    { "type": "recruit", "x": 4, "z": 12 }
+  ]
+}

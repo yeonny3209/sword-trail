@@ -1,6 +1,7 @@
 import type * as THREE from 'three';
 import type { Fighter } from '../combat/Fighter';
 import type { AttackData } from '../combat/types';
+import type { ProjectileSpec } from '../enemies/types';
 
 export interface HitEvent {
   attacker: Fighter;
@@ -39,4 +40,17 @@ export interface GameEvents {
   dodged: { attacker: Fighter; defender: Fighter; attack: AttackData };
   dodgeStarted: { fighter: Fighter };
   blockStarted: { fighter: Fighter };
+  /** 적이 공격 예비 동작을 시작(빛 신호) */
+  telegraph: { fighter: Fighter; attack: AttackData; frames: number };
+  /** 적 고정 대상 변경(null = 해제) */
+  lockChanged: { target: Fighter | null };
+  /** 적 생성 요청 */
+  spawnEnemy: { type: string; x: number; z: number; yaw?: number };
+  /** 모든 적 제거 요청(방 전환) */
+  clearEnemies: Record<string, never>;
+  /** 투사체 발사(궁수 등) */
+  fireProjectile: {
+    owner: Fighter; attack: AttackData; spec: ProjectileSpec;
+    x: number; y: number; z: number; dx: number; dy: number; dz: number;
+  };
 }

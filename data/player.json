@@ -12,13 +12,13 @@
     0
   ],
   "camera": {
-    "distance": 5.5,
-    "pivotHeight": 1.7,
-    "defaultPitch": 0.32,
+    "distance": 6.6,
+    "pivotHeight": 2.0,
+    "defaultPitch": 0.36,
     "pitchMin": -0.3,
     "pitchMax": 1.1,
     "followSharpness": 14,
-    "lockPitch": 0.3,
+    "lockPitch": 0.38,
     "lockYawSharpness": 7,
     "lockMaxRange": 18,
     "lockSwitchFlick": 0.12,
