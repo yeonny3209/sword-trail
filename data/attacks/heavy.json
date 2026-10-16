@@ -5,7 +5,7 @@
     "startup": 10,
     "active": 5,
     "recovery": 24,
-    "cancelFrame": 30,
+    "cancelFrame": 24,
     "damage": 30,
     "posture": 40,
     "advance": 0.9,
@@ -26,6 +26,7 @@
         20,
         -50
       ]
-    }
+    },
+    "moveCancelFrame": 30
   }
 }

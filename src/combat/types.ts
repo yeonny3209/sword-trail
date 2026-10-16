@@ -27,6 +27,8 @@ export interface AttackData {
   recovery: number;
   /** 이 프레임부터 다음 행동으로 캔슬 가능(공격 시작 기준) */
   cancelFrame: number;
+  /** 이 프레임부터 이동 입력만으로 후딜을 끊을 수 있음(없으면 끝까지) */
+  moveCancelFrame?: number;
   damage: number;
   posture: number;
   /** 선딜+판정 동안 앞으로 미끄러지는 거리(m) */

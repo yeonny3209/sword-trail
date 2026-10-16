@@ -2,10 +2,43 @@
   "name": "땅 내려찍기",
   "spirit": 60,
   "attack": {
-    "id": "skill_slam", "startup": 16, "active": 5, "recovery": 30, "cancelFrame": 40,
-    "damage": 34, "posture": 50, "advance": 0.4, "hitstop": 8, "stamina": 0,
-    "shake": 0.5, "heavy": true, "knockback": 1.6, "sfx": "swingHeavy", "hitSfx": "slashHeavy",
-    "hitRadius": 0.22, "superArmor": true, "arc": { "from": [0, 88], "to": [0, -60] },
-    "projectile": { "speed": 12, "radius": 0.6, "length": 2.2, "life": 0.7, "count": 1, "interval": 0, "color": "#ffd890", "height": 0.5 }
+    "id": "skill_slam",
+    "startup": 16,
+    "active": 5,
+    "recovery": 30,
+    "cancelFrame": 32,
+    "damage": 34,
+    "posture": 50,
+    "advance": 0.4,
+    "hitstop": 8,
+    "stamina": 0,
+    "shake": 0.5,
+    "heavy": true,
+    "knockback": 1.6,
+    "sfx": "swingHeavy",
+    "hitSfx": "slashHeavy",
+    "hitRadius": 0.22,
+    "superArmor": true,
+    "arc": {
+      "from": [
+        0,
+        88
+      ],
+      "to": [
+        0,
+        -60
+      ]
+    },
+    "projectile": {
+      "speed": 12,
+      "radius": 0.6,
+      "length": 2.2,
+      "life": 0.7,
+      "count": 1,
+      "interval": 0,
+      "color": "#ffd890",
+      "height": 0.5
+    },
+    "moveCancelFrame": 40
   }
 }

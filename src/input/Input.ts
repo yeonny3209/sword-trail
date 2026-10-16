@@ -4,18 +4,16 @@ import { getData } from '../core/config';
 export type Action =
   | 'moveForward' | 'moveBack' | 'moveLeft' | 'moveRight'
   | 'attack' | 'heavy' | 'block' | 'dodge' | 'lockOn'
-  | 'heal' | 'skill' | 'interact' | 'debug';
+  | 'heal' | 'skill' | 'interact' | 'debug' | 'heavyModifier';
 
 interface InputData {
   bindings: Record<string, string[]>;
-  attackTapMs: number;
-  heavyChargeMs: number;
   mouseSensitivity: number;
 }
 
 /**
  * 키·마우스 입력을 행동 이름으로 바꾸는 계층.
- * 왼쪽 버튼은 짧게 떼면 "attack", 길게 누르면 차지 후 "heavy"로 변환한다.
+ * 왼쪽 버튼은 누르는 순간 "attack", Shift를 누른 채면 "heavy"로 바꾼다.
  */
 export class Input {
   readonly data = getData<InputData>('input');
@@ -24,8 +22,6 @@ export class Input {
   private queued: Action[] = [];
   private codesDown = new Set<string>();
   private codeToAction = new Map<string, Action>();
-  private attackHoldStart: number | null = null;
-  private heavyFired = false;
   mouseDX = 0;
   mouseDY = 0;
   locked = false;
@@ -67,26 +63,12 @@ export class Input {
   beginTick(): void {
     this.pressed = new Set(this.queued);
     this.queued = [];
-    if (this.attackHoldStart !== null && !this.heavyFired) {
-      if (performance.now() - this.attackHoldStart >= this.data.heavyChargeMs) {
-        this.heavyFired = true;
-        this.pressed.add('heavy');
-      }
-    }
   }
 
   isDown(action: Action): boolean {
     if (!this.enabled) return false;
     for (const code of this.data.bindings[action] ?? []) if (this.codesDown.has(code)) return true;
     return false;
-  }
-
-  /** 강공격 차지 중인가(짧게 누르기 기준을 넘김) */
-  charging(): boolean {
-    return (
-      this.enabled && this.attackHoldStart !== null && !this.heavyFired &&
-      performance.now() - this.attackHoldStart >= this.data.attackTapMs
-    );
   }
 
   /** 이동 입력. x: 오른쪽 +, y: 앞 + */
@@ -107,26 +89,17 @@ export class Input {
 
   private press(code: string): void {
     const action = this.codeToAction.get(code);
-    if (!action || !this.enabled) return;
-    if (action === 'attack') {
-      this.attackHoldStart = performance.now();
-      this.heavyFired = false;
+    if (!action || !this.enabled || action === 'heavyModifier') return;
+    // 누르는 순간 바로 공격(입력 지연 0). Shift를 누르고 있으면 강공격
+    if (action === 'attack' && this.isDown('heavyModifier')) {
+      this.queued.push('heavy');
       return;
     }
     this.queued.push(action);
   }
 
-  private release(code: string): void {
-    const action = this.codeToAction.get(code);
-    if (action === 'attack' && this.attackHoldStart !== null) {
-      if (!this.heavyFired && this.enabled) this.queued.push('attack');
-      this.attackHoldStart = null;
-    }
-  }
-
   private releaseAll(): void {
     this.codesDown.clear();
-    this.attackHoldStart = null;
   }
 
   private onKeyDown = (e: KeyboardEvent): void => {
@@ -143,7 +116,6 @@ export class Input {
 
   private onKeyUp = (e: KeyboardEvent): void => {
     this.codesDown.delete(e.code);
-    this.release(e.code);
   };
 
   private onMouseDown = (e: MouseEvent): void => {
@@ -155,9 +127,7 @@ export class Input {
   };
 
   private onMouseUp = (e: MouseEvent): void => {
-    const code = `Mouse${e.button}`;
-    this.codesDown.delete(code);
-    this.release(code);
+    this.codesDown.delete(`Mouse${e.button}`);
   };
 
   private onMouseMove = (e: MouseEvent): void => {

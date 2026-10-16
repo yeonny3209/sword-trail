@@ -4,9 +4,9 @@
   "color": "#e8b04a",
   "moveSpeed": 5.2,
   "lockMoveSpeed": 4.2,
-  "acceleration": 40,
-  "deceleration": 30,
-  "turnSpeed": 14,
+  "acceleration": 90,
+  "deceleration": 80,
+  "turnSpeed": 20,
   "spawn": [
     0,
     0
@@ -66,7 +66,8 @@
     "pose": [
       -15,
       75
-    ]
+    ],
+    "frames": 24
   },
   "hitstunFrames": 20,
   "blockstunFrames": 8,

@@ -2,16 +2,57 @@
   "name": "장도 약공격",
   "hits": [
     {
-      "id": "odachi1", "startup": 10, "active": 5, "recovery": 16, "cancelFrame": 20,
-      "damage": 20, "posture": 18, "advance": 0.45, "hitstop": 5, "stamina": 14,
-      "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.17,
-      "arc": { "from": [-80, 15], "to": [90, -10] }
+      "id": "odachi1",
+      "startup": 10,
+      "active": 5,
+      "recovery": 16,
+      "cancelFrame": 17,
+      "damage": 20,
+      "posture": 18,
+      "advance": 0.45,
+      "hitstop": 5,
+      "stamina": 14,
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.17,
+      "arc": {
+        "from": [
+          -80,
+          15
+        ],
+        "to": [
+          90,
+          -10
+        ]
+      },
+      "moveCancelFrame": 22
     },
     {
-      "id": "odachi2", "startup": 10, "active": 5, "recovery": 22, "cancelFrame": 26,
-      "damage": 26, "posture": 24, "advance": 0.7, "hitstop": 6, "stamina": 14, "shake": 0.12,
-      "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.17,
-      "arc": { "from": [10, 85], "to": [0, -50] }
+      "id": "odachi2",
+      "startup": 10,
+      "active": 5,
+      "recovery": 22,
+      "cancelFrame": 21,
+      "damage": 26,
+      "posture": 24,
+      "advance": 0.7,
+      "hitstop": 6,
+      "stamina": 14,
+      "shake": 0.12,
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.17,
+      "arc": {
+        "from": [
+          10,
+          85
+        ],
+        "to": [
+          0,
+          -50
+        ]
+      },
+      "moveCancelFrame": 27
     }
   ]
 }

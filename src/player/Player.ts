@@ -30,7 +30,7 @@ export interface PlayerData {
   stamina: { max: number; regenDelay: number; regenRate: number; blockRegenMul: number };
   dodge: { frames: number; distance: number; iframeStartFrame: number; iframeMs: number; stamina: number; cancelFrame: number };
   block: { moveSpeed: number };
-  charge: { moveSpeed: number; pose: [number, number] };
+  charge: { moveSpeed: number; pose: [number, number]; frames: number };
   hitstunFrames: number;
   blockstunFrames: number;
   knockback: number;

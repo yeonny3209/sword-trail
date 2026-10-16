@@ -40,18 +40,22 @@ function tryActions(p: Player): boolean {
     return true;
   }
   if (p.canSpend() && b.consume(['heavy'], p.frame)) {
-    startHeavy(p);
+    startCharge(p);
     return true;
   }
   if (p.canSpend() && b.consume(['attack'], p.frame)) {
     startLight(p, 0);
     return true;
   }
-  if (p.input.charging() && p.canSpend()) {
-    p.setState('charge');
-    return true;
-  }
   return false;
+}
+
+/** 강공격(Shift+클릭): 짧은 차지 후 자동으로 내려친다 */
+function startCharge(p: Player): void {
+  p.interrupt();
+  p.combo = 0;
+  p.fighter.pose = [...p.data.charge.pose];
+  p.setState('charge');
 }
 
 function startLight(p: Player, index: number): void {
@@ -111,12 +115,22 @@ function attack(p: Player, dt: number): void {
   if (run.canCancel()) {
     const b = p.buffer;
     if (p.canSpend() && b.consume(['dodge'], p.frame)) return startDodge(p);
-    if (p.canSpend() && b.consume(['heavy'], p.frame)) return startHeavy(p);
+    if (p.canSpend() && b.consume(['heavy'], p.frame)) return startCharge(p);
     const isLight = p.light.includes(run.data);
     if (isLight && p.combo + 1 < p.light.length && p.canSpend() && b.consume(['attack'], p.frame)) {
       return startLight(p, p.combo + 1);
     }
     if (p.input.isDown('block')) return startBlock(p);
+  }
+  // 후딜 뒷부분은 이동 입력으로 끊고 바로 걷는다
+  const moveCancel = run.data.moveCancelFrame ?? run.total;
+  if (run.frame >= moveCancel && !run.done() && p.wishDir()) {
+    f.attack = null;
+    f.iframe = false;
+    p.combo = 0;
+    p.setState('idle');
+    p.locomotion(dt, p.data.moveSpeed);
+    return;
   }
   if (run.done()) {
     f.attack = null;
@@ -129,15 +143,8 @@ function attack(p: Player, dt: number): void {
 
 function charge(p: Player, dt: number): void {
   const f = p.fighter;
-  f.pose = [...p.data.charge.pose];
-  if (p.buffer.consume(['heavy'], p.frame)) return startHeavy(p);
   if (p.canSpend() && p.buffer.consume(['dodge'], p.frame)) return startDodge(p);
-  if (!p.input.charging()) {
-    // 차지 완료 전에 뗌 → 약공격
-    f.pose = [...p.data.sword.rest];
-    if (p.buffer.consume(['attack'], p.frame)) return startLight(p, 0);
-    return p.setState('idle');
-  }
+  if (f.stateFrame >= p.data.charge.frames) return startHeavy(p);
   p.locomotion(dt, p.data.charge.moveSpeed);
 }
 
