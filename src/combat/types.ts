@@ -4,9 +4,24 @@ export type Team = 'player' | 'enemy';
 /** 공격 예고 색. 흰 빛 = 패링 가능, 붉은 빛 = 회피만, 보라 = 잡기 */
 export type Glow = 'white' | 'red' | 'purple';
 
+export interface ProjectileSpec {
+  speed: number;
+  radius: number;
+  length: number;
+  life: number;
+  count: number;
+  /** 연사 간격(프레임) */
+  interval: number;
+  color: string;
+  /** 발사 높이 */
+  height: number;
+}
+
 /** 공격 한 동작의 데이터. 프레임은 60fps 기준. */
 export interface AttackData {
   id: string;
+  /** 표시용 이름(사망 원인 등) */
+  name?: string;
   startup: number;
   active: number;
   recovery: number;
@@ -36,6 +51,8 @@ export interface AttackData {
   blockStamina?: number;
   /** false면 검 판정 없음(투사체만) */
   melee?: boolean;
+  /** 판정 시작 시(또는 간격마다) 발사하는 투사체 */
+  projectile?: ProjectileSpec;
 }
 
 export interface Segment {
@@ -50,6 +67,9 @@ export interface Vitals {
   maxPosture: number;
   stamina: number;
   maxStamina: number;
+  /** 기력(검 기술용, 플레이어만) */
+  spirit: number;
+  maxSpirit: number;
 }
 
 /** 각인·영구 강화가 바꾸는 배율. 기본값 1/0 */
@@ -61,10 +81,18 @@ export interface Modifiers {
   parryWindowBonusMs: number;
   nextHitMul: number;
   damageTakenMul: number;
+  staminaRegenMul: number;
+  blockCostMul: number;
+  dodgeCostDelta: number;
+  /** 강공격 차지·공격 중 강인함 */
+  heavyArmor: boolean;
 }
 
 export function defaultMods(): Modifiers {
-  return { damageMul: 1, postureMul: 1, heavyDamageMul: 1, attackSpeed: 1, parryWindowBonusMs: 0, nextHitMul: 1, damageTakenMul: 1 };
+  return {
+    damageMul: 1, postureMul: 1, heavyDamageMul: 1, attackSpeed: 1, parryWindowBonusMs: 0, nextHitMul: 1,
+    damageTakenMul: 1, staminaRegenMul: 1, blockCostMul: 1, dodgeCostDelta: 0, heavyArmor: false,
+  };
 }
 
 /** 판정 출처: 검 휘두르기 또는 투사체 */

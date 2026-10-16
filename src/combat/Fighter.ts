@@ -82,7 +82,7 @@ export class Fighter {
     this.sword = o.sword;
     this.pose = [...o.sword.rest];
     const st = o.stamina ?? 0;
-    this.vitals = { hp: o.hp, maxHp: o.hp, posture: 0, maxPosture: o.posture, stamina: st, maxStamina: st };
+    this.vitals = { hp: o.hp, maxHp: o.hp, posture: 0, maxPosture: o.posture, stamina: st, maxStamina: st, spirit: 0, maxSpirit: 0 };
     this.postureRegenDelay = o.postureRegenDelay;
     this.postureRegen = o.postureRegen;
   }

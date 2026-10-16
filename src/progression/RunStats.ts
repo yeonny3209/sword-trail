@@ -54,7 +54,12 @@ export class RunStats {
     bus.on('hit', (e) => {
       if (e.target.team !== 'player') return;
       this.s.damageTaken += e.damage;
-      this.lastHitBy = `${e.attacker.name}의 ${e.attack.id}`;
+      this.lastHitBy = `${e.attacker.name}의 ${e.attack.name ?? e.attack.id}`;
+    });
+    bus.on('engravingGained', (e) => this.s.engravings.push(e.name));
+    bus.on('shardsBanked', (e) => {
+      this.s.shardsEarned = e.earned;
+      this.s.shardsKept = e.kept;
     });
     bus.on('runEnded', ({ victory }) => {
       this.running = false;

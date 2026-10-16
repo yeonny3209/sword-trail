@@ -38,6 +38,7 @@ export class Audio {
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
     bus.on('sfx', ({ key, volume }) => this.play(key, volume));
+    bus.on('settingsChanged', ({ settings }) => this.setVolume(settings.volume));
   }
 
   private ensure(): void {

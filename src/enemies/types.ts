@@ -1,18 +1,7 @@
 import type { SwordSpec } from '../combat/Fighter';
-import type { AttackData } from '../combat/types';
+import type { AttackData, ProjectileSpec } from '../combat/types';
 
-export interface ProjectileSpec {
-  speed: number;
-  radius: number;
-  length: number;
-  life: number;
-  count: number;
-  /** 연사 간격(프레임) */
-  interval: number;
-  color: string;
-  /** 발사 높이 */
-  height: number;
-}
+export type { ProjectileSpec };
 
 export interface EnemyAttack extends AttackData {
   weight: number;
@@ -22,8 +11,6 @@ export interface EnemyAttack extends AttackData {
   minRange?: number;
   /** 이어지는 공격 id(연속기) */
   next?: string;
-  /** 투사체 공격(궁수) */
-  projectile?: ProjectileSpec;
   /** 페이즈 제한(보스) */
   phase?: number;
 }

@@ -1,3 +1,4 @@
+import { bus } from '../core/bus';
 import { getData } from '../core/config';
 
 export type Action =
@@ -30,8 +31,11 @@ export class Input {
   locked = false;
   /** 메뉴가 열려 있을 때는 게임 입력을 막는다 */
   enabled = true;
+  /** 설정의 마우스 감도 배율 */
+  sensitivity = 1;
 
   constructor(private readonly canvas: HTMLElement) {
+    bus.on('settingsChanged', ({ settings }) => (this.sensitivity = settings.mouseSensitivity));
     for (const [action, codes] of Object.entries(this.data.bindings)) {
       for (const code of codes) this.codeToAction.set(code, action as Action);
     }
@@ -49,7 +53,10 @@ export class Input {
   }
 
   requestLock(): void {
-    if (!this.locked) this.canvas.requestPointerLock?.();
+    if (this.locked) return;
+    // 사용자 동작 밖이거나 Esc 직후면 거부된다 → 다음 클릭 때 다시 잠근다
+    const r = this.canvas.requestPointerLock?.() as unknown as Promise<void> | undefined;
+    r?.catch?.(() => {});
   }
 
   exitLock(): void {
@@ -91,7 +98,8 @@ export class Input {
   }
 
   consumeMouse(): { dx: number; dy: number } {
-    const r = { dx: this.mouseDX * this.data.mouseSensitivity, dy: this.mouseDY * this.data.mouseSensitivity };
+    const k = this.data.mouseSensitivity * this.sensitivity;
+    const r = { dx: this.mouseDX * k, dy: this.mouseDY * k };
     this.mouseDX = 0;
     this.mouseDY = 0;
     return r;

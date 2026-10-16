@@ -23,7 +23,9 @@
     "lockMaxRange": 18,
     "lockSwitchFlick": 0.12,
     "collisionPadding": 0.25,
-    "minDistance": 1.2
+    "minDistance": 0.6,
+    "liftStart": 2.6,
+    "liftAmount": 0.55
   },
   "sword": {
     "length": 1.1,

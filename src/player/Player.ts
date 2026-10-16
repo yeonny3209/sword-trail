@@ -9,6 +9,7 @@ import { AttackRunner } from '../combat/AttackRunner';
 import { Fighter, type SwordSpec } from '../combat/Fighter';
 import { FighterView } from '../combat/FighterView';
 import type { AttackData } from '../combat/types';
+import { listenPlayerEvents } from './PlayerEvents';
 import { updatePlayerState, type PlayerState } from './PlayerStates';
 
 export interface PlayerData {
@@ -35,11 +36,30 @@ export interface PlayerData {
   knockback: number;
 }
 
-/** 플레이어 본체: 입력 → 상태 기계 → 이동/공격. 상태별 동작은 PlayerStates.ts */
+export interface SwordDef {
+  id: string;
+  name: string;
+  desc: string;
+  cost: number;
+  light: string;
+  heavy: string;
+  skill: string;
+  length: number;
+  width: number;
+  color: string;
+  memory: string;
+}
+
+export interface PotionData { potionHeal: number; potionFrames: number; potionHealFrame: number; potionMoveSpeed: number }
+
+/** 플레이어 본체: 입력 → 상태 기계 → 이동/공격. 상태별 동작은 PlayerStates.ts, 이벤트 반응은 PlayerEvents.ts */
 export class Player {
   readonly data = getData<PlayerData>('player');
-  light = getData<{ hits: AttackData[] }>('attacks/light').hits;
-  heavy = getData<{ attack: AttackData }>('attacks/heavy').attack;
+  readonly potion = getData<PotionData>('progression');
+  light: AttackData[] = [];
+  heavy!: AttackData;
+  skill!: AttackData;
+  skillCost = 50;
   readonly fighter: Fighter;
   readonly view: FighterView;
   readonly body: CharacterBody;
@@ -59,11 +79,12 @@ export class Player {
   stunFrames = 0;
   /** 적 고정 대상 */
   lockTarget: Fighter | null = null;
+  potions = 0;
 
   constructor(scene: THREE.Scene, physics: Physics) {
     const d = this.data;
     this.fighter = new Fighter({
-      team: 'player', name: '수련생', radius: d.radius, height: d.height, sword: d.sword,
+      team: 'player', name: '수련생', radius: d.radius, height: d.height, sword: { ...d.sword },
       hp: d.hp, posture: d.posture, stamina: d.stamina.max,
       postureRegenDelay: d.postureRegenDelay, postureRegen: d.postureRegen,
     });
@@ -73,52 +94,30 @@ export class Player {
     this.fighter.snap();
     const bufferMs = getData<{ bufferMs: number }>('input').bufferMs;
     this.buffer = new InputBuffer(Math.round((bufferMs / 1000) * 60));
+    this.equip('trainee');
     bus.emit('fighterSpawned', { fighter: this.fighter });
-    this.listen();
+    listenPlayerEvents(this);
   }
 
   get pos(): THREE.Vector3 {
     return this.fighter.pos;
   }
 
-  /** 전투 결과에 대한 반응(경직, 넉백, 자세 붕괴) */
-  private listen(): void {
-    const me = this.fighter;
-    bus.on('hit', (e) => {
-      if (e.target !== me || !me.alive) return;
-      this.knockFrom(e.attacker.pos, (e.attack.knockback ?? 1) * this.data.knockback);
-      if (me.superArmor || me.isBroken()) return;
-      this.interrupt();
-      this.stunFrames = this.data.hitstunFrames;
-      this.setState('hitstun');
-    });
-    bus.on('blocked', (e) => {
-      if (e.defender !== me || e.guardBreak) return;
-      this.knockFrom(e.attacker.pos, 0.5 * this.data.knockback);
-    });
-    bus.on('postureBreak', (e) => {
-      if (e.fighter !== me) return;
-      this.interrupt();
-      this.setState('broken');
-    });
-    bus.on('lockChanged', ({ target }) => (this.lockTarget = target));
-    bus.on('teleportPlayer', ({ x, z, yaw }) => {
-      this.body.teleport(x, z);
-      me.pos.set(x, 0, z);
-      me.yaw = yaw;
-      this.push.set(0, 0);
-      this.vel.set(0, 0);
-      me.snap();
-    });
-    bus.on('resetPlayer', () => this.reset());
-    bus.on('death', (e) => {
-      if (e.fighter !== me) return;
-      this.interrupt();
-      this.setState('dead');
-    });
+  /** 검 교체: 공격 세트(약·강·기술)와 검 길이를 바꾼다 */
+  equip(id: string): void {
+    const sw = getData<{ list: SwordDef[] }>('swords').list.find((s) => s.id === id);
+    if (!sw) return;
+    this.light = getData<{ hits: AttackData[] }>(sw.light).hits;
+    this.heavy = getData<{ attack: AttackData }>(sw.heavy).attack;
+    const skill = getData<{ attack: AttackData; spirit: number }>(sw.skill);
+    this.skill = skill.attack;
+    this.skillCost = skill.spirit;
+    this.fighter.sword.length = sw.length;
+    this.view.sword.scale.x = this.view.sword.scale.z = sw.width;
+    this.view.swordMat.color.set(sw.color);
   }
 
-  private knockFrom(from: THREE.Vector3, strength: number): void {
+  knockFrom(from: THREE.Vector3, strength: number): void {
     const dx = this.fighter.pos.x - from.x, dz = this.fighter.pos.z - from.z;
     const len = Math.hypot(dx, dz) || 1;
     this.push.set((dx / len) * strength * 10, (dz / len) * strength * 10);
@@ -134,6 +133,7 @@ export class Player {
     v.hp = v.maxHp;
     v.stamina = v.maxStamina;
     v.posture = 0;
+    v.spirit = 0;
     this.stunFrames = 0;
     this.setState('idle');
   }
@@ -166,7 +166,7 @@ export class Player {
     const v = this.fighter.vitals;
     const busy = this.state === 'attack' || this.state === 'dodge' || this.state === 'charge';
     if (busy || this.frame - this.lastSpendFrame < s.regenDelay * 60) return;
-    const mul = this.fighter.blocking ? s.blockRegenMul : 1;
+    const mul = (this.fighter.blocking ? s.blockRegenMul : 1) * this.fighter.mods.staminaRegenMul;
     v.stamina = Math.min(v.maxStamina, v.stamina + s.regenRate * mul * dt);
   }
 
@@ -178,8 +178,12 @@ export class Player {
     f.beginTick();
     f.stateFrame++;
     for (const a of input.pressed) this.buffer.push(a, frame);
+    if (input.pressed.has('interact')) bus.emit('interactPressed', {});
     if (this.lockTarget && !this.lockTarget.alive) this.lockTarget = null;
     updatePlayerState(this, dt);
+    // 강인함: 기술 자체의 강인함 또는 각인(굳센 차지)
+    const atk = f.attack?.data;
+    f.superArmor = !!atk?.superArmor || (f.mods.heavyArmor && (this.state === 'charge' || !!atk?.heavy));
     this.applyPush(dt);
     this.regenStamina(dt);
     f.updateSword();
@@ -253,6 +257,18 @@ export class Player {
     bus.emit('attackStarted', { fighter: f, attack: data });
   }
 
+  /** 기술 공격의 투사체(검기·충격파) */
+  fireProjectile(data: AttackData): void {
+    const p = data.projectile;
+    if (!p) return;
+    const f = this.fighter;
+    const dx = Math.sin(f.yaw), dz = Math.cos(f.yaw);
+    bus.emit('fireProjectile', {
+      owner: f, attack: data, spec: p,
+      x: f.pos.x + dx * (f.radius + 0.6), y: f.pos.y + p.height, z: f.pos.z + dz * (f.radius + 0.6), dx, dy: 0, dz,
+    });
+  }
+
   render(alpha: number, realDt: number): void {
     this.view.render(alpha, realDt);
     // 구르기: 몸통을 앞으로 한 바퀴
@@ -262,7 +278,7 @@ export class Player {
       body.rotation.x = t * Math.PI * 2;
       body.position.y = this.data.height / 2 - Math.sin(t * Math.PI) * 0.45;
     } else {
-      body.rotation.x = this.state === 'broken' ? -0.35 : this.state === 'dead' ? -1.4 : 0;
+      body.rotation.x = this.state === 'broken' ? -0.35 : this.state === 'dead' ? -1.4 : this.state === 'heal' ? 0.25 : 0;
       body.position.y = this.state === 'dead' ? this.data.radius : this.data.height / 2;
     }
   }

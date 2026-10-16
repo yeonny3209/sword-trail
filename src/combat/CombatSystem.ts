@@ -108,7 +108,8 @@ export class CombatSystem {
   private block(src: HitSource, defender: Fighter, point: THREE.Vector3): void {
     const atk = src.data;
     const v = defender.vitals;
-    if (v.maxStamina > 0) v.stamina = Math.max(0, v.stamina - (atk.blockStamina ?? this.data.blockStaminaDefault));
+    const cost = (atk.blockStamina ?? this.data.blockStaminaDefault) * defender.mods.blockCostMul;
+    if (v.maxStamina > 0) v.stamina = Math.max(0, v.stamina - cost);
     v.hp = Math.max(1, v.hp - Math.round(atk.damage * this.data.blockDamageMul));
     v.posture = Math.min(v.maxPosture, v.posture + atk.posture * this.data.blockPostureMul);
     defender.lastPostureHitFrame = this.frame;

@@ -1,0 +1,9 @@
+{
+  "name": "장도 강공격",
+  "attack": {
+    "id": "odachi_heavy", "startup": 14, "active": 6, "recovery": 28, "cancelFrame": 36,
+    "damage": 44, "posture": 60, "advance": 1.0, "hitstop": 9, "stamina": 30,
+    "shake": 0.45, "heavy": true, "knockback": 1.4, "sfx": "swingHeavy", "hitSfx": "slashHeavy",
+    "hitRadius": 0.22, "arc": { "from": [-20, 85], "to": [15, -55] }
+  }
+}

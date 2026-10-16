@@ -14,14 +14,31 @@
   "posture": 220,
   "postureRegenDelay": 3.0,
   "postureRegen": 10,
-  "sword": { "length": 1.9, "shoulderHeight": 1.9, "rest": [-25, -55], "guard": [70, 15] },
+  "sword": {
+    "length": 1.9,
+    "shoulderHeight": 1.9,
+    "rest": [
+      -25,
+      -55
+    ],
+    "guard": [
+      70,
+      15
+    ]
+  },
   "moveSpeed": 2.7,
   "circleSpeed": 1.0,
   "turnSpeed": 4,
   "trackTurnSpeed": 2.2,
   "aggroRange": 30,
-  "keepDistance": [2.8, 4.4],
-  "attackCooldown": [0.7, 1.5],
+  "keepDistance": [
+    2.8,
+    4.4
+  ],
+  "attackCooldown": [
+    0.7,
+    1.5
+  ],
   "engageTimeout": 4.0,
   "recoverFrames": 30,
   "hitstunFrames": 0,
@@ -35,56 +52,226 @@
   "phase2Speed": 1.15,
   "attacks": [
     {
-      "id": "gk_overhead", "weight": 3, "range": 3.3,
-      "startup": 48, "active": 6, "recovery": 34, "cancelFrame": 88,
-      "damage": 30, "posture": 34, "advance": 1.0, "hitstop": 7, "knockback": 1.4, "shake": 0.25,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.28,
-      "arc": { "from": [0, 85], "to": [0, -50] }
+      "id": "gk_overhead",
+      "weight": 3,
+      "range": 3.3,
+      "startup": 48,
+      "active": 6,
+      "recovery": 34,
+      "cancelFrame": 88,
+      "damage": 30,
+      "posture": 34,
+      "advance": 1.0,
+      "hitstop": 7,
+      "knockback": 1.4,
+      "shake": 0.25,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.28,
+      "arc": {
+        "from": [
+          0,
+          85
+        ],
+        "to": [
+          0,
+          -50
+        ]
+      },
+      "name": "내려치기"
     },
     {
-      "id": "gk_sweep", "weight": 2, "range": 3.4,
-      "startup": 40, "active": 7, "recovery": 30, "cancelFrame": 77,
-      "damage": 24, "posture": 28, "advance": 0.5, "hitstop": 6, "knockback": 1.2,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.26,
-      "arc": { "from": [-100, 0], "to": [110, -10] }
+      "id": "gk_sweep",
+      "weight": 2,
+      "range": 3.4,
+      "startup": 40,
+      "active": 7,
+      "recovery": 30,
+      "cancelFrame": 77,
+      "damage": 24,
+      "posture": 28,
+      "advance": 0.5,
+      "hitstop": 6,
+      "knockback": 1.2,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.26,
+      "arc": {
+        "from": [
+          -100,
+          0
+        ],
+        "to": [
+          110,
+          -10
+        ]
+      },
+      "name": "휩쓸기"
     },
     {
-      "id": "gk_charge", "weight": 1, "range": 8.5, "minRange": 4.5,
-      "startup": 46, "active": 10, "recovery": 40, "cancelFrame": 96,
-      "damage": 32, "posture": 40, "advance": 6.0, "hitstop": 7, "knockback": 1.6, "shake": 0.3,
-      "glow": "red", "parryable": false, "blockable": false,
-      "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.3,
-      "arc": { "from": [4, -5], "to": [0, -12] }
+      "id": "gk_charge",
+      "weight": 1,
+      "range": 8.5,
+      "minRange": 4.5,
+      "startup": 46,
+      "active": 10,
+      "recovery": 40,
+      "cancelFrame": 96,
+      "damage": 32,
+      "posture": 40,
+      "advance": 6.0,
+      "hitstop": 7,
+      "knockback": 1.6,
+      "shake": 0.3,
+      "glow": "red",
+      "parryable": false,
+      "blockable": false,
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.3,
+      "arc": {
+        "from": [
+          4,
+          -5
+        ],
+        "to": [
+          0,
+          -12
+        ]
+      },
+      "name": "붉은 돌진"
     },
     {
-      "id": "gk_combo1", "weight": 3, "range": 3.2, "phase": 2, "next": "gk_combo2",
-      "startup": 30, "active": 5, "recovery": 6, "cancelFrame": 41,
-      "damage": 20, "posture": 22, "advance": 0.7, "hitstop": 5, "knockback": 0.6,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.26,
-      "arc": { "from": [-95, 10], "to": [100, -8] }
+      "id": "gk_combo1",
+      "weight": 3,
+      "range": 3.2,
+      "phase": 2,
+      "next": "gk_combo2",
+      "startup": 30,
+      "active": 5,
+      "recovery": 6,
+      "cancelFrame": 41,
+      "damage": 20,
+      "posture": 22,
+      "advance": 0.7,
+      "hitstop": 5,
+      "knockback": 0.6,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.26,
+      "arc": {
+        "from": [
+          -95,
+          10
+        ],
+        "to": [
+          100,
+          -8
+        ]
+      },
+      "name": "3연속 베기"
     },
     {
-      "id": "gk_combo2", "weight": 0, "range": 3.4, "phase": 2, "next": "gk_combo3",
-      "startup": 16, "active": 5, "recovery": 6, "cancelFrame": 27,
-      "damage": 20, "posture": 22, "advance": 0.7, "hitstop": 5, "knockback": 0.6,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.26,
-      "arc": { "from": [95, 15], "to": [-100, -8] }
+      "id": "gk_combo2",
+      "weight": 0,
+      "range": 3.4,
+      "phase": 2,
+      "next": "gk_combo3",
+      "startup": 16,
+      "active": 5,
+      "recovery": 6,
+      "cancelFrame": 27,
+      "damage": 20,
+      "posture": 22,
+      "advance": 0.7,
+      "hitstop": 5,
+      "knockback": 0.6,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.26,
+      "arc": {
+        "from": [
+          95,
+          15
+        ],
+        "to": [
+          -100,
+          -8
+        ]
+      },
+      "name": "3연속 베기"
     },
     {
-      "id": "gk_combo3", "weight": 0, "range": 3.6, "phase": 2,
-      "startup": 26, "active": 6, "recovery": 40, "cancelFrame": 72,
-      "damage": 30, "posture": 34, "advance": 1.2, "hitstop": 8, "knockback": 1.5, "shake": 0.3,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.28,
-      "arc": { "from": [0, 85], "to": [0, -50] }
+      "id": "gk_combo3",
+      "weight": 0,
+      "range": 3.6,
+      "phase": 2,
+      "startup": 26,
+      "active": 6,
+      "recovery": 40,
+      "cancelFrame": 72,
+      "damage": 30,
+      "posture": 34,
+      "advance": 1.2,
+      "hitstop": 8,
+      "knockback": 1.5,
+      "shake": 0.3,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.28,
+      "arc": {
+        "from": [
+          0,
+          85
+        ],
+        "to": [
+          0,
+          -50
+        ]
+      },
+      "name": "3연속 베기"
     },
     {
-      "id": "gk_spin", "weight": 2, "range": 3.6, "phase": 2,
-      "startup": 50, "active": 12, "recovery": 44, "cancelFrame": 106,
-      "damage": 34, "posture": 40, "advance": 0.3, "hitstop": 7, "knockback": 1.8, "shake": 0.35,
-      "glow": "red", "parryable": false, "blockable": false,
-      "sfx": "swingHeavy", "hitSfx": "slashHeavy", "hitRadius": 0.3,
-      "arc": { "from": [-180, 5], "to": [185, -5] }
+      "id": "gk_spin",
+      "weight": 2,
+      "range": 3.6,
+      "phase": 2,
+      "startup": 50,
+      "active": 12,
+      "recovery": 44,
+      "cancelFrame": 106,
+      "damage": 34,
+      "posture": 40,
+      "advance": 0.3,
+      "hitstop": 7,
+      "knockback": 1.8,
+      "shake": 0.35,
+      "glow": "red",
+      "parryable": false,
+      "blockable": false,
+      "sfx": "swingHeavy",
+      "hitSfx": "slashHeavy",
+      "hitRadius": 0.3,
+      "arc": {
+        "from": [
+          -180,
+          5
+        ],
+        "to": [
+          185,
+          -5
+        ]
+      },
+      "name": "붉은 회전베기"
     }
   ],
-  "shards": [40, 50]
+  "shards": [
+    40,
+    50
+  ]
 }

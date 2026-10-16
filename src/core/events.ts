@@ -1,8 +1,17 @@
 import type * as THREE from 'three';
 import type { Fighter } from '../combat/Fighter';
 import type { AttackData } from '../combat/types';
-import type { ProjectileSpec } from '../enemies/types';
+import type { ProjectileSpec } from '../combat/types';
+import type { SaveData, Settings } from '../progression/Save';
 import type { RunSummary } from '../progression/RunStats';
+
+export interface RewardOption {
+  id: string;
+  name: string;
+  desc: string;
+  tags?: string[];
+  rarity?: string;
+}
 
 export interface HitEvent {
   attacker: Fighter;
@@ -67,6 +76,25 @@ export interface GameEvents {
   transition: { seconds: number };
   /** 게임 논리 일시정지(메뉴, 포인터 잠금 해제) */
   pause: { paused: boolean; reason: string };
+  /** 성장 */
+  shardsChanged: { run: number; bank: number };
+  shardsBanked: { earned: number; kept: number };
+  rewardOffer: { title: string; options: RewardOption[] };
+  rewardChosen: { id: string };
+  engravingGained: { id: string; name: string; tags: string[] };
+  potionsChanged: { count: number; max: number };
+  potionUsed: Record<string, never>;
+  heal: { target: Fighter; amount: number };
+  /** 검 장착(공격 세트 교체) */
+  equipSword: { id: string };
+  /** 플레이어가 F를 누름 */
+  interactPressed: Record<string, never>;
+  interactHint: { text: string | null };
+  openMenu: { kind: 'upgrades' | 'swords' };
+  buyUpgrade: { id: string };
+  selectSword: { id: string };
+  saveChanged: { save: SaveData };
+  settingsChanged: { settings: Settings };
   bossSpawned: { fighter: Fighter };
   bossPhase: { fighter: Fighter; phase: number };
   /** 투사체 발사(궁수 등) */

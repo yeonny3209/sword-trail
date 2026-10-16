@@ -11,15 +11,32 @@
   "posture": 65,
   "postureRegenDelay": 2.0,
   "postureRegen": 14,
-  "sword": { "length": 2.1, "shoulderHeight": 1.2, "rest": [-10, -25], "guard": [70, 15] },
+  "sword": {
+    "length": 2.1,
+    "shoulderHeight": 1.2,
+    "rest": [
+      -10,
+      -25
+    ],
+    "guard": [
+      70,
+      15
+    ]
+  },
   "moveSpeed": 3.2,
   "circleSpeed": 1.6,
   "turnSpeed": 6,
   "trackTurnSpeed": 2.5,
   "aggroRange": 18,
-  "keepDistance": [3.6, 5.2],
+  "keepDistance": [
+    3.6,
+    5.2
+  ],
   "retreatDistance": 2.3,
-  "attackCooldown": [1.0, 2.2],
+  "attackCooldown": [
+    1.0,
+    2.2
+  ],
   "engageTimeout": 3.0,
   "recoverFrames": 32,
   "hitstunFrames": 16,
@@ -28,26 +45,98 @@
   "deathSinkSeconds": 1.5,
   "attacks": [
     {
-      "id": "spear_thrust", "weight": 3, "range": 3.4, "minRange": 1.6,
-      "startup": 30, "active": 6, "recovery": 26, "cancelFrame": 62,
-      "damage": 15, "posture": 18, "advance": 1.4, "hitstop": 4, "knockback": 0.8,
-      "glow": "white", "sfx": "swing", "hitSfx": "slash", "hitRadius": 0.12,
-      "arc": { "from": [6, -2], "to": [0, -6] }
+      "id": "spear_thrust",
+      "weight": 3,
+      "range": 3.4,
+      "minRange": 1.6,
+      "startup": 30,
+      "active": 6,
+      "recovery": 26,
+      "cancelFrame": 62,
+      "damage": 15,
+      "posture": 18,
+      "advance": 1.4,
+      "hitstop": 4,
+      "knockback": 0.8,
+      "glow": "white",
+      "sfx": "swing",
+      "hitSfx": "slash",
+      "hitRadius": 0.12,
+      "arc": {
+        "from": [
+          6,
+          -2
+        ],
+        "to": [
+          0,
+          -6
+        ]
+      },
+      "name": "찌르기"
     },
     {
-      "id": "spear_double", "weight": 1, "range": 3.4, "minRange": 1.6, "next": "spear_double2",
-      "startup": 26, "active": 5, "recovery": 8, "cancelFrame": 39,
-      "damage": 12, "posture": 14, "advance": 1.0, "hitstop": 3, "knockback": 0.5,
-      "glow": "white", "sfx": "swing", "hitSfx": "slash", "hitRadius": 0.12,
-      "arc": { "from": [8, -2], "to": [0, -6] }
+      "id": "spear_double",
+      "weight": 1,
+      "range": 3.4,
+      "minRange": 1.6,
+      "next": "spear_double2",
+      "startup": 26,
+      "active": 5,
+      "recovery": 8,
+      "cancelFrame": 39,
+      "damage": 12,
+      "posture": 14,
+      "advance": 1.0,
+      "hitstop": 3,
+      "knockback": 0.5,
+      "glow": "white",
+      "sfx": "swing",
+      "hitSfx": "slash",
+      "hitRadius": 0.12,
+      "arc": {
+        "from": [
+          8,
+          -2
+        ],
+        "to": [
+          0,
+          -6
+        ]
+      },
+      "name": "2연속 찌르기"
     },
     {
-      "id": "spear_double2", "weight": 0, "range": 3.6,
-      "startup": 14, "active": 6, "recovery": 30, "cancelFrame": 50,
-      "damage": 15, "posture": 18, "advance": 1.2, "hitstop": 4, "knockback": 0.9,
-      "glow": "white", "sfx": "swing", "hitSfx": "slash", "hitRadius": 0.12,
-      "arc": { "from": [-8, 0], "to": [0, -6] }
+      "id": "spear_double2",
+      "weight": 0,
+      "range": 3.6,
+      "startup": 14,
+      "active": 6,
+      "recovery": 30,
+      "cancelFrame": 50,
+      "damage": 15,
+      "posture": 18,
+      "advance": 1.2,
+      "hitstop": 4,
+      "knockback": 0.9,
+      "glow": "white",
+      "sfx": "swing",
+      "hitSfx": "slash",
+      "hitRadius": 0.12,
+      "arc": {
+        "from": [
+          -8,
+          0
+        ],
+        "to": [
+          0,
+          -6
+        ]
+      },
+      "name": "2연속 찌르기"
     }
   ],
-  "shards": [3, 5]
+  "shards": [
+    3,
+    5
+  ]
 }

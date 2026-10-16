@@ -1,5 +1,6 @@
 import { bus } from '../core/bus';
 import type { RunSummary } from '../progression/RunStats';
+import type { Settings } from '../progression/Save';
 
 const CONTROLS = `
   <div class="controls">
@@ -26,8 +27,9 @@ export class Screens {
   private bannerTimer = 0;
   private toastTimer = 0;
   private started = false;
-  /** 다른 메뉴(보상 선택 등)가 열려 있음 */
-  modalOpen = false;
+  /** 현재 일시정지 이유(메뉴 등이 열려 있으면 일시정지 화면을 띄우지 않는다) */
+  private readonly reasons = new Set<string>(['title']);
+  private settings: Settings = { volume: 1, mouseSensitivity: 1, screenShake: true };
 
   constructor(ui: HTMLElement) {
     const el = (cls: string, html = '') => {
@@ -47,8 +49,30 @@ export class Screens {
       <p class="sub">부러진 검들이 묻힌 산 — 첫 번째 검을 향해</p>
       ${CONTROLS}
       <button class="btn">클릭하여 시작</button>`);
-    this.pauseEl = el('screen pause-screen', `<h2>일시정지</h2>${CONTROLS}<button class="btn">클릭하여 계속</button>`);
+    this.pauseEl = el('screen pause-screen', `<h2>일시정지</h2>${CONTROLS}
+      <div class="settings">
+        <label>마우스 감도 <input type="range" class="sens" min="0.3" max="2.5" step="0.05"></label>
+        <label>음량 <input type="range" class="vol" min="0" max="1" step="0.05"></label>
+        <label><input type="checkbox" class="shake"> 화면 흔들림</label>
+      </div>
+      <button class="btn resume">클릭하여 계속</button>`);
     this.pauseEl.style.display = 'none';
+    const sens = this.pauseEl.querySelector('.sens') as HTMLInputElement;
+    const vol = this.pauseEl.querySelector('.vol') as HTMLInputElement;
+    const shake = this.pauseEl.querySelector('.shake') as HTMLInputElement;
+    const emit = () => bus.emit('settingsChanged', {
+      settings: { mouseSensitivity: Number(sens.value), volume: Number(vol.value), screenShake: shake.checked },
+    });
+    sens.addEventListener('input', emit);
+    vol.addEventListener('input', emit);
+    shake.addEventListener('change', emit);
+    bus.on('settingsChanged', ({ settings }) => {
+      this.settings = settings;
+      sens.value = String(settings.mouseSensitivity);
+      vol.value = String(settings.volume);
+      shake.checked = settings.screenShake;
+    });
+    bus.on('pause', ({ paused, reason }) => (paused ? this.reasons.add(reason) : this.reasons.delete(reason)));
     this.result = el('screen result-screen');
     this.result.style.display = 'none';
 
@@ -58,7 +82,7 @@ export class Screens {
       bus.emit('sfx', { key: 'ui' });
       bus.emit('pause', { paused: false, reason: 'title' });
     });
-    this.pauseEl.addEventListener('click', () => this.resume());
+    this.pauseEl.querySelector('.resume')!.addEventListener('click', () => this.resume());
 
     bus.on('roomEntered', (e) => {
       if (e.type === 'camp') this.showBanner(e.name, '출구로 나가면 등반 시작 · 허수아비로 연습하세요');
@@ -87,9 +111,13 @@ export class Screens {
     return this.result.style.display !== 'none';
   }
 
+  get currentSettings(): Settings {
+    return this.settings;
+  }
+
   /** 포인터 잠금이 풀렸을 때 */
   showPause(): void {
-    if (!this.started || this.modalOpen || this.resultOpen) return;
+    if (!this.started || this.reasons.size > 0) return;
     this.pauseEl.style.display = '';
     bus.emit('pause', { paused: true, reason: 'unlock' });
   }

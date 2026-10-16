@@ -22,6 +22,9 @@ import { FxSystem } from '../fx/FxSystem';
 import { Audio } from '../audio/Audio';
 import { SfxRouter } from '../audio/SfxRouter';
 import { RunStats } from '../progression/RunStats';
+import { Progression } from '../progression/Progression';
+import { RewardMenu } from '../ui/RewardMenu';
+import { CampMenu } from '../ui/CampMenu';
 
 interface CameraData { fov: number; near: number; far: number }
 
@@ -51,6 +54,7 @@ export class Game {
   private bossBar!: BossBar;
   private fx!: FxSystem;
   audio!: Audio;
+  progression!: Progression;
   /** 히트스톱 남은 프레임 */
   private freeze = 0;
   /** 일시정지 이유(타이틀, 메뉴, 포인터 잠금 해제…) */
@@ -86,12 +90,16 @@ export class Game {
     this.fx = new FxSystem(this.scene, this.ui);
     this.audio = new Audio();
     new SfxRouter();
+    // 성장은 RunStats보다 먼저: 런 종료 시 파편 정산이 요약보다 앞서야 한다
+    this.progression = new Progression();
     new RunStats();
     this.lockOn = new LockOn();
     this.enemies = new EnemyManager(this.scene, this.physics);
     this.run = new RunManager(this.scene, this.physics);
     this.screens = new Screens(this.ui);
     this.bossBar = new BossBar(this.ui);
+    new RewardMenu(this.ui);
+    new CampMenu(this.ui);
     bus.on('hitstop', ({ frames }) => (this.freeze = Math.max(this.freeze, frames)));
     bus.on('pause', ({ paused, reason }) => this.setPaused(paused, reason));
     this.player = new Player(this.scene, this.physics);

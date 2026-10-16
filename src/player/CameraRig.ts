@@ -17,6 +17,9 @@ export interface CameraData {
   lockSwitchFlick: number;
   collisionPadding: number;
   minDistance: number;
+  /** 벽에 막혀 이 거리보다 가까워지면 카메라를 위로 올린다 */
+  liftStart: number;
+  liftAmount: number;
 }
 
 /**
@@ -72,12 +75,14 @@ export class CameraRig {
     this.dist = dist < this.dist ? dist : this.dist + (dist - this.dist) * damp(6, dt);
 
     this.camera.position.copy(this.pivot).addScaledVector(back, this.dist);
-    if (this.lockPoint) {
-      const mid = new THREE.Vector3().addVectors(this.pivot, this.lockPoint).multiplyScalar(0.5);
-      mid.y = this.pivot.y - 0.2;
-      this.camera.lookAt(mid);
-    } else {
-      this.camera.lookAt(this.pivot);
-    }
+    // 벽에 붙으면 카메라를 올리고 시선은 앞으로 보내서 벽 안으로 들어가지 않게 한다
+    const lift = Math.max(0, d.liftStart - this.dist) * d.liftAmount;
+    this.camera.position.y += lift;
+    const look = this.lockPoint
+      ? new THREE.Vector3().addVectors(this.pivot, this.lockPoint).multiplyScalar(0.5).setY(this.pivot.y - 0.2)
+      : this.pivot.clone();
+    look.x += Math.sin(this.yaw) * lift * 0.9;
+    look.z += Math.cos(this.yaw) * lift * 0.9;
+    this.camera.lookAt(look);
   }
 }

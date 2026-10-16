@@ -10,14 +10,31 @@
   "posture": 70,
   "postureRegenDelay": 2.0,
   "postureRegen": 12,
-  "sword": { "length": 1.15, "shoulderHeight": 1.25, "rest": [-20, -50], "guard": [70, 15] },
+  "sword": {
+    "length": 1.15,
+    "shoulderHeight": 1.25,
+    "rest": [
+      -20,
+      -50
+    ],
+    "guard": [
+      70,
+      15
+    ]
+  },
   "moveSpeed": 3.0,
   "circleSpeed": 1.5,
   "turnSpeed": 6,
   "trackTurnSpeed": 3,
   "aggroRange": 18,
-  "keepDistance": [3.2, 4.6],
-  "attackCooldown": [0.8, 2.0],
+  "keepDistance": [
+    3.2,
+    4.6
+  ],
+  "attackCooldown": [
+    0.8,
+    2.0
+  ],
   "engageTimeout": 3.0,
   "recoverFrames": 36,
   "hitstunFrames": 18,
@@ -26,12 +43,36 @@
   "deathSinkSeconds": 1.5,
   "attacks": [
     {
-      "id": "recruit_overhead", "weight": 1, "range": 2.1,
-      "startup": 36, "active": 5, "recovery": 28, "cancelFrame": 69,
-      "damage": 18, "posture": 22, "advance": 0.8, "hitstop": 5, "knockback": 1.0,
-      "glow": "white", "sfx": "swingHeavy", "hitSfx": "slash",
-      "arc": { "from": [0, 80], "to": [0, -45] }
+      "id": "recruit_overhead",
+      "weight": 1,
+      "range": 2.1,
+      "startup": 36,
+      "active": 5,
+      "recovery": 28,
+      "cancelFrame": 69,
+      "damage": 18,
+      "posture": 22,
+      "advance": 0.8,
+      "hitstop": 5,
+      "knockback": 1.0,
+      "glow": "white",
+      "sfx": "swingHeavy",
+      "hitSfx": "slash",
+      "arc": {
+        "from": [
+          0,
+          80
+        ],
+        "to": [
+          0,
+          -45
+        ]
+      },
+      "name": "내려치기"
     }
   ],
-  "shards": [2, 4]
+  "shards": [
+    2,
+    4
+  ]
 }

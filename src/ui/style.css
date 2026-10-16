@@ -54,3 +54,28 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-f
 .boss-bar .po { height: 5px; margin-top: 3px; display: flex; justify-content: center; background: rgba(0,0,0,.45); }
 .boss-bar .po div { height: 100%; background: #f2b33d; }
 .boss-bar.broken .po div { background: #ff40ff; animation: pulse .25s infinite alternate; }
+.hud .info { display: flex; gap: 16px; font-size: 13px; color: #e8dcc0; text-shadow: 0 0 3px #000; margin-bottom: 4px; }
+.hud .info small { color: #aaa; }
+.hud .sp { height: 5px; width: 60%; } .hud .sp .fill { background: #5aa8ff; }
+.hud .skill { position: absolute; left: 330px; bottom: 0; width: 34px; height: 34px; border: 2px solid #445; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667; background: rgba(0,0,0,.5); }
+.hud .skill.ready { border-color: #5aa8ff; color: #cfe6ff; box-shadow: 0 0 10px #5aa8ff; }
+.hud .engr { position: fixed; right: 14px; top: 40px; text-align: right; font-size: 12px; color: #e8dcc0; text-shadow: 0 0 3px #000; line-height: 1.6; }
+.hud .engr .tags span { display: inline-block; margin-left: 6px; color: #999; } .hud .engr .tags span.full { color: #ffd780; }
+.hud .hint { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); font-size: 16px; color: #fff; background: rgba(0,0,0,.55); padding: 6px 14px; border-radius: 4px; }
+.reward-screen .cards { display: flex; gap: 18px; margin: 10px 0 14px; flex-wrap: wrap; justify-content: center; }
+.card { position: relative; width: 210px; min-height: 170px; background: #1d1b18; border: 1px solid #6a5a40; padding: 18px 14px 14px; cursor: pointer; text-align: left; transition: transform .1s, border-color .1s; }
+.card:hover { transform: translateY(-4px); border-color: #f0c070; }
+.card.rare { border-color: #6aa0ff; box-shadow: 0 0 14px rgba(90,150,255,.25); }
+.card .key { position: absolute; top: 6px; right: 10px; color: #776; font-size: 12px; }
+.card .n { font-size: 18px; color: #f0e2c0; margin-bottom: 6px; }
+.card .tags span { display: inline-block; font-size: 11px; color: #ffd780; border: 1px solid #6a5a40; padding: 0 6px; margin-right: 4px; border-radius: 8px; }
+.card .d { font-size: 13px; color: #ccc; margin-top: 8px; line-height: 1.5; }
+.card .r { position: absolute; bottom: 8px; right: 10px; font-size: 11px; color: #8ab4ff; }
+.camp-menu .list { width: min(560px, 90vw); max-height: 60vh; overflow: auto; margin-bottom: 16px; }
+.camp-menu .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid #333; text-align: left; }
+.camp-menu .n { color: #f0e2c0; } .camp-menu .d { color: #aaa; font-size: 13px; } .camp-menu .memory { color: #8a8170; font-size: 12px; font-style: italic; margin-top: 3px; }
+.camp-menu .pips i { display: inline-block; width: 8px; height: 8px; border: 1px solid #a08050; margin-left: 2px; } .camp-menu .pips i.on { background: #f0c070; }
+.camp-menu .done { color: #7c7; font-size: 13px; } .camp-menu .shards { color: #ffd780; }
+.btn:disabled { opacity: .4; cursor: default; }
+.settings { display: flex; gap: 22px; margin: 4px 0 20px; font-size: 13px; color: #ccc; align-items: center; flex-wrap: wrap; justify-content: center; }
+.settings input[type=range] { vertical-align: middle; width: 120px; }

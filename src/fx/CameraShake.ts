@@ -26,6 +26,7 @@ export class CameraShake {
     });
     bus.on('parrySuccess', () => this.add(d.parry));
     bus.on('bossPhase', () => this.add(d.finisher));
+    bus.on('settingsChanged', ({ settings }) => (this.enabled = settings.screenShake));
     bus.on('postureBreak', (e) => e.guardBreak && this.add(d.guardBreak));
   }
 
