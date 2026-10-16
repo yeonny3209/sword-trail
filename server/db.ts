@@ -2,6 +2,7 @@ import { CLASS_BY_ID, KITS, START_ZONE, ZONES } from '../shared/data';
 import type { CharacterSummary } from '../shared/protocol';
 import { baseStats, emptyAlloc, SKILL_POINTS_PER_LEVEL, STAT_POINTS_PER_LEVEL, type Alloc } from '../shared/rules';
 import type { ClassId } from '../shared/types';
+import { makeItem, type Equip, type Item } from '../shared/items';
 import type { Env } from './env';
 
 /** 캐릭터의 진행 정보(JSON 한 칸에 저장). 필드를 추가하면 migrateData에 기본값을 넣는다 */
@@ -15,6 +16,12 @@ export interface CharData {
   statPoints: number;
   skillPoints: number;
   skills: Record<string, number>;
+  inv: Item[];
+  equip: Equip;
+}
+
+export function newUid(): string {
+  return crypto.randomUUID().replace(/-/g, '').slice(0, 12);
 }
 
 export interface CharRow {
@@ -37,7 +44,7 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
   // v1 → v2: 스탯·스킬 포인트 도입. 이미 오른 레벨만큼 포인트를 돌려준다
   const fresh = !d.alloc;
   return {
-    v: 2,
+    v: 3,
     exp: d.exp ?? 0,
     gold: d.gold ?? 100,
     hp: d.hp ?? s.mhp,
@@ -46,6 +53,9 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
     statPoints: fresh ? STAT_POINTS_PER_LEVEL * (lv - 1) : d.statPoints ?? 0,
     skillPoints: fresh ? SKILL_POINTS_PER_LEVEL * (lv - 1) : d.skillPoints ?? 0,
     skills: { [KITS[cls].skills[0]]: 1, ...(d.skills ?? {}) },
+    // v2 → v3: 아이템. 처음이면 기본 무기와 물약을 준다
+    inv: d.inv ?? [makeItem('pot_hp_s', 5, newUid()), makeItem('pot_mp_s', 3, newUid())],
+    equip: d.equip ?? { weapon: makeItem(`w_${cls}_0`, 1, newUid(), 0, () => 0) },
   };
 }
 

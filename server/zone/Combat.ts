@@ -6,6 +6,7 @@ import { actionTravel, expToNext, MAX_LEVEL, SKILL_POINTS_PER_LEVEL, skillMp, sk
 import type { ZoneDef } from '../../shared/types';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
+import { rollLoot } from './Inventory';
 
 /** 존 DO가 전투에 넘겨주는 기능 */
 export interface CombatHost {
@@ -97,6 +98,7 @@ export class Combat {
     killer.data.gold += gold;
     killer.send({ t: 'reward', exp, gold, name: mon.def.name });
     this.gainExp(killer, exp);
+    rollLoot(killer, mon.def);
   }
 
   gainExp(p: PlayerSession, exp: number): void {

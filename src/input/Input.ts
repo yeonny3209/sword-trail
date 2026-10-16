@@ -93,6 +93,12 @@ export class Input {
     this.queuedDash = null;
   }
 
+  /** 쌓인 입력 취소(NPC를 눌렀을 때 공격 무시 등) */
+  cancel(a: Action): void {
+    this.queued = this.queued.filter((q) => q !== a);
+    this.pressed.delete(a);
+  }
+
   isDown(a: Action): boolean {
     if (!this.enabled) return false;
     for (const c of this.data.bindings[a] ?? []) if (this.codes.has(c)) return true;

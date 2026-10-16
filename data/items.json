@@ -1,0 +1,808 @@
+{
+ "list": [
+  {
+   "id": "w_swordsman_0",
+   "name": "수련용 검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 1,
+   "stats": {
+    "atk": 8
+   },
+   "price": 138
+  },
+  {
+   "id": "w_swordsman_1",
+   "name": "강철 장검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 5,
+   "stats": {
+    "atk": 18
+   },
+   "price": 570
+  },
+  {
+   "id": "w_swordsman_2",
+   "name": "기사의 검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 10,
+   "stats": {
+    "atk": 30
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_swordsman_3",
+   "name": "바람가르기",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 15,
+   "stats": {
+    "atk": 44
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_swordsman_4",
+   "name": "용아검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 20,
+   "stats": {
+    "atk": 60
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_swordsman_5",
+   "name": "첫 번째 검의 파편",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 30,
+   "stats": {
+    "atk": 90
+   },
+   "price": 16320
+  },
+  {
+   "id": "w_berserker_0",
+   "name": "나무 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 1,
+   "stats": {
+    "atk": 12
+   },
+   "price": 138
+  },
+  {
+   "id": "w_berserker_1",
+   "name": "강철 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 5,
+   "stats": {
+    "atk": 22
+   },
+   "price": 570
+  },
+  {
+   "id": "w_berserker_2",
+   "name": "파쇄의 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 10,
+   "stats": {
+    "atk": 34
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_berserker_3",
+   "name": "산맥 가르개",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 15,
+   "stats": {
+    "atk": 48
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_berserker_4",
+   "name": "거인의 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 20,
+   "stats": {
+    "atk": 64
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_berserker_5",
+   "name": "부러진 왕의 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 30,
+   "stats": {
+    "atk": 94
+   },
+   "price": 16320
+  },
+  {
+   "id": "w_blademaster_0",
+   "name": "연습용 쌍단검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 1,
+   "stats": {
+    "atk": 8
+   },
+   "price": 138
+  },
+  {
+   "id": "w_blademaster_1",
+   "name": "강철 쌍단검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 5,
+   "stats": {
+    "atk": 18
+   },
+   "price": 570
+  },
+  {
+   "id": "w_blademaster_2",
+   "name": "그림자 쌍검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 10,
+   "stats": {
+    "atk": 30
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_blademaster_3",
+   "name": "질풍 쌍검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 15,
+   "stats": {
+    "atk": 44
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_blademaster_4",
+   "name": "야차 쌍검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 20,
+   "stats": {
+    "atk": 60
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_blademaster_5",
+   "name": "천 개의 칼날",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 30,
+   "stats": {
+    "atk": 90
+   },
+   "price": 16320
+  },
+  {
+   "id": "w_spellblade_0",
+   "name": "견습 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 1,
+   "stats": {
+    "atk": 8
+   },
+   "price": 138
+  },
+  {
+   "id": "w_spellblade_1",
+   "name": "은빛 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 5,
+   "stats": {
+    "atk": 18
+   },
+   "price": 570
+  },
+  {
+   "id": "w_spellblade_2",
+   "name": "마력 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 10,
+   "stats": {
+    "atk": 30
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_spellblade_3",
+   "name": "성좌 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 15,
+   "stats": {
+    "atk": 44
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_spellblade_4",
+   "name": "차원 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 20,
+   "stats": {
+    "atk": 60
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_spellblade_5",
+   "name": "첫 번째 룬의 검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 30,
+   "stats": {
+    "atk": 90
+   },
+   "price": 16320
+  },
+  {
+   "id": "helmet_0",
+   "name": "가죽 두건",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 1,
+   "stats": {
+    "def": 2,
+    "mhp": 10
+   },
+   "price": 92
+  },
+  {
+   "id": "helmet_1",
+   "name": "철 투구",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 5,
+   "stats": {
+    "def": 5,
+    "mhp": 25
+   },
+   "price": 380
+  },
+  {
+   "id": "helmet_2",
+   "name": "기사의 투구",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 10,
+   "stats": {
+    "def": 9,
+    "mhp": 45
+   },
+   "price": 1280
+  },
+  {
+   "id": "helmet_3",
+   "name": "바람의 관",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 15,
+   "stats": {
+    "def": 14,
+    "mhp": 70
+   },
+   "price": 2780
+  },
+  {
+   "id": "helmet_4",
+   "name": "용비늘 투구",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 20,
+   "stats": {
+    "def": 20,
+    "mhp": 100
+   },
+   "price": 4880
+  },
+  {
+   "id": "helmet_5",
+   "name": "검성의 관",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 30,
+   "stats": {
+    "def": 30,
+    "mhp": 150
+   },
+   "price": 10880
+  },
+  {
+   "id": "armor_0",
+   "name": "가죽 갑옷",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 1,
+   "stats": {
+    "def": 4,
+    "mhp": 20
+   },
+   "price": 92
+  },
+  {
+   "id": "armor_1",
+   "name": "사슬 갑옷",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 5,
+   "stats": {
+    "def": 9,
+    "mhp": 45
+   },
+   "price": 380
+  },
+  {
+   "id": "armor_2",
+   "name": "기사의 갑옷",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 10,
+   "stats": {
+    "def": 16,
+    "mhp": 80
+   },
+   "price": 1280
+  },
+  {
+   "id": "armor_3",
+   "name": "바람 갑주",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 15,
+   "stats": {
+    "def": 24,
+    "mhp": 120
+   },
+   "price": 2780
+  },
+  {
+   "id": "armor_4",
+   "name": "용비늘 갑옷",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 20,
+   "stats": {
+    "def": 34,
+    "mhp": 170
+   },
+   "price": 4880
+  },
+  {
+   "id": "armor_5",
+   "name": "검성의 갑주",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 30,
+   "stats": {
+    "def": 50,
+    "mhp": 250
+   },
+   "price": 10880
+  },
+  {
+   "id": "gloves_0",
+   "name": "가죽 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 1,
+   "stats": {
+    "def": 1,
+    "atk": 2
+   },
+   "price": 92
+  },
+  {
+   "id": "gloves_1",
+   "name": "철 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 5,
+   "stats": {
+    "def": 3,
+    "atk": 4
+   },
+   "price": 380
+  },
+  {
+   "id": "gloves_2",
+   "name": "기사의 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 10,
+   "stats": {
+    "def": 5,
+    "atk": 7
+   },
+   "price": 1280
+  },
+  {
+   "id": "gloves_3",
+   "name": "바람의 손",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 15,
+   "stats": {
+    "def": 8,
+    "atk": 10
+   },
+   "price": 2780
+  },
+  {
+   "id": "gloves_4",
+   "name": "용비늘 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 20,
+   "stats": {
+    "def": 11,
+    "atk": 14
+   },
+   "price": 4880
+  },
+  {
+   "id": "gloves_5",
+   "name": "검성의 손",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 30,
+   "stats": {
+    "def": 16,
+    "atk": 20
+   },
+   "price": 10880
+  },
+  {
+   "id": "boots_0",
+   "name": "가죽 장화",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 1,
+   "stats": {
+    "def": 1,
+    "speed": 0.1
+   },
+   "price": 92
+  },
+  {
+   "id": "boots_1",
+   "name": "철 장화",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 5,
+   "stats": {
+    "def": 3,
+    "speed": 0.15
+   },
+   "price": 380
+  },
+  {
+   "id": "boots_2",
+   "name": "기사의 장화",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 10,
+   "stats": {
+    "def": 5,
+    "speed": 0.2
+   },
+   "price": 1280
+  },
+  {
+   "id": "boots_3",
+   "name": "바람의 걸음",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 15,
+   "stats": {
+    "def": 8,
+    "speed": 0.25
+   },
+   "price": 2780
+  },
+  {
+   "id": "boots_4",
+   "name": "용비늘 장화",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 20,
+   "stats": {
+    "def": 11,
+    "speed": 0.3
+   },
+   "price": 4880
+  },
+  {
+   "id": "boots_5",
+   "name": "검성의 걸음",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 30,
+   "stats": {
+    "def": 16,
+    "speed": 0.4
+   },
+   "price": 10880
+  },
+  {
+   "id": "ring_0",
+   "name": "구리 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 1,
+   "stats": {
+    "atk": 2,
+    "crit": 0.01
+   },
+   "price": 92
+  },
+  {
+   "id": "ring_1",
+   "name": "은 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 5,
+   "stats": {
+    "atk": 5,
+    "crit": 0.015
+   },
+   "price": 380
+  },
+  {
+   "id": "ring_2",
+   "name": "기사의 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 10,
+   "stats": {
+    "atk": 8,
+    "crit": 0.02
+   },
+   "price": 1280
+  },
+  {
+   "id": "ring_3",
+   "name": "바람의 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 15,
+   "stats": {
+    "atk": 12,
+    "crit": 0.025
+   },
+   "price": 2780
+  },
+  {
+   "id": "ring_4",
+   "name": "용의 눈",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 20,
+   "stats": {
+    "atk": 17,
+    "crit": 0.03
+   },
+   "price": 4880
+  },
+  {
+   "id": "ring_5",
+   "name": "검성의 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 30,
+   "stats": {
+    "atk": 25,
+    "crit": 0.04
+   },
+   "price": 10880
+  },
+  {
+   "id": "necklace_0",
+   "name": "끈 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 1,
+   "stats": {
+    "mhp": 15,
+    "mmp": 10
+   },
+   "price": 92
+  },
+  {
+   "id": "necklace_1",
+   "name": "은 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 5,
+   "stats": {
+    "mhp": 35,
+    "mmp": 20
+   },
+   "price": 380
+  },
+  {
+   "id": "necklace_2",
+   "name": "기사의 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 10,
+   "stats": {
+    "mhp": 60,
+    "mmp": 35
+   },
+   "price": 1280
+  },
+  {
+   "id": "necklace_3",
+   "name": "바람의 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 15,
+   "stats": {
+    "mhp": 90,
+    "mmp": 50
+   },
+   "price": 2780
+  },
+  {
+   "id": "necklace_4",
+   "name": "용의 심장",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 20,
+   "stats": {
+    "mhp": 130,
+    "mmp": 70
+   },
+   "price": 4880
+  },
+  {
+   "id": "necklace_5",
+   "name": "검성의 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 30,
+   "stats": {
+    "mhp": 190,
+    "mmp": 100
+   },
+   "price": 10880
+  },
+  {
+   "id": "pot_hp_s",
+   "name": "작은 HP 물약",
+   "kind": "potion",
+   "lv": 1,
+   "heal": {
+    "hp": 0.3
+   },
+   "price": 30,
+   "stack": 99,
+   "desc": "최대 HP의 30%를 회복한다."
+  },
+  {
+   "id": "pot_hp_m",
+   "name": "HP 물약",
+   "kind": "potion",
+   "lv": 10,
+   "heal": {
+    "hp": 0.5
+   },
+   "price": 90,
+   "stack": 99,
+   "desc": "최대 HP의 50%를 회복한다."
+  },
+  {
+   "id": "pot_mp_s",
+   "name": "작은 MP 물약",
+   "kind": "potion",
+   "lv": 1,
+   "heal": {
+    "mp": 0.3
+   },
+   "price": 40,
+   "stack": 99,
+   "desc": "최대 MP의 30%를 회복한다."
+  },
+  {
+   "id": "pot_mp_m",
+   "name": "MP 물약",
+   "kind": "potion",
+   "lv": 10,
+   "heal": {
+    "mp": 0.5
+   },
+   "price": 110,
+   "stack": 99,
+   "desc": "최대 MP의 50%를 회복한다."
+  },
+  {
+   "id": "enh_stone",
+   "name": "강화석",
+   "kind": "material",
+   "lv": 1,
+   "price": 100,
+   "stack": 999,
+   "desc": "장비 강화에 쓰는 돌."
+  },
+  {
+   "id": "mat_jelly",
+   "name": "슬라임 젤리",
+   "kind": "material",
+   "lv": 1,
+   "price": 8,
+   "stack": 999,
+   "desc": "말랑한 젤리. 물약 재료."
+  },
+  {
+   "id": "mat_pelt",
+   "name": "늑대 가죽",
+   "kind": "material",
+   "lv": 2,
+   "price": 14,
+   "stack": 999,
+   "desc": "질긴 가죽. 방어구 재료."
+  },
+  {
+   "id": "mat_iron",
+   "name": "녹슨 쇳조각",
+   "kind": "material",
+   "lv": 4,
+   "price": 20,
+   "stack": 999,
+   "desc": "녹을 벗기면 쓸 만하다."
+  }
+ ]
+}

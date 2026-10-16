@@ -1,0 +1,146 @@
+import * as THREE from 'three';
+import { bus } from '../core/bus';
+import { ITEMS, itemName, rarityColor, rarityName } from '../../shared/items';
+import type { C2S, S2C } from '../../shared/protocol';
+import type { NpcDef } from '../../shared/types';
+import type { Input } from '../input/Input';
+import { CharacterWindow, SkillWindow, Window } from '../ui/CharWindows';
+import { InventoryWindow } from '../ui/InventoryWindow';
+import { ShopWindow, SmithWindow } from '../ui/NpcWindows';
+import type { LocalPlayer } from './LocalPlayer';
+import type { NpcView } from './ZoneScene';
+
+const TALK_RANGE = 3.2;
+
+/**
+ * 게임 창 묶음(캐릭터·스킬·인벤토리·상점·대장간)과 NPC 대화.
+ * 서버 메시지 중 창에 관련된 것을 받아 갱신한다.
+ */
+export class UiHub {
+  readonly charWin: CharacterWindow;
+  readonly skillWin: SkillWindow;
+  readonly invWin: InventoryWindow;
+  readonly shopWin: ShopWindow;
+  readonly smithWin: SmithWindow;
+  /** NPC를 만났을 때 처리할 역할(이후 단계: 퀘스트·경매장·길드·우편 등) */
+  readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
+  private readonly ray = new THREE.Raycaster();
+  private readonly potBar: HTMLDivElement;
+  private me: LocalPlayer | null = null;
+
+  constructor(ui: HTMLElement, private readonly send: (m: C2S) => void, private readonly say: (text: string) => void) {
+    this.charWin = new CharacterWindow(ui, send);
+    this.skillWin = new SkillWindow(ui, send);
+    this.invWin = new InventoryWindow(ui, send);
+    this.shopWin = new ShopWindow(ui, send, this.invWin);
+    this.smithWin = new SmithWindow(ui, send, this.invWin);
+    this.npcHandlers.shop = (n) => this.shopWin.openShop(n.id, n.ref ?? 'general');
+    this.npcHandlers.smith = () => this.smithWin.openSmith();
+    this.potBar = document.createElement('div');
+    this.potBar.className = 'potbar';
+    ui.appendChild(this.potBar);
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') Window.closeTop();
+    });
+    bus.on('net', (m) => this.onNet(m));
+  }
+
+  bind(me: LocalPlayer): void {
+    this.me = me;
+    this.charWin.me = me.self;
+    this.skillWin.me = me.self;
+  }
+
+  private onNet(m: S2C): void {
+    switch (m.t) {
+      case 'me':
+        this.charWin.draw();
+        this.skillWin.draw();
+        if (m.s.gold !== undefined) {
+          this.invWin.gold = m.s.gold;
+          this.invWin.draw();
+          this.smithWin.draw();
+        }
+        break;
+      case 'inv':
+        this.invWin.set(m.inv, m.equip, m.gold);
+        this.smithWin.draw();
+        this.drawPots();
+        break;
+      case 'loot':
+        for (const it of m.items) {
+          const d = ITEMS[it.id];
+          if (d?.kind === 'equip') {
+            this.say(`<span style="color:${rarityColor(it.rar)}">[${rarityName(it.rar)}] ${d.name}</span>을(를) 얻었습니다!`);
+            if ((it.rar ?? 0) >= 2) bus.emit('sfx', { key: 'gate' });
+          } else this.say(`${d?.name ?? it.id} ${it.n}개를 얻었습니다.`);
+        }
+        break;
+      case 'enh': {
+        this.smithWin.onResult(m.ok, m.enh);
+        bus.emit('sfx', { key: m.ok ? 'gate' : 'block' });
+        const it = [...this.invWin.inv, ...Object.values(this.invWin.equip)].find((x) => x?.uid === m.uid);
+        if (it) this.say(m.ok ? `강화 성공! ${itemName({ ...it, enh: m.enh })}` : `강화 실패… (+${m.enh})`);
+        break;
+      }
+    }
+  }
+
+  private drawPots(): void {
+    const hp = this.invWin.inv.filter((s) => ITEMS[s.id]?.heal?.hp).reduce((a, s) => a + s.n, 0);
+    const mp = this.invWin.inv.filter((s) => ITEMS[s.id]?.heal?.mp).reduce((a, s) => a + s.n, 0);
+    this.potBar.innerHTML = `<div class="pot"><span class="k">C</span>🧪<b>${hp}</b></div><div class="pot"><span class="k">V</span>💧<b>${mp}</b></div>`;
+  }
+
+  /** 고정 단계마다: 단축키 창 열기, 물약, 마을에서 스페이스로 NPC 대화 */
+  update(input: Input, npcs: NpcView[], town: boolean): void {
+    if (input.pressed.has('character')) this.charWin.toggle();
+    if (input.pressed.has('skills')) this.skillWin.toggle();
+    if (input.pressed.has('inventory')) this.invWin.toggle();
+    if (input.pressed.has('pot1')) this.send({ t: 'pot', k: 1 });
+    if (input.pressed.has('pot2')) this.send({ t: 'pot', k: 2 });
+    const me = this.me;
+    if (!me || !town || !input.pressed.has('jump')) return;
+    const n = this.nearest(npcs, me.pos.x, me.pos.z);
+    if (n) {
+      input.pressed.delete('jump');
+      this.talk(n);
+    }
+  }
+
+  private nearest(npcs: NpcView[], x: number, z: number): NpcDef | null {
+    let best: NpcDef | null = null, bd = TALK_RANGE * TALK_RANGE;
+    for (const n of npcs) {
+      const d = (n.def.x - x) ** 2 + (n.def.z - z) ** 2;
+      if (d < bd) {
+        bd = d;
+        best = n.def;
+      }
+    }
+    return best;
+  }
+
+  /** 클릭한 곳에 NPC가 있으면 대화(가까우면) */
+  clickNpc(ndc: { x: number; y: number }, camera: THREE.Camera, npcs: NpcView[]): boolean {
+    this.ray.setFromCamera(new THREE.Vector2(ndc.x, ndc.y), camera);
+    const hit = this.ray.intersectObjects(npcs.map((n) => n.model.root), true)[0];
+    if (!hit) return false;
+    const view = npcs.find((n) => { let o: THREE.Object3D | null = hit.object; while (o) { if (o === n.model.root) return true; o = o.parent; } return false; });
+    if (!view || !this.me) return false;
+    if ((view.def.x - this.me.pos.x) ** 2 + (view.def.z - this.me.pos.z) ** 2 > (TALK_RANGE * 2) ** 2) {
+      this.say('조금 더 가까이 가야 합니다.');
+      return true;
+    }
+    this.talk(view.def);
+    return true;
+  }
+
+  talk(n: NpcDef): void {
+    const line = n.lines?.[Math.floor(Math.random() * n.lines.length)];
+    if (line) this.say(`<b>${n.name}</b>: ${line}`);
+    bus.emit('sfx', { key: 'ui' });
+    const h = this.npcHandlers[n.role];
+    if (h) h(n);
+    else this.say(`(${n.title} 기능은 곧 열립니다)`);
+  }
+}

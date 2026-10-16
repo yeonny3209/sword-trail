@@ -1,5 +1,6 @@
 import type { Alloc, StatKey } from './rules';
 import type { ClassId } from './types';
+import type { Equip, Item, Slot } from './items';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -95,6 +96,15 @@ export type C2S =
   | { t: 'skill'; a: string }
   /** 스탯·스킬 초기화 */
   | { t: 'reset' }
+  | { t: 'equip'; uid: string }
+  | { t: 'unequip'; slot: Slot }
+  | { t: 'use'; uid: string }
+  /** 물약 단축키: 1 = HP, 2 = MP */
+  | { t: 'pot'; k: 1 | 2 }
+  | { t: 'buy'; npc: string; id: string; n: number }
+  | { t: 'sell'; uid: string; n: number }
+  | { t: 'enhance'; uid: string }
+  | { t: 'discard'; uid: string }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -119,6 +129,11 @@ export type S2C =
   | { t: 'lvup'; id: number; lv: number }
   | { t: 'died'; wait: number }
   | { t: 'cdfail'; a: string }
+  /** 가방·장비·골드 전체 */
+  | { t: 'inv'; inv: Item[]; equip: Equip; gold: number }
+  /** 얻은 아이템 알림 */
+  | { t: 'loot'; items: { id: string; n: number; rar?: number }[] }
+  | { t: 'enh'; ok: boolean; uid: string; enh: number; broke?: boolean }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
   | { t: 'pos'; x: number; z: number }

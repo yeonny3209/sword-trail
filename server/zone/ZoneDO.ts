@@ -9,6 +9,7 @@ import { Combat } from './Combat';
 import { Monster } from './Monster';
 import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
+import { onInventory, syncInv } from './Inventory';
 
 const PLAYER_RADIUS = 0.4;
 const SAVE_EVERY_MS = 30_000;
@@ -74,6 +75,7 @@ export class ZoneDO extends DurableObject<Env> {
       players: [...this.players.values()].filter((o) => o !== p).map((o) => o.info()),
       monsters: [...this.monsters.values()].filter((m) => !m.dead).map((m) => m.info()),
     });
+    syncInv(p);
     if (p.dead) p.send({ t: 'died', wait: 0 });
     this.broadcast({ t: 'join', p: p.info() }, p);
     this.broadcast({ t: 'sys', text: `${p.name}님이 ${z.name}에 들어왔습니다.` }, p);
@@ -102,6 +104,15 @@ export class ZoneDO extends DurableObject<Env> {
       case 'stat': return onStat(p, msg);
       case 'skill': return onSkill(p, msg);
       case 'reset': return onReset(p);
+      case 'equip':
+      case 'unequip':
+      case 'use':
+      case 'pot':
+      case 'buy':
+      case 'sell':
+      case 'enhance':
+      case 'discard':
+        return onInventory(p, msg, this.zone!);
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });

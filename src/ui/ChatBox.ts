@@ -86,6 +86,16 @@ export class ChatBox {
     this.onSend(ch, text, to);
   }
 
+  /** 시스템 알림(HTML 허용 — 게임 코드가 만든 문자열만) */
+  addHtml(html: string): void {
+    const line = document.createElement('div');
+    line.className = 'ln ch-system';
+    line.innerHTML = html;
+    this.log.appendChild(line);
+    while (this.log.children.length > 60) this.log.firstChild?.remove();
+    this.log.scrollTop = this.log.scrollHeight;
+  }
+
   add(ch: ChatChannel, from: string, text: string): void {
     const line = document.createElement('div');
     line.className = `ln ch-${ch}`;

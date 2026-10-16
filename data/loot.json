@@ -1,0 +1,99 @@
+{
+ "rarity": [
+  {
+   "name": "일반",
+   "color": "#d8d8d8",
+   "w": 600
+  },
+  {
+   "name": "고급",
+   "color": "#5fd45f",
+   "w": 280
+  },
+  {
+   "name": "희귀",
+   "color": "#4aa0ff",
+   "w": 100
+  },
+  {
+   "name": "영웅",
+   "color": "#c070ff",
+   "w": 18
+  },
+  {
+   "name": "전설",
+   "color": "#ff9a30",
+   "w": 2
+  }
+ ],
+ "sellRate": 0.3,
+ "invSize": 48,
+ "potionCooldown": 1.0,
+ "enhance": {
+  "rates": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0.9,
+   0.8,
+   0.7,
+   0.6,
+   0.5,
+   0.4,
+   0.35,
+   0.3,
+   0.25,
+   0.2
+  ],
+  "max": 15,
+  "failDropFrom": 10,
+  "goldBase": 50,
+  "stoneBase": 1
+ },
+ "drops": {
+  "slime": [
+   {
+    "item": "mat_jelly",
+    "chance": 0.5
+   },
+   {
+    "item": "pot_hp_s",
+    "chance": 0.06
+   }
+  ],
+  "wolf": [
+   {
+    "item": "mat_pelt",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_s",
+    "chance": 0.07
+   },
+   {
+    "item": "pot_mp_s",
+    "chance": 0.05
+   }
+  ],
+  "recruit": [
+   {
+    "item": "mat_iron",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.06
+   },
+   {
+    "item": "pot_hp_s",
+    "chance": 0.08
+   }
+  ]
+ },
+ "equipChance": {
+  "default": 0.06,
+  "boss": 1.0
+ }
+}

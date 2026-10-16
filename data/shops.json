@@ -1,0 +1,32 @@
+{
+ "general": {
+  "name": "미라의 잡화점",
+  "items": [
+   "pot_hp_s",
+   "pot_mp_s",
+   "pot_hp_m",
+   "pot_mp_m",
+   "enh_stone",
+   "w_swordsman_0",
+   "w_berserker_0",
+   "w_blademaster_0",
+   "w_spellblade_0",
+   "w_swordsman_1",
+   "w_berserker_1",
+   "w_blademaster_1",
+   "w_spellblade_1",
+   "helmet_0",
+   "armor_0",
+   "gloves_0",
+   "boots_0",
+   "ring_0",
+   "necklace_0",
+   "helmet_1",
+   "armor_1",
+   "gloves_1",
+   "boots_1",
+   "ring_1",
+   "necklace_1"
+  ]
+ }
+}
