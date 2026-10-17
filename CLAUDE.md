@@ -30,6 +30,7 @@
 - `npm run dev` : 로컬 서버(wrangler dev :8787) + 클라이언트(vite :5173, /api·/ws 프록시)
 - `npm run db:migrate` : 로컬 D1 테이블 생성
 - `npm run check` : 클라이언트·서버 타입 검사, `npm test` : 공용 로직 단위 테스트
+- `node scripts/smoke.mjs` · `smoke-social.mjs` · `smoke-party.mjs` : 로컬 서버 연기 테스트(접속·이동 / 채팅·파티·길드 / 파티 경험치)
 - `npm run deploy` : 빌드 후 Cloudflare 배포(먼저 `npx wrangler login`)
 
 ## 코딩 규칙
@@ -51,5 +52,6 @@ M7 거래·경매장·우편함 / M8 PvP 결투장 / M9 Cloudflare 배포
 
 ## 진행 상황 (2026-10-17)
 - 완료: M1~M5. 필드 4개(Lv1~30)·몬스터 14종·필드 보스 3, 퀘스트 20(촌장 이야기·경비대장 수집), 채집(스페이스·클릭, 1.6초), 대장간 강화·제작 탭, 미니맵, 보스 체력 바
-- 다음: M6 전체 채팅·귓속말·파티·길드(SocialDO) → M7 거래·경매장·우편함 → M8 PvP 결투장 → M9 Cloudflare 배포(사용자가 `npx wrangler login`)
+- 완료: M6. SocialDO 하나(`/social` 웹소켓)가 전체 채팅·귓속말(/w, /r)·파티(최대 4, 같은 존 40m 안 경험치 나눔 +20%/인)·길드(D1, 하론 앞 Lv5·2000G 창설, 직위 3단계)를 맡고, 존 DO와는 RPC(setParty·setGuild·partyMembers·createGuild)로 주고받는다. 클라이언트: 파티 프레임, P 파티 창, N 길드 창, 초대 팝업, 다른 플레이어 오른쪽 클릭 메뉴
+- 다음: M7 거래·경매장·우편함 → M8 PvP 결투장 → M9 Cloudflare 배포(사용자가 `npx wrangler login`)
 - 자동 저장 10초(서버 코드가 다시 올라가면 저장 안 된 진행은 사라지므로)

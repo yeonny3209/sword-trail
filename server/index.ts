@@ -15,6 +15,7 @@ export default {
     try {
       if (url.pathname.startsWith('/api/')) return await api(req, env, url);
       if (url.pathname === '/ws') return await connect(req, env, url);
+      if (url.pathname === '/social') return await connectSocial(req, env, url);
     } catch (e) {
       console.error(e);
       return fail('서버 오류가 발생했습니다.', 500);
@@ -48,6 +49,18 @@ async function api(req: Request, env: Env, url: URL): Promise<Response> {
     return (await deleteCharacter(env, account, Number(del[1]))) ? json({ ok: true }) : fail('캐릭터를 찾을 수 없습니다.', 404);
   }
   return fail('없는 주소입니다.', 404);
+}
+
+/** 소셜 웹소켓: 하나뿐인 소셜 DO로 넘긴다 */
+async function connectSocial(req: Request, env: Env, url: URL): Promise<Response> {
+  if (req.headers.get('Upgrade') !== 'websocket') return fail('웹소켓이 필요합니다.', 426);
+  const account = await accountFromToken(env, url.searchParams.get('token'));
+  if (!account) return fail('다시 로그인해 주세요.', 401);
+  const row = await loadCharacter(env, Number(url.searchParams.get('char')));
+  if (!row || row.account_id !== account) return fail('캐릭터를 찾을 수 없습니다.', 404);
+  const headers = new Headers(req.headers);
+  headers.set('X-Char-Id', String(row.id));
+  return env.SOCIAL.get(env.SOCIAL.idFromName('global')).fetch(new Request(req, { headers }));
 }
 
 /** 웹소켓: 토큰과 캐릭터를 확인하고, 캐릭터가 있는 존의 DO로 넘긴다 */

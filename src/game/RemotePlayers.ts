@@ -79,6 +79,16 @@ export class RemotePlayers {
     }
   }
 
+  /** 길드 이름 등 정보가 바뀌었다 */
+  setInfo(info: PlayerInfo): void {
+    const r = this.list.get(info.id);
+    if (!r) return;
+    r.info.guild = info.guild;
+    r.info.lv = info.lv;
+    r.info.mhp = info.mhp;
+    this.plates.setHtml(`p${info.id}`, this.label(r.info));
+  }
+
   setLevel(id: number, lv: number): void {
     const r = this.list.get(id);
     if (!r) return;

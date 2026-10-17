@@ -16,6 +16,7 @@ import { Hud } from '../ui/Hud';
 import { Nameplates } from '../ui/Nameplates';
 import { DeathOverlay, SkillBar } from '../ui/SkillBar';
 import { UiHub } from './UiHub';
+import { SocialHub } from './SocialHub';
 import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
@@ -46,6 +47,7 @@ export class GameClient {
   private readonly death: DeathOverlay;
   readonly ui: UiHub;
   private chat: ChatBox;
+  readonly social: SocialHub;
   private readonly sun: THREE.DirectionalLight;
   private zone: ZoneScene | null = null;
   me: LocalPlayer | null = null;
@@ -87,8 +89,10 @@ export class GameClient {
     this.remotes.onRemove = (r) => this.combat.forget(r.model);
     this.skillbar = new SkillBar(ui);
     this.death = new DeathOverlay(ui, () => this.net.send({ t: 'revive' }));
-    this.chat = new ChatBox(ui, (ch, text, to) => this.net.send({ t: 'chat', ch, text, to }));
+    this.chat = new ChatBox(ui, (ch, text, to) => this.social.chat(ch, text, to) || this.net.send({ t: 'chat', ch, text, to }));
     this.ui = new UiHub(ui, (m) => this.net.send(m), (text) => this.chat.addHtml(text), () => this.zone);
+    this.social = new SocialHub(ui, this.chat, this.remotes, (m) => this.net.send(m));
+    this.ui.npcHandlers.guild = () => this.social.ui.guildWin.open();
     this.ui.quests.onChange = () => this.refreshNpcPlates();
     this.minimap = new Minimap(ui);
     this.bossBar = new BossBar(ui);
@@ -98,8 +102,10 @@ export class GameClient {
       else if (a.heavy) this.fx.ring(v.pos.x, v.pos.z, 1.2, '#ff5040');
     };
     this.renderer.domElement.addEventListener('mousedown', (e) => {
-      if (e.button !== 0 || !this.zone || !this.me) return;
+      if (!this.zone || !this.me) return;
       const ndc = this.input.mouseNdc();
+      if (e.button === 2) return void this.social.rightClick(ndc, this.camera, e.clientX, e.clientY);
+      if (e.button !== 0) return;
       if (this.ui.clickNpc(ndc, this.camera, this.zone.npcs) || this.ui.gathering.click(ndc, this.camera, this.me)) this.input.cancel('attack');
     });
     new Audio();
@@ -120,11 +126,13 @@ export class GameClient {
 
   start(charId: number): void {
     this.net.connect(charId);
+    this.social.connect(charId);
     this.loop.start();
   }
 
   private exit(): void {
     this.net.close();
+    this.social.close();
     location.reload();
     this.onExit();
   }
@@ -152,6 +160,7 @@ export class GameClient {
         this.hud.setSelf(m.you);
         this.skillbar.bind(me);
         this.ui.bind(me);
+        this.social.bind(me);
         this.death.hide();
         if (m.you.hp <= 0) me.die();
         this.portalCooldown = 1.5;
@@ -226,6 +235,7 @@ export class GameClient {
     this.input.beginTick();
     bus.emit('tick', { frame, dt });
     if (this.zone) this.ui.update(this.input, this.zone.npcs, this.zone.def.type === 'town', dt);
+    this.social.update(this.input, dt);
     const me = this.me, zone = this.zone;
     if (!me || !zone) return;
     // 마우스가 가리키는 땅 쪽이 공격 방향
@@ -284,7 +294,7 @@ export class GameClient {
     this.renderMap(dt);
     this.plates.render();
     this.skillbar.render();
-    this.hud.setNet(this.net.rtt, this.remotes.list.size + 1);
+    this.hud.setNet(this.net.rtt, this.remotes.list.size + 1, this.social.ui.online);
     this.renderer.render(this.scene, this.camera);
   };
 

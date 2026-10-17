@@ -10,6 +10,8 @@ import { Monster } from './Monster';
 import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
 import { onInventory, syncInv } from './Inventory';
+import { guildNameOf } from '../social/Guilds';
+import { GUILD_COST, GUILD_MIN_LV } from '../../shared/social';
 import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
 
@@ -50,7 +52,7 @@ export class ZoneDO extends DurableObject<Env> {
     }
     const self = this;
     this.combat = new Combat({
-      zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e),
+      zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), players: this.players,
       onKill: (p, id) => self.quests?.onKill(p, id),
     });
     this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
@@ -76,6 +78,9 @@ export class ZoneDO extends DurableObject<Env> {
     const inZone = row.zone === z.id;
     const [x, zz] = resolveCircle(inZone ? row.x : z.spawn[0], inZone ? row.z : z.spawn[1], PLAYER_RADIUS, z.walls, z.size);
     const p = new PlayerSession(server, row, z.id, x, zz);
+    // 길드 이름과 파티 구성을 먼저 알아 둔다(소셜 DO가 없거나 늦으면 건너뜀)
+    p.guild = await guildNameOf(this.env, p.id).catch(() => null);
+    p.party = await this.social().partyMembers(p.id).catch(() => [] as number[]);
     this.players.set(p.id, p);
     this.bySocket.set(server, p);
 
@@ -131,6 +136,7 @@ export class ZoneDO extends DurableObject<Env> {
       case 'gather': return this.gather?.onStart(p, msg.i | 0);
       case 'gatherdone': return this.gather?.onDone(p, msg.i | 0);
       case 'craft': return onCraft(p, this.zone!, String(msg.id));
+      case 'gcreate': return this.createGuild(p, String(msg.name));
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });
@@ -144,6 +150,38 @@ export class ZoneDO extends DurableObject<Env> {
 
   async webSocketError(ws: WebSocket): Promise<void> {
     await this.webSocketClose(ws);
+  }
+
+  private social() {
+    return this.env.SOCIAL.get(this.env.SOCIAL.idFromName('global'));
+  }
+
+  /** RPC(소셜 DO): 파티 구성이 바뀌었다 */
+  async setParty(id: number, members: number[]): Promise<void> {
+    const p = this.players.get(id);
+    if (p) p.party = members;
+  }
+
+  /** RPC(소셜 DO): 길드 가입·탈퇴 — 이름표 갱신 */
+  async setGuild(id: number, name: string | null): Promise<void> {
+    const p = this.players.get(id);
+    if (!p) return;
+    p.guild = name;
+    this.broadcast({ t: 'pinfo', p: p.info() });
+  }
+
+  /** 길드 관리인 앞에서 골드를 내고 길드 창설 */
+  private async createGuild(p: PlayerSession, name: string): Promise<void> {
+    const npc = this.zone?.npcs.find((n) => n.role === 'guild' && dist2(p.x, p.z, n.x, n.z) <= 25);
+    if (!npc) return p.send({ t: 'err', text: '길드 관리인 근처에서만 창설할 수 있습니다.' });
+    if (p.lv < GUILD_MIN_LV) return p.send({ t: 'err', text: `레벨 ${GUILD_MIN_LV}부터 길드를 만들 수 있습니다.` });
+    if (p.data.gold < GUILD_COST) return p.send({ t: 'err', text: `골드가 ${GUILD_COST.toLocaleString()} 필요합니다.` });
+    const r = await this.social().createGuild(p.id, name);
+    if (!r.ok) return p.send({ t: 'err', text: r.error ?? '창설에 실패했습니다.' });
+    p.data.gold -= GUILD_COST;
+    p.dirty = true;
+    await this.save(p);
+    p.send({ t: 'me', s: { gold: p.data.gold } });
   }
 
   private onMove(p: PlayerSession, m: Extract<C2S, { t: 'move' }>): void {

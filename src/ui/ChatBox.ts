@@ -16,6 +16,10 @@ export class ChatBox {
   private readonly log: HTMLDivElement;
   private readonly input: HTMLInputElement;
   private active = false;
+  /** 마지막으로 귓속말을 보낸 사람(/r 로 답장) */
+  private lastWhisper = '';
+  /** 채널 말고 다른 명령(/초대 등). 처리했으면 true */
+  onCommand: (cmd: string, arg: string) => boolean = () => false;
 
   constructor(ui: HTMLElement, private readonly onSend: (ch: ChatChannel, text: string, to?: string) => void) {
     this.el = document.createElement('div');
@@ -38,6 +42,10 @@ export class ChatBox {
       if (e.key === 'Escape') this.close();
     });
     this.input.addEventListener('blur', () => this.active && this.close());
+    bus.on('chatPrefill', ({ text }) => {
+      this.open();
+      this.input.value = text;
+    });
     bus.on('net', (m) => {
       if (m.t === 'chat') this.add(m.ch, m.from, m.text);
       else if (m.t === 'sys') this.add('system', '', m.text);
@@ -72,7 +80,12 @@ export class ChatBox {
       if (cmd === '전체' || cmd === 'all' || cmd === 'world') ch = 'world';
       else if (cmd === '파티' || cmd === 'p') ch = 'party';
       else if (cmd === '길드' || cmd === 'g') ch = 'guild';
-      else if (cmd === 'w' || cmd === '귓' || cmd === '귓속말') {
+      else if (cmd === 'r' || cmd === '답장') {
+        if (!this.lastWhisper || !m[2]) return this.add('system', '', '답장할 귓속말이 없습니다.');
+        return this.onSend('whisper', m[2], this.lastWhisper);
+      } else if (cmd === '도움' || cmd === 'help' || cmd === '?') {
+        return this.add('system', '', '채팅: /전체 /파티 /길드 /w 이름 /r(답장) · 파티: /초대 이름, /파티나가기 · 길드: /길드초대 이름 · 창: P 파티, N 길드');
+      } else if (cmd === 'w' || cmd === '귓' || cmd === '귓속말') {
         const parts = m[2].split(/\s+/);
         ch = 'whisper';
         to = parts.shift();
@@ -80,6 +93,8 @@ export class ChatBox {
         if (!to || !text) return this.add('system', '', '사용법: /w 이름 내용');
         return this.onSend(ch, text, to);
       }
+      else if (this.onCommand(cmd, m[2])) return;
+      else return this.add('system', '', `모르는 명령입니다: /${m[1]} (도움말: /도움)`);
       text = m[2];
       if (!text) return;
     }
@@ -97,6 +112,7 @@ export class ChatBox {
   }
 
   add(ch: ChatChannel, from: string, text: string): void {
+    if (ch === 'whisper' && !from.startsWith('→')) this.lastWhisper = from;
     const line = document.createElement('div');
     line.className = `ln ch-${ch}`;
     line.innerHTML = ch === 'system' ? esc(text) : `<span class="tag">[${CH_NAME[ch]}]</span> <b>${esc(from)}</b>: ${esc(text)}`;

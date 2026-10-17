@@ -1,4 +1,5 @@
 import type { S2C } from '../../shared/protocol';
+import type { Social2C } from '../../shared/social';
 
 export interface Settings {
   volume: number;
@@ -21,4 +22,8 @@ export interface GameEvents {
   typing: { active: boolean };
   /** 화면 알림 한 줄 */
   toast: { text: string; kind?: 'info' | 'warn' | 'good' };
+  /** 소셜 서버에서 받은 메시지 */
+  social: Social2C;
+  /** 채팅 입력창을 이 내용으로 연다(귓속말 등) */
+  chatPrefill: { text: string };
 }

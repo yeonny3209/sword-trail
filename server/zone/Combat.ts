@@ -7,6 +7,7 @@ import type { ZoneDef } from '../../shared/types';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
 import { rollLoot } from './Inventory';
+import { PARTY_SHARE_RANGE, partyExp } from '../../shared/social';
 
 /** 존 DO가 전투에 넘겨주는 기능 */
 export interface CombatHost {
@@ -15,6 +16,7 @@ export interface CombatHost {
   broadcast(msg: S2C, except?: PlayerSession): void;
   /** 처치 알림(퀘스트 진행) */
   onKill(p: PlayerSession, monsterId: string): void;
+  players: Map<number, PlayerSession>;
 }
 
 const SLACK_RANGE = 3;
@@ -94,14 +96,21 @@ export class Combat {
     mon.respawnT = mon.def.respawn;
     mon.window = null;
     this.host.broadcast({ t: 'mdie', id: mon.id, by: killer.id });
-    const exp = Math.max(1, Math.round(mon.def.exp * expFactor(killer.lv, mon.def.lv)));
     const [g0, g1] = mon.def.gold;
     const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
     killer.data.gold += gold;
-    killer.send({ t: 'reward', exp, gold, name: mon.def.name });
-    this.gainExp(killer, exp);
     rollLoot(killer, mon.def);
-    this.host.onKill(killer, mon.def.id);
+    // 같은 존에서 가까이 있는 파티원과 경험치를 나누고, 퀘스트 처치도 함께 센다
+    const mates = killer.party
+      .map((id) => this.host.players.get(id))
+      .filter((q): q is PlayerSession => !!q && !q.dead && !q.leaving && dist2(q.x, q.z, mon.body.x, mon.body.z) <= PARTY_SHARE_RANGE ** 2);
+    if (!mates.includes(killer)) mates.push(killer);
+    for (const q of mates) {
+      const exp = partyExp(Math.max(1, Math.round(mon.def.exp * expFactor(q.lv, mon.def.lv))), mates.length);
+      q.send({ t: 'reward', exp, gold: q === killer ? gold : 0, name: mon.def.name });
+      this.gainExp(q, exp);
+      this.host.onKill(q, mon.def.id);
+    }
   }
 
   gainExp(p: PlayerSession, exp: number): void {

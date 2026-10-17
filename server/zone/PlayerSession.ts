@@ -37,6 +37,9 @@ export class PlayerSession {
   lastPotAt = 0;
   /** 채집 중인 노드 */
   gathering: { i: number; start: number } | null = null;
+  /** 파티원 id(나 포함, 없으면 빈 배열) — 소셜 DO가 알려 준다 */
+  party: number[] = [];
+  guild: string | null = null;
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;
@@ -72,7 +75,7 @@ export class PlayerSession {
   info(): PlayerInfo {
     return {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv,
-      x: this.x, z: this.z, f: this.f, hp: this.data.hp, mhp: this.stats.mhp,
+      x: this.x, z: this.z, f: this.f, hp: this.data.hp, mhp: this.stats.mhp, guild: this.guild ?? undefined,
     };
   }
 

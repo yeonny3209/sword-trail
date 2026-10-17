@@ -113,6 +113,8 @@ export type C2S =
   | { t: 'gather'; i: number }
   | { t: 'gatherdone'; i: number }
   | { t: 'craft'; id: string }
+  /** 길드 창설(길드 관리인 앞) */
+  | { t: 'gcreate'; name: string }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -143,6 +145,8 @@ export type S2C =
   | { t: 'loot'; items: { id: string; n: number; rar?: number }[] }
   | { t: 'enh'; ok: boolean; uid: string; enh: number; broke?: boolean }
   | { t: 'quests'; q: QuestState }
+  /** 다른 플레이어 정보 변경(길드 등) */
+  | { t: 'pinfo'; p: PlayerInfo }
   /** 채집 노드 상태: 지금 쓸 수 없는 노드 번호들 */
   | { t: 'nodes'; down: number[] }
   | { t: 'node'; i: number; up: boolean }

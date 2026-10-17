@@ -40,8 +40,8 @@ export class Hud {
     this.q('.zone-name').innerHTML = z ? `${z.name}${z.type === 'field' ? ` <small>Lv ${z.level[0]}~${z.level[1]}</small>` : ''}${z.pvp ? ' <small class="pvp">PvP</small>' : ''}` : '';
   }
 
-  setNet(rtt: number, players: number): void {
-    this.q('.net').textContent = `${Math.round(rtt)}ms · 이 지역 ${players}명`;
+  setNet(rtt: number, players: number, online = 0): void {
+    this.q('.net').textContent = `${Math.round(rtt)}ms · 이 지역 ${players}명${online ? ` · 접속 ${online}명` : ''}`;
   }
 
   draw(): void {
