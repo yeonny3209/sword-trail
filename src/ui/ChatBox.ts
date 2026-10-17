@@ -18,6 +18,9 @@ export class ChatBox {
   private active = false;
   /** 마지막으로 귓속말을 보낸 사람(/r 로 답장) */
   private lastWhisper = '';
+  /** 보낸 말 기록(↑↓) */
+  private history: string[] = [];
+  private hi = 0;
   /** 채널 말고 다른 명령(/초대 등). 처리했으면 true */
   onCommand: (cmd: string, arg: string) => boolean = () => false;
 
@@ -40,6 +43,12 @@ export class ChatBox {
     });
     this.input.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.close();
+      // ↑↓: 지난번에 보낸 말 다시 쓰기
+      else if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && this.history.length) {
+        e.preventDefault();
+        this.hi = Math.max(0, Math.min(this.history.length, this.hi + (e.key === 'ArrowUp' ? -1 : 1)));
+        this.input.value = this.history[this.hi] ?? '';
+      }
     });
     this.input.addEventListener('blur', () => this.active && this.close());
     bus.on('chatPrefill', ({ text }) => {
@@ -72,12 +81,15 @@ export class ChatBox {
   private send(): void {
     let text = this.input.value.trim();
     if (!text) return;
+    if (this.history[this.history.length - 1] !== text) this.history.push(text);
+    if (this.history.length > 30) this.history.shift();
+    this.hi = this.history.length;
     let ch: ChatChannel = 'zone';
     let to: string | undefined;
     const m = text.match(/^\/(\S+)\s*(.*)$/);
     if (m) {
       const cmd = m[1].toLowerCase();
-      if (cmd === '전체' || cmd === 'all' || cmd === 'world') ch = 'world';
+      if (cmd === '전체' || cmd === 'all' || cmd === 'world' || cmd === 'a') ch = 'world';
       else if (cmd === '파티' || cmd === 'p') ch = 'party';
       else if (cmd === '길드' || cmd === 'g') ch = 'guild';
       else if (cmd === 'r' || cmd === '답장') {

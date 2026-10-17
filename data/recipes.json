@@ -2079,6 +2079,65 @@
    "gold": 14000,
    "lv": 40,
    "minRar": 2
+  },
+  {
+   "id": "r_pot_elixir",
+   "out": "pot_elixir",
+   "n": 2,
+   "need": [
+    [
+     "mat_silk",
+     2
+    ],
+    [
+     "herb_2",
+     2
+    ],
+    [
+     "mat_batwing",
+     2
+    ]
+   ],
+   "gold": 60,
+   "lv": 15
+  },
+  {
+   "id": "r_pot_hp_x",
+   "out": "pot_hp_x",
+   "n": 3,
+   "need": [
+    [
+     "herb_4",
+     2
+    ],
+    [
+     "mat_cinder",
+     1
+    ],
+    [
+     "mat_soul",
+     1
+    ]
+   ],
+   "gold": 150,
+   "lv": 30
+  },
+  {
+   "id": "r_pot_mp_x",
+   "out": "pot_mp_x",
+   "n": 3,
+   "need": [
+    [
+     "herb_4",
+     3
+    ],
+    [
+     "mat_frostsilk",
+     1
+    ]
+   ],
+   "gold": 150,
+   "lv": 30
   }
  ]
 }

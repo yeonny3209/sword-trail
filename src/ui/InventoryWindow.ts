@@ -37,7 +37,13 @@ export class InventoryWindow extends Window {
     this.body.innerHTML = `<div class="doll">${doll}</div>
       <div class="bag">${cells}</div>
       <div class="gold">💰 ${this.gold.toLocaleString()} G <small>${this.inv.length}/${LOOT.invSize}칸</small></div>
-      <div class="hint">아이템을 클릭하면 장착·사용·버리기 · 상인 앞에서는 판매</div>`;
+      <div class="row inv-tools"><button class="btn small" data-sort>정리</button><button class="btn small" data-sell="0" title="상인 앞에서: 강화 안 한 일반 장비를 모두 판매">일반 장비 팔기</button><button class="btn small" data-sell="1" title="상인 앞에서: 강화 안 한 일반·고급 장비를 모두 판매">고급까지 팔기</button></div>
+      <div class="hint">클릭: 장착·사용·버리기 · 더블클릭: 바로 장착·사용 · 상인 앞에서는 판매</div>`;
+    this.body.querySelector('[data-sort]')?.addEventListener('click', () => this.send({ t: 'isort' }));
+    this.body.querySelectorAll<HTMLButtonElement>('[data-sell]').forEach((b) => b.addEventListener('click', () => {
+      const rar = Number(b.dataset.sell);
+      if (confirm(rar ? '강화하지 않은 일반·고급 장비를 모두 팔까요?' : '강화하지 않은 일반 장비를 모두 팔까요?')) this.send({ t: 'sellall', rar });
+    }));
     this.body.querySelectorAll<HTMLDivElement>('.cell[data-uid]').forEach((c) => {
       const uid = c.dataset.uid!;
       const it = this.find(uid);

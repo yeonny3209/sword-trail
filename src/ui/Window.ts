@@ -39,6 +39,8 @@ export class Window {
 
   front(): void {
     this.el.style.zIndex = String(++Window.z);
+    // Esc가 맨 앞 창부터 닫도록 순서도 맨 뒤로
+    if (Window.openList.includes(this)) Window.openList = [...Window.openList.filter((w) => w !== this), this];
   }
 
   open(): void {
@@ -56,6 +58,10 @@ export class Window {
   toggle(): void {
     if (this.isOpen) this.close();
     else this.open();
+  }
+
+  static anyOpen(): boolean {
+    return Window.openList.length > 0;
   }
 
   /** Esc: 가장 위의 창 닫기 */

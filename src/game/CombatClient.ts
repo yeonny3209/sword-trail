@@ -137,8 +137,15 @@ export class CombatClient {
     const dir = hit.shape.type === 'box' ? [Math.sin(me.yaw), Math.cos(me.yaw)] : [v.pos.x - me.pos.x, v.pos.z - me.pos.z];
     this.c.monsters.predictHit(v, hit, dir[0], dir[1]);
     this.c.net.send({ t: 'hit', i: run.instance, h: hi, m: v.id });
+    bus.emit('target', { id: v.id });
     const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.6, v.pos.z);
-    this.hitstop = Math.max(this.hitstop, this.hitfx.landed(at, dir[0], dir[1], hit, v.def.hitMat ?? 'flesh'));
+    // 1.2초 안에 이어 맞히면 연타 수가 쌓인다(타격음이 점점 높아짐)
+    const now = performance.now();
+    this.chain = now - this.chainAt < 1200 ? this.chain + 1 : 1;
+    this.chainAt = now;
+    this.lastHit = { id: v.id, dx: dir[0], dz: dir[1], stop: hit.stop };
+    const weight = this.hitfx.juice.classWeight[me.self.cls] ?? 1;
+    this.hitstop = Math.max(this.hitstop, this.hitfx.landed(at, dir[0], dir[1], hit, v.def.hitMat ?? 'flesh', weight, this.chain));
     me.model.setGlow('#ffffff', 2.2);
     this.glowT = 0.08;
     this.c.numbers.hit();
@@ -209,7 +216,9 @@ export class CombatClient {
           this.hitstop = Math.max(this.hitstop, this.hitfx.kill(at, !!v.def.boss, m.by === me?.self.id));
           if (m.by === me?.self.id) this.streakCount();
         }
-        this.c.monsters.die(m.id);
+        // 내가 잡았으면 마지막으로 때린 방향으로 날아간다(센 타격일수록 멀리)
+        const lh = this.lastHit?.id === m.id && m.by === me?.self.id ? this.lastHit : null;
+        this.c.monsters.die(m.id, lh ? { dx: lh.dx, dz: lh.dz, power: this.hitfx.juice.killLaunch * (0.7 + lh.stop * 0.05) } : undefined);
         break;
       }
       case 'matk':
@@ -291,6 +300,10 @@ export class CombatClient {
     this.c.numbers.render(dt);
   }
 
+  private chain = 0;
+  private chainAt = 0;
+  /** 마지막으로 내가 때린 몬스터와 방향(처치될 때 날려 보낼 쪽) */
+  private lastHit: { id: number; dx: number; dz: number; stop: number } | null = null;
   private streakN = 0;
   private streakAt = 0;
   private readonly trailColors = new Map<string, string>();

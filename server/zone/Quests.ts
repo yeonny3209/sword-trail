@@ -1,5 +1,5 @@
 import { dist2 } from '../../shared/geom';
-import { ITEMS, makeItem } from '../../shared/items';
+import { ITEMS, LOOT, makeItem } from '../../shared/items';
 import { availableQuests, isComplete, MAX_ACTIVE_QUESTS, QUESTS, type QuestDef } from '../../shared/quests';
 import type { ZoneDef } from '../../shared/types';
 import { questExp } from '../../shared/rules';
@@ -71,6 +71,9 @@ export class QuestSystem {
     const qs = p.data.quests;
     if (!q || !(id in qs.active) || !this.nearGiver(p, q)) return;
     if (!isComplete(q, qs, (it) => countItem(p, it))) return p.send({ t: 'err', text: '아직 목표를 다 채우지 못했습니다.' });
+    // 보상 아이템을 넣을 자리가 없으면 받지 않는다(가방이 차서 보상이 사라지던 문제)
+    const slots = (q.reward.items?.length ?? 0) + (q.reward.equip ? 1 : 0);
+    if (slots && LOOT.invSize - p.data.inv.length < slots) return p.send({ t: 'err', text: `가방에 빈칸이 ${slots}개 필요합니다.` });
     for (const o of q.obj) if (o.type === 'collect') removeById(p, o.target, o.n);
     delete qs.active[id];
     qs.done.push(id);
@@ -85,6 +88,7 @@ export class QuestSystem {
     p.dirty = true;
     this.send(p);
     p.send({ t: 'qdone', id });
+    p.achieve('quest');
     syncInv(p);
     p.send({ t: 'me', s: { gold: p.data.gold } });
     if (r.exp) this.gainExp(p, questExp(r.exp, p.lv));

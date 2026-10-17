@@ -67,7 +67,7 @@ await wait(800);
 check('북쪽 포탈 → 잿빛 협곡', inbox.some((m) => m.t === 'goto' && m.zone === 'field5'));
 w = await connect();
 check('잿빛 협곡 도착(남쪽 포탈 근처)', w.zone === 'field5' && Math.abs(w.you.x + 42) < 3 && w.you.z > 45, `${w.zone} (${w.you.x}, ${w.you.z})`);
-check('잿빛 협곡 몬스터 구성', JSON.stringify(kinds(w)) === JSON.stringify(['ash_wolf', 'barga', 'canyon_raider', 'ember_mage', 'magma_slime', 'rock_titan']), kinds(w).join(','));
+check('잿빛 협곡 몬스터 구성', JSON.stringify(kinds(w)) === JSON.stringify(['ash_wolf', 'barga', 'canyon_raider', 'cinder_bat', 'ember_mage', 'magma_slime', 'rock_titan']), kinds(w).join(','));
 const boss5 = w.monsters.find((m) => m.kind === 'barga');
 check('필드 보스 바르가', boss5?.mhp === 64000, `${boss5?.mhp}`);
 check('채집 노드', inbox.some((m) => m.t === 'nodes'));
@@ -82,7 +82,7 @@ await wait(800);
 check('북쪽 포탈 → 서리 고원', inbox.some((m) => m.t === 'goto' && m.zone === 'field6'));
 w = await connect();
 check('서리 고원 도착', w.zone === 'field6' && w.you.z > 45, `${w.zone} (${w.you.x}, ${w.you.z})`);
-check('서리 고원 몬스터 구성', JSON.stringify(kinds(w)) === JSON.stringify(['frost_knight', 'frost_wolf', 'ice_archer', 'siryen', 'snow_wisp', 'yeti']), kinds(w).join(','));
+check('서리 고원 몬스터 구성', JSON.stringify(kinds(w)) === JSON.stringify(['frost_knight', 'frost_spider', 'frost_wolf', 'ice_archer', 'siryen', 'snow_wisp', 'yeti']), kinds(w).join(','));
 const boss6 = w.monsters.find((m) => m.kind === 'siryen');
 check('필드 보스 시리엔', boss6?.mhp === 98000, `${boss6?.mhp}`);
 

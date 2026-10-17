@@ -104,6 +104,7 @@ export class PvpSystem {
     v.data.pvp.r = Math.max(0, v.data.pvp.r - gain);
     p.dirty = v.dirty = true;
     p.send({ t: 'pvp', me: p.data.pvp, delta: gain });
+    if (!repeat) p.achieve('pvp');
     v.send({ t: 'pvp', me: v.data.pvp, delta: -gain });
     this.h.broadcast({ t: 'sys', text: `⚔ ${p.name}님이 ${v.name}님을 쓰러뜨렸습니다!${gain ? ` (점수 +${gain})` : ' (같은 상대 반복: 점수 없음)'}` });
   }

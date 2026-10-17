@@ -1,0 +1,311 @@
+{
+ "list": [
+  {
+   "id": "kill_100",
+   "name": "첫걸음 사냥꾼",
+   "desc": "몬스터 100마리 처치",
+   "type": "kill",
+   "n": 100,
+   "target": "*",
+   "title": "견습 사냥꾼",
+   "gold": 500
+  },
+  {
+   "id": "kill_1000",
+   "name": "베테랑 사냥꾼",
+   "desc": "몬스터 1,000마리 처치",
+   "type": "kill",
+   "n": 1000,
+   "target": "*",
+   "title": "베테랑",
+   "gold": 3000
+  },
+  {
+   "id": "kill_5000",
+   "name": "전장의 학살자",
+   "desc": "몬스터 5,000마리 처치",
+   "type": "kill",
+   "n": 5000,
+   "target": "*",
+   "title": "학살자",
+   "gold": 12000
+  },
+  {
+   "id": "slime_50",
+   "name": "말랑말랑 연구가",
+   "desc": "흙 슬라임 50마리 처치",
+   "type": "kill",
+   "n": 50,
+   "target": "slime",
+   "title": "말랑말랑",
+   "gold": 300
+  },
+  {
+   "id": "wolf_100",
+   "name": "들개 퇴치반",
+   "desc": "들개 100마리 처치",
+   "type": "kill",
+   "n": 100,
+   "target": "wolf",
+   "title": "들개 사냥꾼",
+   "gold": 800
+  },
+  {
+   "id": "spider_50",
+   "name": "거미줄 청소부",
+   "desc": "숲 거미 50마리 처치",
+   "type": "kill",
+   "n": 50,
+   "target": "forest_spider",
+   "title": "거미 사냥꾼",
+   "gold": 1200
+  },
+  {
+   "id": "ghost_50",
+   "name": "퇴마사",
+   "desc": "사원 원혼 50마리 처치",
+   "type": "kill",
+   "n": 50,
+   "target": "temple_ghost",
+   "title": "퇴마사",
+   "gold": 2500
+  },
+  {
+   "id": "boss_1",
+   "name": "첫 번째 보스",
+   "desc": "필드 보스·레이드 보스를 처음 쓰러뜨림",
+   "type": "boss",
+   "n": 1,
+   "gold": 1000
+  },
+  {
+   "id": "boss_25",
+   "name": "보스 사냥꾼",
+   "desc": "보스 25마리 처치",
+   "type": "boss",
+   "n": 25,
+   "title": "보스 사냥꾼",
+   "gold": 8000
+  },
+  {
+   "id": "elite_1",
+   "name": "정예 격파",
+   "desc": "정예 몬스터 처치",
+   "type": "elite",
+   "n": 1,
+   "gold": 800
+  },
+  {
+   "id": "elite_20",
+   "name": "정예 킬러",
+   "desc": "정예 몬스터 20마리 처치",
+   "type": "elite",
+   "n": 20,
+   "title": "정예 킬러",
+   "gold": 6000
+  },
+  {
+   "id": "gargon",
+   "name": "성채 해방자",
+   "desc": "폐허의 군주 가르곤 처치",
+   "type": "kill",
+   "n": 1,
+   "target": "gargon",
+   "title": "성채 해방자",
+   "gold": 5000
+  },
+  {
+   "id": "ignis",
+   "name": "불꽃을 끈 자",
+   "desc": "화염의 대사제 이그니스 처치",
+   "type": "kill",
+   "n": 1,
+   "target": "ignis",
+   "title": "불꽃을 끈 자",
+   "gold": 9000
+  },
+  {
+   "id": "siryen",
+   "name": "겨울의 끝",
+   "desc": "빙설의 여왕 시리엔 처치",
+   "type": "kill",
+   "n": 1,
+   "target": "siryen",
+   "title": "빙설을 녹인 자",
+   "gold": 7000
+  },
+  {
+   "id": "lv10",
+   "name": "모험의 시작",
+   "desc": "레벨 10 달성",
+   "type": "level",
+   "n": 10,
+   "gold": 500
+  },
+  {
+   "id": "lv20",
+   "name": "숙련된 검객",
+   "desc": "레벨 20 달성",
+   "type": "level",
+   "n": 20,
+   "title": "숙련자",
+   "gold": 2000
+  },
+  {
+   "id": "lv30",
+   "name": "이름난 검객",
+   "desc": "레벨 30 달성",
+   "type": "level",
+   "n": 30,
+   "title": "이름난 검객",
+   "gold": 5000
+  },
+  {
+   "id": "lv40",
+   "name": "검의 궤적",
+   "desc": "최고 레벨 40 달성",
+   "type": "level",
+   "n": 40,
+   "title": "검의 달인",
+   "gold": 15000
+  },
+  {
+   "id": "tower5",
+   "name": "탑의 문턱",
+   "desc": "시련의 탑 5층 돌파",
+   "type": "tower",
+   "n": 5,
+   "gold": 800
+  },
+  {
+   "id": "tower10",
+   "name": "탑 오르는 자",
+   "desc": "시련의 탑 10층 돌파",
+   "type": "tower",
+   "n": 10,
+   "title": "탑 오르는 자",
+   "gold": 2500
+  },
+  {
+   "id": "tower20",
+   "name": "탑의 정복자",
+   "desc": "시련의 탑 20층 돌파",
+   "type": "tower",
+   "n": 20,
+   "title": "탑의 정복자",
+   "gold": 8000
+  },
+  {
+   "id": "tower30",
+   "name": "끝없는 도전",
+   "desc": "시련의 탑 30층 돌파",
+   "type": "tower",
+   "n": 30,
+   "title": "끝없는 도전자",
+   "gold": 20000
+  },
+  {
+   "id": "enh7",
+   "name": "강화 입문",
+   "desc": "장비를 +7까지 강화",
+   "type": "enhance",
+   "n": 7,
+   "gold": 1000
+  },
+  {
+   "id": "enh10",
+   "name": "불꽃 튀는 망치",
+   "desc": "장비를 +10까지 강화",
+   "type": "enhance",
+   "n": 10,
+   "title": "대장장이의 벗",
+   "gold": 4000
+  },
+  {
+   "id": "enh15",
+   "name": "전설의 강화",
+   "desc": "장비를 +15까지 강화",
+   "type": "enhance",
+   "n": 15,
+   "title": "강화의 신",
+   "gold": 30000
+  },
+  {
+   "id": "quest10",
+   "name": "마을의 일꾼",
+   "desc": "퀘스트 10개 완료",
+   "type": "quest",
+   "n": 10,
+   "gold": 800
+  },
+  {
+   "id": "quest30",
+   "name": "마을의 영웅",
+   "desc": "퀘스트 30개 완료",
+   "type": "quest",
+   "n": 30,
+   "title": "마을의 영웅",
+   "gold": 5000
+  },
+  {
+   "id": "bounty10",
+   "name": "현상금 사냥꾼",
+   "desc": "현상 수배 10건 완료",
+   "type": "bounty",
+   "n": 10,
+   "title": "현상금 사냥꾼",
+   "gold": 3000
+  },
+  {
+   "id": "bounty50",
+   "name": "전설의 추적자",
+   "desc": "현상 수배 50건 완료",
+   "type": "bounty",
+   "n": 50,
+   "title": "추적자",
+   "gold": 12000
+  },
+  {
+   "id": "gather50",
+   "name": "부지런한 손",
+   "desc": "채집 50번",
+   "type": "gather",
+   "n": 50,
+   "gold": 600
+  },
+  {
+   "id": "gather300",
+   "name": "대자연의 장인",
+   "desc": "채집 300번",
+   "type": "gather",
+   "n": 300,
+   "title": "장인",
+   "gold": 4000
+  },
+  {
+   "id": "craft10",
+   "name": "손재주",
+   "desc": "제작 10번",
+   "type": "craft",
+   "n": 10,
+   "gold": 800
+  },
+  {
+   "id": "pvp1",
+   "name": "첫 승리",
+   "desc": "결투장에서 처음 쓰러뜨림",
+   "type": "pvp",
+   "n": 1,
+   "gold": 500
+  },
+  {
+   "id": "pvp30",
+   "name": "결투왕",
+   "desc": "결투장에서 30번 쓰러뜨림",
+   "type": "pvp",
+   "n": 30,
+   "title": "결투왕",
+   "gold": 6000
+  }
+ ]
+}

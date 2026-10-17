@@ -14,7 +14,7 @@
     }
    ],
    "reward": {
-    "exp": 150,
+    "exp": 60,
     "gold": 100,
     "items": [
      [
@@ -39,7 +39,7 @@
     }
    ],
    "reward": {
-    "exp": 400,
+    "exp": 60,
     "gold": 150,
     "items": [
      [
@@ -64,7 +64,7 @@
     }
    ],
    "reward": {
-    "exp": 900,
+    "exp": 139,
     "gold": 250,
     "items": [
      [
@@ -89,7 +89,7 @@
     }
    ],
    "reward": {
-    "exp": 700,
+    "exp": 71,
     "gold": 200
    }
   },
@@ -113,7 +113,7 @@
     }
    ],
    "reward": {
-    "exp": 3500,
+    "exp": 339,
     "gold": 600,
     "items": [
      [
@@ -138,7 +138,7 @@
     }
    ],
    "reward": {
-    "exp": 8000,
+    "exp": 825,
     "gold": 1500,
     "equip": {
      "lv": 10,
@@ -161,7 +161,7 @@
     }
    ],
    "reward": {
-    "exp": 3000,
+    "exp": 250,
     "gold": 500
    }
   },
@@ -185,7 +185,7 @@
     }
    ],
    "reward": {
-    "exp": 16000,
+    "exp": 1031,
     "gold": 2000,
     "items": [
      [
@@ -210,7 +210,7 @@
     }
    ],
    "reward": {
-    "exp": 24000,
+    "exp": 1016,
     "gold": 2500,
     "items": [
      [
@@ -235,7 +235,7 @@
     }
    ],
    "reward": {
-    "exp": 60000,
+    "exp": 2265,
     "gold": 8000,
     "equip": {
      "lv": 20,
@@ -258,7 +258,7 @@
     }
    ],
    "reward": {
-    "exp": 20000,
+    "exp": 529,
     "gold": 3000
    }
   },
@@ -282,7 +282,7 @@
     }
    ],
    "reward": {
-    "exp": 90000,
+    "exp": 2234,
     "gold": 10000,
     "items": [
      [
@@ -307,7 +307,7 @@
     }
    ],
    "reward": {
-    "exp": 250000,
+    "exp": 4355,
     "gold": 30000,
     "equip": {
      "lv": 30,
@@ -329,7 +329,7 @@
     }
    ],
    "reward": {
-    "exp": 200,
+    "exp": 60,
     "gold": 80,
     "items": [
      [
@@ -353,7 +353,7 @@
     }
    ],
    "reward": {
-    "exp": 300,
+    "exp": 60,
     "items": [
      [
       "enh_stone",
@@ -376,7 +376,7 @@
     }
    ],
    "reward": {
-    "exp": 300,
+    "exp": 60,
     "gold": 150
    }
   },
@@ -394,7 +394,7 @@
     }
    ],
    "reward": {
-    "exp": 700,
+    "exp": 70,
     "gold": 200,
     "equip": {
      "lv": 5,
@@ -417,7 +417,7 @@
     }
    ],
    "reward": {
-    "exp": 3000,
+    "exp": 230,
     "gold": 600,
     "items": [
      [
@@ -442,7 +442,7 @@
     }
    ],
    "reward": {
-    "exp": 9000,
+    "exp": 501,
     "gold": 1200,
     "items": [
      [
@@ -467,7 +467,7 @@
     }
    ],
    "reward": {
-    "exp": 20000,
+    "exp": 833,
     "gold": 2000,
     "items": [
      [
@@ -497,7 +497,7 @@
     }
    ],
    "reward": {
-    "exp": 3920,
+    "exp": 3194,
     "gold": 2520,
     "items": [
      [
@@ -522,7 +522,7 @@
     }
    ],
    "reward": {
-    "exp": 4129,
+    "exp": 2447,
     "gold": 2610,
     "items": [
      [
@@ -547,7 +547,7 @@
     }
    ],
    "reward": {
-    "exp": 4342,
+    "exp": 2573,
     "gold": 2700,
     "items": [
      [
@@ -577,7 +577,7 @@
     }
    ],
    "reward": {
-    "exp": 4781,
+    "exp": 3895,
     "gold": 2880,
     "items": [
      [
@@ -602,7 +602,7 @@
     }
    ],
    "reward": {
-    "exp": 8141,
+    "exp": 5815,
     "gold": 4000,
     "equip": {
      "lv": 35,
@@ -630,7 +630,7 @@
     }
    ],
    "reward": {
-    "exp": 5234,
+    "exp": 4264,
     "gold": 3060,
     "items": [
      [
@@ -655,7 +655,7 @@
     }
    ],
    "reward": {
-    "exp": 5465,
+    "exp": 3238,
     "gold": 3150,
     "items": [
      [
@@ -685,7 +685,7 @@
     }
    ],
    "reward": {
-    "exp": 5937,
+    "exp": 4838,
     "gold": 3330,
     "items": [
      [
@@ -710,7 +710,7 @@
     }
    ],
    "reward": {
-    "exp": 10378,
+    "exp": 7413,
     "gold": 8000,
     "equip": {
      "lv": 40,
@@ -733,7 +733,7 @@
     }
    ],
    "reward": {
-    "exp": 3920,
+    "exp": 1742,
     "gold": 2520,
     "items": [
      [
@@ -758,7 +758,7 @@
     }
    ],
    "reward": {
-    "exp": 4129,
+    "exp": 1835,
     "gold": 2610,
     "items": [
      [
@@ -783,7 +783,7 @@
     }
    ],
    "reward": {
-    "exp": 5234,
+    "exp": 2326,
     "gold": 3060,
     "items": [
      [
@@ -808,7 +808,7 @@
     }
    ],
    "reward": {
-    "exp": 8896,
+    "exp": 2965,
     "gold": 6000,
     "items": [
      [
@@ -817,6 +817,184 @@
      ]
     ]
    }
+  },
+  {
+   "id": "t1",
+   "name": "박쥐 소동",
+   "giver": "explorer",
+   "lv": 8,
+   "desc": "성채 지하에서 박쥐 떼가 쏟아져 나와요. 좀 줄여 주세요!",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "cave_bat",
+     "n": 12
+    }
+   ],
+   "reward": {
+    "gold": 800,
+    "exp": 371
+   }
+  },
+  {
+   "id": "t2",
+   "name": "시련의 탑",
+   "giver": "explorer",
+   "lv": 5,
+   "desc": "마을 북서쪽 탑에 들어가 봐요. 층마다 괴물이 나오고, 깰수록 보상이 커져요!",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "tower",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "gold": 300,
+    "items": [
+     [
+      "enh_stone",
+      2
+     ]
+    ],
+    "exp": 71
+   }
+  },
+  {
+   "id": "t3",
+   "name": "거미 둥지",
+   "giver": "explorer",
+   "lv": 13,
+   "desc": "검의 숲 북서쪽에 거미가 둥지를 틀었대요.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "forest_spider",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "gold": 1600,
+    "exp": 750
+   },
+   "req": "t1"
+  },
+  {
+   "id": "t4",
+   "name": "끈적한 실",
+   "giver": "explorer",
+   "lv": 14,
+   "desc": "거미줄로 영약을 만들 수 있어요. 모아 오면 하나 드릴게요.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_silk",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "gold": 1200,
+    "items": [
+     [
+      "pot_elixir",
+      5
+     ]
+    ],
+    "exp": 627
+   },
+   "req": "t3"
+  },
+  {
+   "id": "t5",
+   "name": "사원의 원혼",
+   "giver": "explorer",
+   "lv": 23,
+   "desc": "정상 사원 동쪽에서 원혼이 떠돈대요. 잠재워 주세요.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "temple_ghost",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "gold": 3600,
+    "items": [
+     [
+      "enh_stone",
+      4
+     ]
+    ],
+    "exp": 1735
+   },
+   "req": "t4"
+  },
+  {
+   "id": "t6",
+   "name": "불티 박쥐",
+   "giver": "explorer",
+   "lv": 31,
+   "desc": "잿빛 협곡의 박쥐는 날개가 불타고 있어요!",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "cinder_bat",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "gold": 3000,
+    "exp": 2702
+   },
+   "req": "t5"
+  },
+  {
+   "id": "t7",
+   "name": "얼음 거미",
+   "giver": "explorer",
+   "lv": 37,
+   "desc": "서리 고원 북서쪽에 얼음 거미가 산대요. 조심하세요.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "frost_spider",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "gold": 4200,
+    "exp": 3518
+   },
+   "req": "t6"
+  },
+  {
+   "id": "t8",
+   "name": "서리 실타래",
+   "giver": "explorer",
+   "lv": 38,
+   "desc": "서리 거미줄로 최상급 물약을 만들 수 있어요.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_frostsilk",
+     "n": 10
+    }
+   ],
+   "reward": {
+    "gold": 4000,
+    "items": [
+     [
+      "pot_hp_x",
+      5
+     ],
+     [
+      "enh_stone",
+      8
+     ]
+    ],
+    "exp": 2746
+   },
+   "req": "t7"
   }
  ]
 }

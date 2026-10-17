@@ -136,7 +136,7 @@ export function defaultLook(body: string, enemy: boolean): Look {
   const hairs = ['#3a2a20', '#1e1a1a', '#7a5030', '#c8a060', '#8a8a90'];
   const dark = new THREE.Color(body).multiplyScalar(0.55).getStyle();
   return {
-    hairStyle: styles[h % styles.length], hairColor: hairs[(h >> 3) % hairs.length],
+    hairStyle: styles[h % styles.length], hairColor: hairs[(h >>> 3) % hairs.length],
     armor: enemy ? '#5a5560' : dark, accent: enemy ? '#3a3238' : '#c8a060', boots: '#3a3028',
     pauldron: enemy ? 'small' : 'none', helm: enemy,
   };

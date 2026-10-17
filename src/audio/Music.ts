@@ -59,7 +59,7 @@ export class Music {
     window.addEventListener('keydown', unlock);
     bus.on('zoneTheme', ({ type, ambient }) => this.set(themeOf({ type, ambient })));
     bus.on('settingsChanged', ({ settings }) => {
-      this.volume = settings.volume;
+      this.volume = settings.music;
       this.apply();
     });
     window.addEventListener('keydown', (e) => {

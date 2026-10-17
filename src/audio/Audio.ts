@@ -37,7 +37,7 @@ export class Audio {
     const unlock = () => this.ensure();
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
-    bus.on('sfx', ({ key, volume }) => this.play(key, volume));
+    bus.on('sfx', ({ key, volume, rate }) => this.play(key, volume, rate));
     bus.on('settingsChanged', ({ settings }) => this.setVolume(settings.volume));
   }
 
@@ -73,11 +73,11 @@ export class Audio {
     if (this.ctx) this.master.gain.value = this.data.master * v;
   }
 
-  play(key: string, volume = 1): void {
+  play(key: string, volume = 1, rate = 1): void {
     const ctx = this.ctx;
     const snd = this.data.sounds[key];
     if (!ctx || !snd || ctx.state !== 'running') return;
-    const pitch = 1 + (Math.random() * 2 - 1) * this.data.pitchJitter;
+    const pitch = (1 + (Math.random() * 2 - 1) * this.data.pitchJitter) * rate;
     const file = this.files.get(key);
     if (file) {
       const src = ctx.createBufferSource();

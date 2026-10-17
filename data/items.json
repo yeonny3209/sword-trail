@@ -1601,6 +1601,88 @@
     "atk": 148
    },
    "price": 48960
+  },
+  {
+   "id": "mat_batwing",
+   "name": "박쥐 날개막",
+   "kind": "material",
+   "lv": 8,
+   "price": 22,
+   "stack": 999,
+   "desc": "얇고 질긴 막. 물약과 가벼운 장비 재료."
+  },
+  {
+   "id": "mat_silk",
+   "name": "끈적한 거미줄",
+   "kind": "material",
+   "lv": 13,
+   "price": 34,
+   "stack": 999,
+   "desc": "끊기지 않는 실. 고급 물약의 재료."
+  },
+  {
+   "id": "mat_soul",
+   "name": "원혼의 조각",
+   "kind": "material",
+   "lv": 23,
+   "price": 60,
+   "stack": 999,
+   "desc": "희미하게 빛나는 영혼의 파편."
+  },
+  {
+   "id": "mat_cinder",
+   "name": "불티 날개",
+   "kind": "material",
+   "lv": 31,
+   "price": 80,
+   "stack": 999,
+   "desc": "아직도 뜨거운 날개 조각."
+  },
+  {
+   "id": "mat_frostsilk",
+   "name": "서리 거미줄",
+   "kind": "material",
+   "lv": 37,
+   "price": 96,
+   "stack": 999,
+   "desc": "얼음처럼 차가운 실."
+  },
+  {
+   "id": "pot_hp_x",
+   "name": "최상급 HP 물약",
+   "kind": "potion",
+   "lv": 30,
+   "heal": {
+    "hp": 0.9
+   },
+   "price": 420,
+   "stack": 99,
+   "desc": "최대 HP의 90%를 회복한다."
+  },
+  {
+   "id": "pot_mp_x",
+   "name": "최상급 MP 물약",
+   "kind": "potion",
+   "lv": 30,
+   "heal": {
+    "mp": 0.9
+   },
+   "price": 480,
+   "stack": 99,
+   "desc": "최대 MP의 90%를 회복한다."
+  },
+  {
+   "id": "pot_elixir",
+   "name": "회복의 영약",
+   "kind": "potion",
+   "lv": 15,
+   "heal": {
+    "hp": 0.5,
+    "mp": 0.5
+   },
+   "price": 320,
+   "stack": 99,
+   "desc": "HP와 MP를 50%씩 회복한다."
   }
  ]
 }

@@ -43,6 +43,11 @@ export class Gathering {
     return ITEMS[`${n.def.kind}_${tier}`]?.name ?? KIND_NAME[n.def.kind];
   }
 
+  /** 지금 캘 수 있는 노드 위치(지도 표시) */
+  upNodes(): { x: number; z: number }[] {
+    return (this.zone()?.nodes ?? []).filter((n) => n.up).map((n) => n.def);
+  }
+
   nearest(x: number, z: number): NodeView | null {
     let best: NodeView | null = null, bd = this.g.range * this.g.range;
     for (const n of this.zone()?.nodes ?? []) {

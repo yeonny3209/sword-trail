@@ -1,5 +1,6 @@
 import { resolveCircle } from '../../shared/geom';
-import type { C2S } from '../../shared/protocol';
+import type { C2S, S2C } from '../../shared/protocol';
+import type { Monster } from './Monster';
 import type { ZoneDef } from '../../shared/types';
 import type { PlayerSession } from './PlayerSession';
 
@@ -34,4 +35,45 @@ export function applyMove(zone: ZoneDef, p: PlayerSession, m: Extract<C2S, { t: 
   p.st = m.st | 0;
   p.dirty = true;
   if (corrected) p.send({ t: 'pos', x: p.x, z: p.z });
+}
+
+/** 20Hz: 몬스터 진행(쓰러진 몬스터는 다시 나오게, 소환·이벤트 몬스터는 지움) + 서로 겹치지 않게 밀어내기 */
+export function stepMonsters(monsters: Map<number, Monster>, dt: number, z: ZoneDef, players: Iterable<PlayerSession>, emit: (m: S2C) => void): void {
+  const list = [...players];
+  for (const m of monsters.values()) {
+    if (m.dead) {
+      m.respawnT -= dt;
+      if (m.respawnT <= 0) {
+        if (m.summoned || m.temporary) {
+          monsters.delete(m.id);
+          continue;
+        }
+        m.respawn(z);
+        emit({ t: 'mspawn', m: m.info() });
+      }
+      continue;
+    }
+    // 한 마리에서 오류가 나도 존 전체가 멈추지 않게
+    try {
+      m.update(dt, z, list, emit);
+    } catch (e) {
+      console.error('monster update', m.def.id, e);
+    }
+  }
+  // 띄워진 몬스터는 밀지 않는다
+  const alive = [...monsters.values()].filter((m) => !m.dead && !m.body.air);
+  for (let i = 0; i < alive.length; i++) {
+    for (let j = i + 1; j < alive.length; j++) {
+      const a = alive[i].body, b = alive[j].body;
+      const min = alive[i].def.radius + alive[j].def.radius;
+      const dx = b.x - a.x, dz = b.z - a.z;
+      const d2 = dx * dx + dz * dz;
+      if (d2 >= min * min || d2 < 1e-6) continue;
+      const d = Math.sqrt(d2), push = (min - d) / 2;
+      a.x -= (dx / d) * push;
+      a.z -= (dz / d) * push;
+      b.x += (dx / d) * push;
+      b.z += (dz / d) * push;
+    }
+  }
 }

@@ -16,7 +16,7 @@ export interface CombatHost {
   monsters: Map<number, Monster>;
   broadcast(msg: S2C, except?: PlayerSession): void;
   /** 처치 알림(퀘스트 진행) */
-  onKill(p: PlayerSession, monsterId: string): void;
+  onKill(p: PlayerSession, monsterId: string, elite?: boolean): void;
   players: Map<number, PlayerSession>;
   /** 레이드 보스를 쓰러뜨렸다(참여한 모두에게 보상) */
   onRaidClear?(mon: Monster): void;
@@ -44,6 +44,8 @@ export class Combat {
       const ready = p.cds.get(a.id) ?? 0;
       if (slv < 1 || now < ready - 150 || p.data.mp + 0.5 < cost) {
         p.send({ t: 'cdfail', a: a.id });
+        // 클라이언트가 미리 깎은 MP를 되돌린다
+        p.send({ t: 'me', s: { mp: p.data.mp } });
         return;
       }
       p.data.mp -= cost;
@@ -93,7 +95,10 @@ export class Combat {
     const dir = hit.shape.type === 'box' ? [Math.sin(p.f), Math.cos(p.f)] : [mon.body.x - p.x, mon.body.z - p.z];
     applyReaction(mon.body, hit, dir[0], dir[1], mon.def.weight, mon.def.superArmor);
     mon.interrupt();
-    if (hit.mp) p.data.mp = Math.min(p.stats.mmp, p.data.mp + hit.mp);
+    if (hit.mp) {
+      p.data.mp = Math.min(p.stats.mmp, p.data.mp + hit.mp);
+      p.send({ t: 'me', s: { mp: Math.round(p.data.mp) } });
+    }
     p.lastHitAt = now;
     this.host.broadcast({ t: 'dmg', tk: 'm', id: mon.id, n, crit, back, counter, by: p.id });
     if (mon.hp <= 0) this.kill(mon, p);
@@ -124,7 +129,7 @@ export class Combat {
       const exp = partyExp(Math.max(1, Math.round(mon.def.exp * PROGRESSION.monsterExpRate * expBoost(q.lv) * expFactor(q.lv, mon.def.lv))), mates.length);
       q.send({ t: 'reward', exp, gold, name: mon.def.name });
       this.gainExp(q, exp);
-      this.host.onKill(q, mon.def.elite ?? mon.def.id);
+      this.host.onKill(q, mon.def.elite ?? mon.def.id, !!mon.def.elite);
     }
   }
 
@@ -138,12 +143,15 @@ export class Combat {
       p.data.skillPoints += SKILL_POINTS_PER_LEVEL;
       leveled = true;
     }
+    // 최고 레벨이면 경험치가 끝없이 쌓이지 않게
+    if (p.lv >= MAX_LEVEL) p.data.exp = Math.min(p.data.exp, expToNext(p.lv));
     if (leveled) {
       p.recalc();
       p.data.hp = p.stats.mhp;
       p.send({ t: 'sys', text: `레벨 ${p.lv}! 스탯 포인트 ${STAT_POINTS_PER_LEVEL}, 스킬 포인트 ${SKILL_POINTS_PER_LEVEL}을 얻었습니다. (U: 캐릭터, K: 스킬)` });
       p.data.mp = p.stats.mmp;
       this.host.broadcast({ t: 'lvup', id: p.id, lv: p.lv });
+      p.achieve('level', undefined, p.lv);
       p.send({ t: 'me', s: p.self() });
     } else {
       p.send({ t: 'me', s: { exp: p.data.exp, gold: p.data.gold, mp: p.data.mp } });
@@ -173,6 +181,11 @@ export class Combat {
   /** 플레이어 피해(몬스터 by 또는 결투장에서 플레이어 by) */
   damagePlayer(p: PlayerSession, n: number, by: number, o: { crit?: boolean; pvp?: boolean } = {}): void {
     p.gathering = null;
+    // 맞으면 마을 귀환이 끊긴다
+    if (p.recallAt) {
+      p.recallAt = 0;
+      p.send({ t: 'recall', ms: 0 });
+    }
     // 수호(받는 피해 감소)와 보호막이 먼저 받는다
     n = Math.round(n * p.damageTaken);
     const hadShield = (p.buffs.get('shield')?.val ?? 0) > 0;

@@ -60,6 +60,8 @@ export class Monster {
   window: AttackWindow | null = null;
   /** 마지막으로 때린 플레이어(어그로) */
   lastAttacker = 0;
+  /** 집으로 돌아가지 않는다(시련의 탑) */
+  leashless = false;
 
   constructor(readonly def: MonsterDef, private readonly area: Rect, zone: ZoneDef) {
     const [x, z] = this.randomPoint(zone);
@@ -179,6 +181,11 @@ export class Monster {
     this.target = null;
     this.window = null;
     this.status.clear();
+    // 다시 나온 몬스터가 예전에 자기를 잡은 사람을 맵 끝까지 쫓아가지 않게
+    this.lastAttacker = 0;
+    this.threat.clear();
+    this.dealt.clear();
+    this.cd = 1 + Math.random();
     this.set(MonState.Idle);
   }
 
@@ -199,18 +206,24 @@ export class Monster {
 
     // 대상 고르기: 가까운 살아 있는 플레이어. 집에서 너무 멀어지면 포기
     const homeD = dist2(b.x, b.z, this.area.x, this.area.z);
-    const leashed = homeD > (d.leash + Math.max(this.area.w, this.area.d) / 2) ** 2;
-    if (this.target && (this.target.dead || this.target.leaving || leashed)) this.target = null;
+    const leashed = !this.leashless && homeD > (d.leash + Math.max(this.area.w, this.area.d) / 2) ** 2;
+    if (this.target && (this.target.dead || this.target.leaving || leashed)) {
+      // 끈이 끊겨 돌아갈 때는 원한도 잊는다
+      if (leashed) this.lastAttacker = 0;
+      this.target = null;
+    }
     if (d.raid) this.pickRaidTarget(dt, players);
     else if (!this.target && !leashed) {
       let best = d.aggro * d.aggro;
       for (const p of players) {
         if (p.dead || p.leaving) continue;
         const dd = dist2(b.x, b.z, p.x, p.z);
-        if (dd < best || p.id === this.lastAttacker) {
+        // 마지막으로 때린 사람은 조금 멀어도 쫓지만, 끝없이 쫓지는 않는다(집으로 돌아갔다 다시 쫓는 왕복 방지)
+        const grudge = p.id === this.lastAttacker && dd < (d.aggro * 2.5) ** 2;
+        if (dd < best || grudge) {
           best = dd;
           this.target = p;
-          if (p.id === this.lastAttacker) break;
+          if (grudge) break;
         }
       }
     }

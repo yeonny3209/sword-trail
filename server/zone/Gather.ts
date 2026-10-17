@@ -68,6 +68,7 @@ export class GatherSystem {
     }
     p.dirty = true;
     p.send({ t: 'gathered', id, n, lv: skill.lv });
+    p.achieve('gather');
     syncInv(p);
   }
 }
@@ -91,6 +92,7 @@ export function onCraft(p: PlayerSession, zone: ZoneDef, id: string): void {
   addItem(p, it);
   p.dirty = true;
   p.send({ t: 'crafted', id: r.out, n: r.n, rar });
+  p.achieve('craft');
   syncInv(p);
   p.send({ t: 'me', s: { gold: p.data.gold } });
 }

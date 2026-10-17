@@ -17,6 +17,12 @@ interface Juice {
   kickBase: number;
   kickPerStop: number;
   zoomPerStop: number;
+  /** 직업별 무기 무게(히트스톱·흔들림 배율) */
+  classWeight: Record<string, number>;
+  chainPitch: number;
+  chainPitchMax: number;
+  /** 처치될 때 날아가는 세기 */
+  killLaunch: number;
 }
 
 const COLOR: Record<string, string> = { slash: '#cfe6ff', heavy: '#ffd890', pierce: '#e0f4ff', x: '#ff9070', magic: '#c4a0ff' };
@@ -53,7 +59,7 @@ export class HitFx {
    * 맞았다: 충격 별빛·불꽃·소리·흔들림·반동. (dx, dz) = 때린 방향, mat = 맞은 재질
    * 돌려주는 값: 이 타격으로 멈출 프레임
    */
-  landed(at: THREE.Vector3, dx: number, dz: number, hit: HitDef, mat: string): number {
+  landed(at: THREE.Vector3, dx: number, dz: number, hit: HitDef, mat: string, weight = 1, chain = 0): number {
     const strong = hit.stop >= 8;
     const size = 0.8 + hit.stop * 0.07;
     const hard = mat === 'metal' || mat === 'stone';
@@ -68,7 +74,8 @@ export class HitFx {
       this.fx.crack(at.x, at.z, 0.8 + hit.stop * 0.06);
       this.particles.burst(new THREE.Vector3(at.x, 0.1, at.z), this.bursts.dust);
     }
-    const stop = this.stopFrames(hit);
+    // 무기 무게: 무거운 무기일수록 오래 멈추고 크게 흔들린다
+    const stop = Math.round(this.stopFrames(hit) * weight);
     // 마무리 일격(묵직한 타격): 순간 느려지고 하얗게 번쩍, 충격 고리가 크게 퍼진다
     if (hit.stop >= 10) {
       this.fx.ring(at.x, at.z, 1.5 + hit.stop * 0.05, '#ffffff');
@@ -79,9 +86,16 @@ export class HitFx {
       this.cam.addKick(dx, dz, 0.18, 0.035);
     }
     const shake = Math.max(this.juice.shakeBase + hit.stop * this.juice.shakePerStop, (hit.shake ?? 0) * 1.6);
-    this.cam.addShake(shake);
-    this.cam.addKick(dx, dz, this.juice.kickBase + hit.stop * this.juice.kickPerStop, hit.stop * this.juice.zoomPerStop);
-    bus.emit('sfx', { key: mat === 'metal' ? 'hitMetal' : mat === 'slime' ? 'hitSlime' : strong || mat === 'stone' ? 'hitHeavy' : 'hitFlesh' });
+    this.cam.addShake(shake * weight);
+    this.cam.addKick(dx, dz, (this.juice.kickBase + hit.stop * this.juice.kickPerStop) * weight, hit.stop * this.juice.zoomPerStop * weight);
+    // 연타할수록 타격음이 조금씩 높아진다(무거운 무기는 낮게)
+    const rate = (1 + Math.min(this.juice.chainPitchMax, chain * this.juice.chainPitch)) / Math.sqrt(weight);
+    bus.emit('sfx', { key: mat === 'metal' ? 'hitMetal' : mat === 'slime' ? 'hitSlime' : strong || mat === 'stone' ? 'hitHeavy' : 'hitFlesh', rate });
+    // 10타마다 금빛 고리와 짧은 울림
+    if (chain > 0 && chain % 10 === 0) {
+      this.fx.ring(at.x, at.z, 1.3 + Math.min(1.5, chain / 40), '#ffe080');
+      bus.emit('sfx', { key: 'gate', volume: 0.35, rate: 1.2 + Math.min(0.5, chain / 100) });
+    }
     return stop;
   }
 

@@ -25,7 +25,14 @@
     "from": 0.3
   },
   "particles": {
-    "footDust": { "count": 5, "color": "#b8a890", "speed": 1.7, "life": 0.5, "size": 0.24, "gravity": -0.6 },
+    "footDust": {
+      "count": 5,
+      "color": "#b8a890",
+      "speed": 1.7,
+      "life": 0.5,
+      "size": 0.24,
+      "gravity": -0.6
+    },
     "max": 600,
     "hit": {
       "count": 26,
@@ -148,6 +155,17 @@
     "shakePerStop": 0.028,
     "kickBase": 0.1,
     "kickPerStop": 0.03,
-    "zoomPerStop": 0.006
+    "zoomPerStop": 0.006,
+    "classWeight": {
+      "swordsman": 1.0,
+      "berserker": 1.35,
+      "blademaster": 0.8,
+      "spellblade": 0.95,
+      "buffer": 1.05,
+      "debuffer": 1.1
+    },
+    "chainPitch": 0.028,
+    "chainPitchMax": 0.4,
+    "killLaunch": 7.5
   }
 }

@@ -4,6 +4,7 @@ import { questExp } from '../../shared/rules';
 import { availableQuests, isComplete, progressOf, QUESTS, type QuestDef, type QuestState } from '../../shared/quests';
 import type { C2S } from '../../shared/protocol';
 import { Window } from './Window';
+import { bus } from '../core/bus';
 
 function objText(q: QuestDef, p: number[]): string {
   return q.obj.map((o, i) => {
@@ -77,8 +78,9 @@ export class QuestUi {
       if (!q) return '';
       const p = progressOf(q, this.qs, this.count);
       const done = isComplete(q, this.qs, this.count);
-      return `<div class="tq ${done ? 'done' : ''}"><b>${q.name}</b>${done ? ' <small>완료 — 돌아가서 보고</small>' : objText(q, p)}</div>`;
+      return `<div class="tq ${done ? 'done' : ''}"><b>${q.name}</b> <button class="guide" data-q="${id}" title="목표까지 자동 이동">🧭</button>${done ? ' <small>완료 — 돌아가서 보고</small>' : objText(q, p)}</div>`;
     }).join('')}` : '';
+    this.tracker.querySelectorAll<HTMLButtonElement>('.guide').forEach((b) => b.addEventListener('click', () => bus.emit('guide', { quest: b.dataset.q! })));
   }
 
   private drawLog(): void {
@@ -89,7 +91,7 @@ export class QuestUi {
       const p = progressOf(q, this.qs, this.count);
       return `<div class="qrow"><div class="qn">${q.name} <small>Lv${q.lv}</small></div><div class="qd">${q.desc}</div>${objText(q, p)}
         <div class="qr">보상: ${rewardText(q, this.lv)}</div><div class="row end"><button class="btn small ab" data-id="${id}">포기</button></div></div>`;
-    }).join('') : '<div class="hint">진행 중인 퀘스트가 없습니다. 마을의 <b>촌장 오윤</b>과 <b>경비대장 루크</b>에게 말을 걸어 보세요.</div>')
+    }).join('') : '<div class="hint">진행 중인 퀘스트가 없습니다. 마을의 <b>촌장 오윤</b>·<b>경비대장 루크</b>·<b>탐험가 이렌</b>에게 말을 걸어 보세요.</div>')
       + `<div class="hint">완료한 퀘스트 ${this.qs.done.length}개</div>`;
     this.win.body.querySelectorAll<HTMLButtonElement>('.ab').forEach((b) => b.addEventListener('click', () => {
       if (confirm('이 퀘스트를 포기할까요? 진행이 사라집니다.')) this.send({ t: 'qabandon', id: b.dataset.id! });

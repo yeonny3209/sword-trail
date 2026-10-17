@@ -11,7 +11,7 @@ import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
 import { onInventory, syncInv } from './Inventory';
 import { guildNameOf } from '../social/Guilds';
-import { applyMove, PLAYER_RADIUS } from './Movement';
+import { applyMove, PLAYER_RADIUS, stepMonsters } from './Movement';
 import { createGuildAt, portalTarget } from './Travel';
 import { RaidSystem } from './Raid';
 import { StatusSystem } from './Status';
@@ -21,6 +21,9 @@ import { GatherSystem, onCraft } from './Gather';
 import { Market, MARKET_MSGS, type MarketMsg } from './Market';
 import { TradeSystem, TRADE_MSGS, type TradeMsg } from './Trade';
 import { PvpSystem } from './Pvp';
+import { Achievements } from './Achieve';
+import { TowerSystem } from './Tower';
+import { EXTRA_MSGS, onExtra, recallTick, type ExtraHost, type ExtraMsg } from './Extras';
 
 
 const SAVE_EVERY_MS = 10_000;
@@ -50,6 +53,9 @@ export class ZoneDO extends DurableObject<Env> {
   private market: Market | null = null;
   private trade: TradeSystem | null = null;
   private pvp: PvpSystem | null = null;
+  private ach: Achievements | null = null;
+  private tower: TowerSystem | null = null;
+  private extra: ExtraHost | null = null;
 
   /** 존을 처음 열 때 몬스터를 배치한다 */
   private init(zoneId: string): boolean {
@@ -69,10 +75,21 @@ export class ZoneDO extends DurableObject<Env> {
     const self = this;
     this.combat = new Combat({
       zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), players: this.players,
-      onKill: (p, id) => self.quests?.onKill(p, id),
+      onKill: (p, id, elite) => {
+        self.quests?.onKill(p, id);
+        self.ach?.onKill(p, id, elite);
+      },
       onRaidClear: (m) => self.raid?.clear(m),
       onCast: (p, a, slv) => self.status?.schedule(p, a, slv),
     });
+    this.ach = new Achievements({ broadcast: (m, e) => self.broadcast(m, e), gainExp: (p, n) => self.combat!.gainExp(p, n) });
+    this.extra = { zone: z, ach: this.ach, travel: (p, k, x, zz) => self.travel(p, k, x, zz) };
+    if (z.tower) {
+      this.tower = new TowerSystem({
+        zone: z, players: this.players, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e),
+        spawn: (def, x, zz) => self.spawnMonster(def, x, zz), gainExp: (p, n) => self.combat!.gainExp(p, n),
+      });
+    }
     this.status = new StatusSystem({ players: this.players, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), combat: this.combat });
     this.elite = new EliteSystem({ zone: z, players: this.players, broadcast: (m) => self.broadcast(m), spawn: (def, x, zz) => self.spawnMonster(def, x, zz) });
     this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
@@ -121,6 +138,8 @@ export class ZoneDO extends DurableObject<Env> {
     this.quests!.send(p);
     this.quests!.onEnterZone(p);
     p.send({ t: 'nodes', down: this.gather!.downList() });
+    this.ach!.attach(p);
+    this.tower?.onEnter(p);
     if (p.dead) p.send({ t: 'died', wait: 0 });
     void this.market!.onConnect(p).catch(() => undefined);
     this.broadcast({ t: 'join', p: p.info() }, p);
@@ -143,10 +162,16 @@ export class ZoneDO extends DurableObject<Env> {
     }
     switch (msg.t) {
       case 'move': return void (this.zone && applyMove(this.zone, p, msg));
-      case 'act': return this.combat?.onAct(p, msg);
+      case 'act':
+        p.recallAt = 0;
+        return this.combat?.onAct(p, msg);
       case 'hit': return this.combat?.onHit(p, msg);
       case 'hurt': return this.combat?.onHurt(p, msg);
-      case 'revive': return this.combat?.onRevive(p);
+      case 'revive':
+        this.combat?.onRevive(p);
+        // 마을에서 부활: 살아난 뒤 마을로 보낸다
+        if (msg.town && !p.dead && this.zone?.type !== 'town') return this.travel(p, ZONES.town.id, ZONES.town.spawn[0], ZONES.town.spawn[1]);
+        return;
       case 'stat': return onStat(p, msg);
       case 'skill': return onSkill(p, msg);
       case 'reset': return onReset(p);
@@ -158,6 +183,8 @@ export class ZoneDO extends DurableObject<Env> {
       case 'sell':
       case 'enhance':
       case 'discard':
+      case 'isort':
+      case 'sellall':
         return onInventory(p, msg, this.zone!);
       case 'qaccept': return this.quests?.onAccept(p, String(msg.id));
       case 'qturnin': return this.quests?.onTurnin(p, String(msg.id));
@@ -176,6 +203,7 @@ export class ZoneDO extends DurableObject<Env> {
       default:
         if (MARKET_MSGS.has(msg.t)) return this.market?.on(p, msg as MarketMsg);
         if (TRADE_MSGS.has(msg.t)) return this.trade?.on(p, msg as TradeMsg);
+        if (EXTRA_MSGS.has(msg.t) && this.extra) return onExtra(this.extra, p, msg as ExtraMsg);
     }
   }
 
@@ -213,7 +241,10 @@ export class ZoneDO extends DurableObject<Env> {
       zone: z, players: this.players, broadcast: (m, e) => self.broadcast(m, e),
       spawn: (def, x, zz) => self.spawnMonster(def, x, zz),
       gainExp: (p, n) => self.combat!.gainExp(p, n),
-      onKill: (p, id) => self.quests?.onKill(p, id),
+      onKill: (p, id) => {
+        self.quests?.onKill(p, id);
+        self.ach?.onKill(p, id);
+      },
       mailItem: (p, it, subject) => self.market!.mailItem(p.id, it, subject),
       save: (p) => self.save(p),
     });
@@ -224,7 +255,8 @@ export class ZoneDO extends DurableObject<Env> {
   /** 모두 나간 레이드 방을 처음 상태로 되돌린다(다음 입장 때 init이 새로 만든다) */
   private resetRaid(): void {
     this.zone = null;
-    this.raid = this.combat = this.quests = this.gather = this.market = this.trade = this.pvp = this.status = this.elite = null;
+    this.raid = this.combat = this.quests = this.gather = this.market = this.trade = this.pvp = this.status = this.elite = this.tower = this.ach = null;
+    this.extra = null;
     this.monsters.clear();
   }
 
@@ -249,12 +281,19 @@ export class ZoneDO extends DurableObject<Env> {
     const t = portalTarget(this.zone, p, portalId);
     if (!t) return;
     if (typeof t === 'string') return p.send({ t: 'err', text: t });
+    await this.travel(p, t.key, t.x, t.z);
+  }
+
+  /** 다른 존(서버 이름 key)으로 보낸다: 저장 → 이동 알림 → 연결 끊기 */
+  private async travel(p: PlayerSession, key: string, x: number, z: number): Promise<void> {
+    if (p.leaving) return;
     p.leaving = true;
-    p.zone = t.key;
-    p.x = t.x;
-    p.z = t.z;
+    p.recallAt = 0;
+    p.zone = key;
+    p.x = x;
+    p.z = z;
     await this.save(p);
-    p.send({ t: 'goto', zone: t.id });
+    p.send({ t: 'goto', zone: baseZone(key) });
     await this.remove(p);
   }
 
@@ -270,7 +309,10 @@ export class ZoneDO extends DurableObject<Env> {
     } catch {
       /* 이미 닫힘 */
     }
-    if (!p.leaving) await this.save(p);
+    // 나간 사람은 leaving으로 표시해 몬스터가 더 쫓지 않게 한다(포탈로 나갈 때는 이미 저장함)
+    const saved = p.leaving;
+    p.leaving = true;
+    if (!saved) await this.save(p);
     this.broadcast({ t: 'leave', id: p.id });
     if (this.players.size === 0) {
       this.stop();
@@ -306,25 +348,6 @@ export class ZoneDO extends DurableObject<Env> {
     this.timer = null;
   }
 
-  /** 몬스터끼리 겹치지 않게 살짝 밀어낸다(띄워진 몬스터는 제외) */
-  private separate(): void {
-    const list = [...this.monsters.values()].filter((m) => !m.dead && !m.body.air);
-    for (let i = 0; i < list.length; i++) {
-      for (let j = i + 1; j < list.length; j++) {
-        const a = list[i].body, b = list[j].body;
-        const min = list[i].def.radius + list[j].def.radius;
-        const dx = b.x - a.x, dz = b.z - a.z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 >= min * min || d2 < 1e-6) continue;
-        const d = Math.sqrt(d2), push = (min - d) / 2;
-        a.x -= (dx / d) * push;
-        a.z -= (dz / d) * push;
-        b.x += (dx / d) * push;
-        b.z += (dz / d) * push;
-      }
-    }
-  }
-
   /** 20Hz 진행: 몬스터 → 스냅샷 → 회복·저장 */
   private step(): void {
     this.tickCount++;
@@ -332,24 +355,10 @@ export class ZoneDO extends DurableObject<Env> {
     const dt = Math.min(0.1, (now - this.lastStep) / 1000);
     this.lastStep = now;
     const z = this.zone!;
-    const emit = (msg: S2C) => this.broadcast(msg);
-    for (const m of this.monsters.values()) {
-      if (m.dead) {
-        m.respawnT -= dt;
-        if (m.respawnT <= 0) {
-          if (m.summoned || m.temporary) {
-            this.monsters.delete(m.id);
-            continue;
-          }
-          m.respawn(z);
-          this.broadcast({ t: 'mspawn', m: m.info() });
-        }
-        continue;
-      }
-      m.update(dt, z, this.players.values(), emit);
-    }
-    this.separate();
+    stepMonsters(this.monsters, dt, z, this.players.values(), (msg) => this.broadcast(msg));
     this.raid?.update(now);
+    this.tower?.update(now);
+    if (this.extra) recallTick(this.extra, this.players.values(), now);
     // 효과·이벤트 처리에서 오류가 나도 존 진행(몬스터·스냅샷)은 멈추지 않게 한다
     try {
       this.status?.update(now);

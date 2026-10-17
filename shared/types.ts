@@ -48,7 +48,7 @@ export interface NpcDef {
   z: number;
   f: number;
   color: string;
-  role: 'shop' | 'quest' | 'smith' | 'auction' | 'guild' | 'mail' | 'storage' | 'skill' | 'arena' | 'flavor';
+  role: 'shop' | 'quest' | 'smith' | 'auction' | 'guild' | 'mail' | 'storage' | 'skill' | 'arena' | 'flavor' | 'bounty';
   ref?: string;
   lines?: string[];
 }
@@ -84,6 +84,8 @@ export interface ZoneDef {
   ambient?: 'dust' | 'leaf' | 'firefly' | 'mist' | 'ash' | 'snow' | 'ember' | 'wisp';
   /** 안개가 시작되는 거리·완전히 덮는 거리 */
   fog?: [number, number];
+  /** 시련의 탑(층마다 몬스터가 나오는 파티 방) */
+  tower?: boolean;
   walls: WallDef[];
   props: PropDef[];
   portals: PortalDef[];
@@ -246,6 +248,8 @@ export interface MonsterAttackDef {
   fx?: 'arrow' | 'wave';
 }
 
+export type MonsterDeco = 'horns' | 'crown' | 'mane' | 'crystal' | 'moss' | 'flame' | 'frost' | 'shadow';
+
 export interface MonsterDef {
   id: string;
   name: string;
@@ -268,7 +272,14 @@ export interface MonsterDef {
   /** 레이드 보스: 부하 소환·체력 단계·격노 */
   raid?: { adds: string; phases: number[]; addsPerPlayer: number; enrageSec: number };
   attacks: MonsterAttackDef[];
-  model: { shape: 'slime' | 'beast' | 'humanoid' | 'golem'; color: string; scale: number; weapon?: { kind: WeaponKind; length: number; width: number; color: string } };
+  model: {
+    shape: 'slime' | 'beast' | 'humanoid' | 'golem' | 'spider' | 'bat' | 'ghost' | 'brute';
+    color: string;
+    scale: number;
+    weapon?: { kind: WeaponKind; length: number; width: number; color: string };
+    /** 장식: 뿔·왕관·갈기·수정·이끼·불꽃·서리·그림자 */
+    deco?: MonsterDeco[];
+  };
   /** 정예 몬스터: 원래 몬스터 id */
   elite?: string;
   hitMat?: 'flesh' | 'metal' | 'slime' | 'stone';

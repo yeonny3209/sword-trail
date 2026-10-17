@@ -41,6 +41,8 @@ export class UiHub {
   private readonly prompt: HTMLDivElement;
   readonly gathering: Gathering;
   private me: LocalPlayer | null = null;
+  /** 닫을 창이 없을 때 Esc(설정 창 열기 등) */
+  onEscIdle: () => void = () => {};
 
   constructor(ui: HTMLElement, private readonly send: (m: C2S) => void, private readonly say: (text: string) => void, zone: () => ZoneScene | null) {
     this.gathering = new Gathering(ui, send, say, zone);
@@ -71,7 +73,8 @@ export class UiHub {
     this.potBar.className = 'potbar';
     ui.appendChild(this.potBar);
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Escape') Window.closeTop();
+      if (e.code !== 'Escape' || (e.target as HTMLElement | null)?.tagName === 'INPUT') return;
+      if (!Window.closeTop()) this.onEscIdle();
     });
     bus.on('net', (m) => this.onNet(m));
   }
@@ -136,9 +139,15 @@ export class UiHub {
     }
   }
 
+  /** 쓸 수 있는(레벨이 되는) HP(1)·MP(2) 물약 수 */
+  potionCount(k: 1 | 2): number {
+    const key = k === 1 ? 'hp' : 'mp', lv = this.me?.self.lv ?? 1;
+    return this.invWin.inv.filter((s) => ITEMS[s.id]?.heal?.[key] && ITEMS[s.id].lv <= lv).reduce((a, s) => a + s.n, 0);
+  }
+
   private drawPots(): void {
-    const hp = this.invWin.inv.filter((s) => ITEMS[s.id]?.heal?.hp).reduce((a, s) => a + s.n, 0);
-    const mp = this.invWin.inv.filter((s) => ITEMS[s.id]?.heal?.mp).reduce((a, s) => a + s.n, 0);
+    const hp = this.potionCount(1);
+    const mp = this.potionCount(2);
     this.potBar.innerHTML = `<div class="pot"><span class="k">C</span>🧪<b>${hp}</b></div><div class="pot"><span class="k">V</span>💧<b>${mp}</b></div>`;
   }
 

@@ -17,14 +17,11 @@ import { Nameplates } from '../ui/Nameplates';
 import { DeathOverlay, SkillBar } from '../ui/SkillBar';
 import { UiHub } from './UiHub';
 import { SocialHub } from './SocialHub';
-import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
 import { ScreenFx } from '../ui/ScreenFx';
 import { Music } from '../audio/Music';
 import { MoveFx } from '../fx/MoveFx';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { PostFx } from '../fx/PostFx';
+import { HelperHub } from './HelperHub';
 import { BuffBar } from '../ui/BuffBar';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
@@ -50,12 +47,8 @@ export class GameClient {
   private readonly fx: Effects;
   private readonly particles: Particles;
   private readonly moveFx: MoveFx;
-  /** 빛 번짐(블룸) 후처리. F4로 끄고 켠다 */
-  private readonly composer: EffectComposer;
-  private readonly bloom: UnrealBloomPass;
-  private fancy = true;
-  private readonly minimap: Minimap;
-  private readonly bossBar: BossBar;
+  private readonly post: PostFx;
+  readonly helpers: HelperHub;
   readonly combat: CombatClient;
   private readonly skillbar: SkillBar;
   private readonly death: DeathOverlay;
@@ -96,47 +89,29 @@ export class GameClient {
     this.remotes = new RemotePlayers(this.scene, this.plates);
     this.remotes.delayFrames = Math.round((this.interpDelay / 1000) * 60);
     this.monsters = new Monsters(this.scene, this.plates, () => this.interpDelay);
+    let numbers!: DamageNumbers;
     const bursts = getData<{ particles: Record<string, BurstSpec> }>('fx').particles;
     this.combat = new CombatClient({
       scene: this.scene, net: this.net, monsters: this.monsters, remotes: this.remotes, cam: this.cam,
-      fx: (this.fx = new Effects(this.scene)), particles: (this.particles = new Particles(this.scene)), numbers: new DamageNumbers(ui, this.camera),
+      fx: (this.fx = new Effects(this.scene)), particles: (this.particles = new Particles(this.scene)), numbers: (numbers = new DamageNumbers(ui, this.camera)),
       bursts, me: () => this.me, zone: () => this.zone?.def ?? null,
       ally: (id) => !!this.social.ui.party?.members.some((p) => p.id === id),
     });
     this.remotes.onRemove = (r) => this.combat.forget(r.model);
     this.moveFx = new MoveFx(this.fx, this.particles, this.cam);
     this.monsters.onLand = (v, strong) => this.moveFx.land(v.pos.x, v.pos.z, strong);
-    // 후처리: 밝은 부분(번쩍임·불꽃·검기·수정)이 은은하게 번진다
-    try {
-      this.fancy = localStorage.getItem('sto-fancy') !== '0';
-    } catch {
-      /* 저장소를 못 쓰면 기본값 */
-    }
-    this.composer = new EffectComposer(this.renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.55, 0.6, 0.92);
-    this.composer.addPass(this.bloom);
-    this.composer.addPass(new OutputPass());
-    window.addEventListener('keydown', (e) => {
-      if (e.code !== 'F4') return;
-      e.preventDefault();
-      this.fancy = !this.fancy;
-      try {
-        localStorage.setItem('sto-fancy', this.fancy ? '1' : '0');
-      } catch {
-        /* 무시 */
-      }
-      bus.emit('toast', { text: this.fancy ? '고급 화면 효과 켬 (F4)' : '고급 화면 효과 끔 (F4) — 느린 컴퓨터에서 끄면 빨라집니다', kind: 'info' });
-    });
+    this.post = new PostFx(this.renderer, this.scene, this.camera);
     this.skillbar = new SkillBar(ui);
-    this.death = new DeathOverlay(ui, () => this.net.send({ t: 'revive' }));
+    this.death = new DeathOverlay(ui, (town) => this.net.send({ t: 'revive', town }));
     this.chat = new ChatBox(ui, (ch, text, to) => this.social.chat(ch, text, to) || this.net.send({ t: 'chat', ch, text, to }));
     this.ui = new UiHub(ui, (m) => this.net.send(m), (text) => this.chat.addHtml(text), () => this.zone);
     this.social = new SocialHub(ui, this.chat, this.remotes, (m) => this.net.send(m));
     this.ui.npcHandlers.guild = () => this.social.ui.guildWin.open();
     this.ui.quests.onChange = () => this.refreshNpcPlates();
-    this.minimap = new Minimap(ui);
-    this.bossBar = new BossBar(ui);
+    this.helpers = new HelperHub({
+      ui, scene: this.scene, input: this.input, cam: this.cam, plates: this.plates, numbers, skillbar: this.skillbar,
+      monsters: this.monsters, remotes: this.remotes, hub: this.ui, send: (m) => this.net.send(m), me: () => this.me,
+    });
     new ScreenFx(ui);
     new BuffBar(ui);
     bus.on('slowmo', ({ scale, ms }) => {
@@ -213,6 +188,7 @@ export class GameClient {
         this.ui.bind(me);
         this.social.bind(me);
         this.death.hide();
+        this.death.inTown = ZONES[m.zone]?.type === 'town';
         if (m.you.hp <= 0) me.die();
         this.portalCooldown = 1.5;
         break;
@@ -278,7 +254,7 @@ export class GameClient {
     }
     for (const p of this.zone.portals) this.plates.add(`portal${p.def.id}`, p.ring, 3.4, p.def.label, 'portal', false, 80);
     this.hud.setZone(id);
-    this.minimap.setZone(def);
+    this.helpers.setZone(def);
     this.refreshNpcPlates();
   }
 
@@ -299,7 +275,8 @@ export class GameClient {
     if (!me || !zone) return;
     // 마우스가 가리키는 땅 쪽이 공격 방향
     const ndc = this.input.mouseNdc();
-    if (this.cam.groundPoint(ndc.x, ndc.y, this.aim)) me.aimYaw = Math.atan2(this.aim.x - me.pos.x, this.aim.z - me.pos.z);
+    if (this.cam.groundPoint(ndc.x, ndc.y, this.aim)) me.aimYaw = this.helpers.assist.aim(me, Math.atan2(this.aim.x - me.pos.x, this.aim.z - me.pos.z), this.monsters);
+    this.helpers.update(dt, me, zone.def);
     const frozen = this.combat.frozen();
     if (!frozen) me.update(dt, this.input, zone.def);
     else me.prev.copy(me.pos);
@@ -360,43 +337,19 @@ export class GameClient {
     const sdt = dt * this.loop.timeScale;
     this.monsters.render(renderTime, sdt);
     this.combat.render(sdt);
-    this.renderMap(dt);
+    this.helpers.render(dt, me);
     this.plates.render();
     this.skillbar.render();
     this.hud.setNet(this.net.rtt, this.remotes.list.size + 1, this.social.ui.online);
     if (me) this.moveFx.update(dt, me.model.root.position, me.pstate !== 'dead');
-    if (this.fancy) this.composer.render();
-    else this.renderer.render(this.scene, this.camera);
+    this.post.render();
   };
-
-  /** 미니맵 점과 가까운 보스 체력 바 */
-  private renderMap(dt: number): void {
-    const me = this.me, z = this.zone;
-    if (!me || !z) return;
-    const dots: MapDot[] = [];
-    let boss: { name: string; lv: number; hp: number; mhp: number; d: number } | null = null;
-    for (const v of this.monsters.list.values()) {
-      if (v.dying) continue;
-      dots.push({ x: v.pos.x, z: v.pos.z, kind: v.def.boss || v.def.elite ? 'boss' : 'monster' });
-      if (v.def.boss) {
-        const d = Math.hypot(v.pos.x - me.pos.x, v.pos.z - me.pos.z);
-        if (d < (v.def.raid ? 90 : 30) && (!boss || d < boss.d)) boss = { name: v.def.name, lv: v.def.lv, hp: v.hp, mhp: v.mhp, d };
-      }
-    }
-    for (const r of this.remotes.list.values()) dots.push({ x: r.model.root.position.x, z: r.model.root.position.z, kind: 'player' });
-    for (const n of z.npcs) dots.push({ x: n.def.x, z: n.def.z, kind: 'npc' });
-    for (const n of z.nodes) if (n.up) dots.push({ x: n.def.x, z: n.def.z, kind: 'node' });
-    this.minimap.render(dt, { x: me.pos.x, z: me.pos.z, yaw: me.yaw }, dots, this.cam.theta);
-    if (boss) this.bossBar.show(boss.name, boss.lv, boss.hp, boss.mhp);
-    else this.bossBar.hide();
-  }
 
   private resize = (): void => {
     const w = this.mount.clientWidth || window.innerWidth;
     const h = this.mount.clientHeight || window.innerHeight;
     this.renderer.setSize(w, h, false);
-    this.composer.setPixelRatio(this.renderer.getPixelRatio());
-    this.composer.setSize(w, h);
+    this.post?.resize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.particles.resize(h, this.camera.fov, this.renderer.getPixelRatio());

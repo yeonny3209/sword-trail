@@ -5,6 +5,7 @@ import type { QuestState } from './quests';
 import type { AhCategory, AuctionRow, MailRow, TradeSide } from './market';
 import type { PvpRankRow, PvpRecord } from './pvp';
 import type { BuffView, StatusId } from './status';
+import type { BountyState } from './bounty';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -17,6 +18,8 @@ export interface PlayerInfo {
   cls: ClassId;
   lv: number;
   guild?: string;
+  /** 칭호(업적으로 얻음) */
+  title?: string;
   x: number;
   z: number;
   f: number;
@@ -94,7 +97,16 @@ export type C2S =
   | { t: 'hit'; i: number; h: number; m: number }
   /** 몬스터 m의 k번째 공격에 내가 맞았다 */
   | { t: 'hurt'; m: number; k: number }
-  | { t: 'revive' }
+  /** 부활. town: 마을에서 */
+  | { t: 'revive'; town?: boolean }
+  /** 마을 귀환 시작(on)·취소 */
+  | { t: 'recall'; on: boolean }
+  /** 가방 정리 */
+  | { t: 'isort' }
+  /** 상인 앞: 이 등급 이하(강화 안 한) 장비를 모두 판다 */
+  | { t: 'sellall'; rar: number }
+  /** 칭호 바꾸기(업적 id, 빈 문자열 = 없음) */
+  | { t: 'title'; id: string }
   /** 스탯 포인트 1 올리기 */
   | { t: 'stat'; s: StatKey }
   /** 스킬 배우기·레벨 올리기 */
@@ -208,6 +220,16 @@ export type S2C =
   | { t: 'pvprank'; me: PvpRecord; top: PvpRankRow[] }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
+  /** 마을 귀환 시전: ms 뒤 이동(0 = 취소됨) */
+  | { t: 'recall'; ms: number }
+  /** 시련의 탑 상태: 층·남은 시간(초)·남은 몬스터·내 최고 층 */
+  | { t: 'tower'; floor: number; left: number; alive: number; best: number; state: 'wait' | 'fight' | 'clear' | 'over' }
+  /** 업적 진행도 전체와 지금 칭호 */
+  | { t: 'achs'; p: Record<string, number>; title: string }
+  /** 업적 달성 */
+  | { t: 'ach'; id: string }
+  /** 오늘의 현상 수배 */
+  | { t: 'bounty'; b: BountyState }
   | { t: 'pos'; x: number; z: number }
   | { t: 'pong'; c: number; time: number }
   | { t: 'sys'; text: string }

@@ -25,6 +25,8 @@ export class QuarterCamera {
   private readonly kick = new THREE.Vector3();
   private punch = 0;
   enabledShake = true;
+  /** 흔들림·반동 세기(설정) */
+  shakeScale = 1;
 
   constructor(readonly camera: THREE.PerspectiveCamera) {
     this.pitch = this.pitch0 = Math.atan2(this.d.height, this.d.back);
@@ -57,16 +59,16 @@ export class QuarterCamera {
   }
 
   addShake(amount: number): void {
-    if (this.enabledShake) this.shake = Math.min(1, this.shake + amount);
+    if (this.enabledShake) this.shake = Math.min(1, this.shake + amount * this.shakeScale);
   }
 
   /** 타격 반동: (dx, dz) 방향으로 amount(m)만큼 밀리고 zoom만큼 당겨졌다가 돌아온다 */
   addKick(dx: number, dz: number, amount: number, zoom = 0): void {
     if (!this.enabledShake) return;
     const l = Math.hypot(dx, dz) || 1;
-    this.kick.x += (dx / l) * amount;
-    this.kick.z += (dz / l) * amount;
-    this.punch = Math.min(0.14, this.punch + zoom);
+    this.kick.x += (dx / l) * amount * this.shakeScale;
+    this.kick.z += (dz / l) * amount * this.shakeScale;
+    this.punch = Math.min(0.14, this.punch + zoom * this.shakeScale);
   }
 
   update(target: THREE.Vector3, dt: number): void {

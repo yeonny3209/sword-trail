@@ -3,6 +3,8 @@ import type { NodeDef, NpcDef, PortalDef, PropDef, ZoneDef } from '../../shared/
 import { LOOT } from '../../shared/items';
 import { AmbientParticles, SkyDome } from '../fx/Atmosphere';
 import { CharacterModel } from './CharacterModel';
+import { buildWall, portalBase } from './Buildings';
+import { toon } from './CharacterParts';
 
 type GroundStyle = 'grass' | 'snow' | 'ash' | 'plain';
 
@@ -89,6 +91,7 @@ export interface PortalView {
   def: PortalDef;
   ring: THREE.Mesh;
   beam: THREE.Mesh;
+  runes: THREE.Mesh;
 }
 
 export interface NpcView {
@@ -149,31 +152,8 @@ export class ZoneScene {
     }
     this.track(edgeMat);
 
-    for (const wl of def.walls) {
-      const mat = new THREE.MeshStandardMaterial({ color: wl.color ?? '#777', roughness: 0.9 });
-      const box = new THREE.Mesh(new THREE.BoxGeometry(wl.w, wl.h, wl.d), mat);
-      box.position.set(wl.x, wl.h / 2, wl.z);
-      box.castShadow = box.receiveShadow = true;
-      this.group.add(box);
-      this.track(box.geometry, mat);
-      if (wl.roof) {
-        const rm = new THREE.MeshStandardMaterial({ color: wl.roof, roughness: 0.8 });
-        const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.hypot(wl.w, wl.d) / 2 + 0.6, wl.h * 0.6, 4), rm);
-        roof.rotation.y = Math.PI / 4;
-        roof.scale.set(wl.w / Math.max(wl.w, wl.d), 1, wl.d / Math.max(wl.w, wl.d));
-        roof.position.set(wl.x, wl.h + wl.h * 0.3, wl.z);
-        roof.castShadow = true;
-        this.group.add(roof);
-        this.track(roof.geometry, rm);
-        // 문
-        const door = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.4), new THREE.MeshStandardMaterial({ color: '#3a2a1e' }));
-        const front = wl.z < 0 ? 1 : -1;
-        door.position.set(wl.x, 1.2, wl.z + front * (wl.d / 2 + 0.01));
-        if (front < 0) door.rotation.y = Math.PI;
-        this.group.add(door);
-        this.track(door.geometry, door.material as THREE.Material);
-      }
-    }
+    // 벽: 집(지붕)·담·기둥·돌덩이 모양으로 (`Buildings.ts`)
+    for (const wl of def.walls) this.group.add(buildWall(wl, (...x) => this.track(...x)));
     for (const p of def.props) this.prop(p, def);
     for (const p of def.portals) this.portal(p);
     const tier = (LOOT as unknown as { gather: { tiers: Record<string, number> } }).gather.tiers[def.id] ?? 1;
@@ -182,9 +162,32 @@ export class ZoneScene {
       const model = new CharacterModel({ body: n.color, weapon: null });
       model.root.position.set(n.x, 0, n.z);
       model.root.rotation.y = n.f;
+      if (n.role === 'bounty') this.board(model);
       this.group.add(model.root);
       this.npcs.push({ def: n, model });
     }
+  }
+
+  /** 현상 수배 게시판: 사람 대신 나무 게시판(수배지 여러 장) */
+  private board(model: CharacterModel): void {
+    model.body.visible = false;
+    const wood = toon('#6a4a2a'), paper = toon('#e8dcb8'), red = toon('#a02a20');
+    this.track(wood, paper, red);
+    const add = (geo: THREE.BufferGeometry, m: THREE.Material, x: number, y: number, z: number, rz = 0) => {
+      const mesh = new THREE.Mesh(geo, m);
+      mesh.position.set(x, y, z);
+      mesh.rotation.z = rz;
+      mesh.castShadow = true;
+      model.root.add(mesh);
+      this.track(geo);
+    };
+    for (const s of [-1, 1]) add(new THREE.BoxGeometry(0.16, 2.4, 0.16), wood, 0.95 * s, 1.2, 0);
+    add(new THREE.BoxGeometry(2.2, 1.3, 0.1), wood, 0, 1.55, 0);
+    add(new THREE.BoxGeometry(2.4, 0.14, 0.3), wood, 0, 2.28, 0);
+    [[-0.6, 1.7, 0.08], [0.05, 1.55, -0.05], [0.65, 1.72, 0.1], [-0.3, 1.25, 0.04], [0.45, 1.22, -0.06]].forEach(([x, y, r]) => {
+      add(new THREE.PlaneGeometry(0.5, 0.62), paper, x, y, 0.06, r);
+      add(new THREE.PlaneGeometry(0.3, 0.06), red, x, y + 0.18, 0.065, r);
+    });
   }
 
   private track(...items: { dispose(): void }[]): void {
@@ -329,9 +332,10 @@ export class ZoneScene {
     const beamMat = new THREE.MeshBasicMaterial({ color: '#7fdcff', transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false });
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(p.r * 0.95, p.r, 3.2, 24, 1, true), beamMat);
     beam.position.set(p.x, 1.6, p.z);
-    this.group.add(ring, beam);
+    const base = portalBase(p, (...x) => this.track(...x));
+    this.group.add(ring, beam, base.group);
     this.track(ring.geometry, ringMat, beam.geometry, beamMat);
-    this.portals.push({ def: p, ring, beam });
+    this.portals.push({ def: p, ring, beam, runes: base.runes });
   }
 
   resize(heightPx: number, fovDeg: number, pixelRatio: number): void {
@@ -345,6 +349,7 @@ export class ZoneScene {
     this.time += dt;
     for (const p of this.portals) {
       p.ring.rotation.z += dt * 0.8;
+      p.runes.rotation.z -= dt * 0.5;
       (p.beam.material as THREE.MeshBasicMaterial).opacity = 0.14 + Math.sin(this.time * 2.5) * 0.06;
     }
     for (const n of this.npcs) n.model.animate(dt, 0, false);

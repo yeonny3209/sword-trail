@@ -45,7 +45,11 @@ export class DamageNumbers {
   }
 
   /** value: 피해량이면 클수록 숫자를 키운다 */
+  /** 피해 숫자 표시(설정). 꺼도 경험치·골드·레벨업은 보인다 */
+  enabled = true;
+
   add(pos: THREE.Vector3, text: string, kind: string, extra = '', value = 0): void {
+    if (!this.enabled && ['n', 'c', 'o', 'p', 'dot'].includes(kind)) return;
     const el = document.createElement('div');
     el.className = `dmg ${kind}`;
     if (value > 0 && (kind === 'n' || kind === 'c' || kind === 'p' || kind === 'o')) {

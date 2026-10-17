@@ -86,6 +86,24 @@
     ],
     "s10": [
       "Digit4"
+    ],
+    "map": [
+      "Tab"
+    ],
+    "help": [
+      "F1"
+    ],
+    "recall": [
+      "KeyB"
+    ],
+    "meter": [
+      "KeyH"
+    ],
+    "achieve": [
+      "KeyY"
+    ],
+    "settings": [
+      "F10"
     ]
   },
   "doubleTapMs": 240

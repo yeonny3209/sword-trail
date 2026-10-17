@@ -359,7 +359,10 @@
      "length": 1.5,
      "width": 1.4,
      "color": "#b0a090"
-    }
+    },
+    "deco": [
+     "horns"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -562,7 +565,10 @@
      "length": 1.2,
      "width": 0.8,
      "color": "#c8b8ff"
-    }
+    },
+    "deco": [
+     "shadow"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -666,7 +672,10 @@
      "length": 1.9,
      "width": 1.9,
      "color": "#d0d4da"
-    }
+    },
+    "deco": [
+     "horns"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -789,7 +798,10 @@
      "length": 1.0,
      "width": 0.8,
      "color": "#ffe090"
-    }
+    },
+    "deco": [
+     "shadow"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -852,7 +864,10 @@
    "model": {
     "shape": "golem",
     "color": "#8a8478",
-    "scale": 1
+    "scale": 1,
+    "deco": [
+     "moss"
+    ]
    },
    "hitMat": "stone"
   },
@@ -957,7 +972,10 @@
      "length": 2.2,
      "width": 2.0,
      "color": "#fff4c0"
-    }
+    },
+    "deco": [
+     "crown"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -1153,7 +1171,11 @@
      "length": 2.6,
      "width": 2.4,
      "color": "#c8a0ff"
-    }
+    },
+    "deco": [
+     "horns",
+     "shadow"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -1358,7 +1380,11 @@
      "length": 2.8,
      "width": 2.6,
      "color": "#ff8a40"
-    }
+    },
+    "deco": [
+     "horns",
+     "flame"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -1432,7 +1458,11 @@
    "model": {
     "shape": "beast",
     "color": "#6a5a52",
-    "scale": 1
+    "scale": 1,
+    "deco": [
+     "mane",
+     "flame"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -1496,7 +1526,10 @@
    "model": {
     "shape": "slime",
     "color": "#ff6a2a",
-    "scale": 1.25
+    "scale": 1.25,
+    "deco": [
+     "flame"
+    ]
    },
    "hitMat": "slime"
   },
@@ -1628,7 +1661,10 @@
    "model": {
     "shape": "golem",
     "color": "#7a6a62",
-    "scale": 1
+    "scale": 1,
+    "deco": [
+     "crystal"
+    ]
    },
    "hitMat": "stone"
   },
@@ -1698,7 +1734,10 @@
      "length": 1.0,
      "width": 0.8,
      "color": "#ff9040"
-    }
+    },
+    "deco": [
+     "flame"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -1822,7 +1861,11 @@
      "length": 2.3,
      "width": 2.1,
      "color": "#ff9040"
-    }
+    },
+    "deco": [
+     "horns",
+     "flame"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
@@ -1886,7 +1929,11 @@
    "model": {
     "shape": "beast",
     "color": "#b8d0e8",
-    "scale": 1
+    "scale": 1,
+    "deco": [
+     "mane",
+     "frost"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -1948,9 +1995,12 @@
     }
    ],
    "model": {
-    "shape": "slime",
+    "shape": "ghost",
     "color": "#bfe8ff",
-    "scale": 1.2
+    "scale": 1.2,
+    "deco": [
+     "frost"
+    ]
    },
    "hitMat": "slime"
   },
@@ -2081,9 +2131,12 @@
     }
    ],
    "model": {
-    "shape": "golem",
+    "shape": "brute",
     "color": "#e8f0f8",
-    "scale": 1
+    "scale": 1.35,
+    "deco": [
+     "frost"
+    ]
    },
    "hitMat": "flesh"
   },
@@ -2149,7 +2202,10 @@
      "length": 1.3,
      "width": 1.2,
      "color": "#cfe8ff"
-    }
+    },
+    "deco": [
+     "frost"
+    ]
    },
    "hitMat": "metal"
   },
@@ -2290,11 +2346,352 @@
      "length": 2.2,
      "width": 1.8,
      "color": "#9fe0ff"
-    }
+    },
+    "deco": [
+     "crown",
+     "frost"
+    ]
    },
    "hitMat": "metal",
    "boss": true,
    "superArmor": true
+  },
+  {
+   "id": "cave_bat",
+   "name": "동굴 박쥐",
+   "lv": 8,
+   "hp": 190,
+   "atk": 22,
+   "def": 6,
+   "exp": 120,
+   "gold": [
+    12,
+    24
+   ],
+   "speed": 4.6,
+   "radius": 0.45,
+   "height": 1.4,
+   "weight": 0.7,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "물어뜯기",
+     "windup": 0.35,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 1.9,
+     "shape": {
+      "type": "arc",
+      "range": 1.5,
+      "width": 110
+     },
+     "dmg": 1.0,
+     "kx": 3,
+     "stun": 18,
+     "lunge": 8,
+     "cd": 1.4
+    },
+    {
+     "name": "초음파",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 5,
+     "shape": {
+      "type": "arc",
+      "range": 5,
+      "width": 60
+     },
+     "dmg": 1.2,
+     "kx": 5,
+     "stun": 24,
+     "cd": 4.5,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "bat",
+    "color": "#5a4a5e",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "forest_spider",
+   "name": "숲 거미",
+   "lv": 13,
+   "hp": 600,
+   "atk": 36,
+   "def": 15,
+   "exp": 330,
+   "gold": [
+    20,
+    42
+   ],
+   "speed": 3.8,
+   "radius": 0.6,
+   "height": 0.9,
+   "weight": 1.3,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "독니",
+     "windup": 0.45,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 1.8,
+      "width": 110
+     },
+     "dmg": 1.1,
+     "kx": 3,
+     "stun": 20,
+     "lunge": 5,
+     "cd": 1.7
+    },
+    {
+     "name": "거미줄 뿜기",
+     "windup": 0.8,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 7,
+     "shape": {
+      "type": "box",
+      "range": 7.5,
+      "width": 1.1
+     },
+     "dmg": 1.2,
+     "kx": 4,
+     "stun": 34,
+     "cd": 4.0,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "spider",
+    "color": "#4a5a3a",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "temple_ghost",
+   "name": "사원 원혼",
+   "lv": 23,
+   "hp": 900,
+   "atk": 60,
+   "def": 20,
+   "exp": 980,
+   "gold": [
+    36,
+    72
+   ],
+   "speed": 3.6,
+   "radius": 0.5,
+   "height": 1.9,
+   "weight": 0.8,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "원혼의 손길",
+     "windup": 0.6,
+     "active": 0.25,
+     "recover": 0.8,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.6,
+      "width": 160
+     },
+     "dmg": 1.2,
+     "kx": 4,
+     "stun": 22,
+     "cd": 1.9
+    },
+    {
+     "name": "저주 폭발",
+     "windup": 1.2,
+     "active": 0.3,
+     "recover": 1.1,
+     "range": 1.7999999999999998,
+     "shape": {
+      "type": "circle",
+      "range": 3.0,
+      "width": 0,
+      "offset": 0.0
+     },
+     "dmg": 1.8,
+     "kx": 7,
+     "kz": 6,
+     "stun": 30,
+     "cd": 6.5,
+     "heavy": true
+    }
+   ],
+   "model": {
+    "shape": "ghost",
+    "color": "#a8c8e8",
+    "scale": 1
+   },
+   "hitMat": "slime",
+   "superArmor": false
+  },
+  {
+   "id": "cinder_bat",
+   "name": "불티 박쥐",
+   "lv": 31,
+   "hp": 2700,
+   "atk": 92,
+   "def": 26,
+   "exp": 1700,
+   "gold": [
+    46,
+    92
+   ],
+   "speed": 5.0,
+   "radius": 0.5,
+   "height": 1.5,
+   "weight": 0.8,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "불꽃 송곳니",
+     "windup": 0.35,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 2.1,
+     "shape": {
+      "type": "arc",
+      "range": 1.7,
+      "width": 110
+     },
+     "dmg": 1.2,
+     "kx": 3,
+     "stun": 24,
+     "lunge": 9,
+     "cd": 1.5
+    },
+    {
+     "name": "불티 뿌리기",
+     "windup": 0.8,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 6,
+     "shape": {
+      "type": "box",
+      "range": 6.5,
+      "width": 1.1
+     },
+     "dmg": 1.4,
+     "kx": 4,
+     "stun": 28,
+     "cd": 3.8,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "bat",
+    "color": "#8a3a2a",
+    "scale": 1.15,
+    "deco": [
+     "flame"
+    ]
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "frost_spider",
+   "name": "얼음 거미",
+   "lv": 37,
+   "hp": 4600,
+   "atk": 114,
+   "def": 40,
+   "exp": 2450,
+   "gold": [
+    55,
+    110
+   ],
+   "speed": 4.0,
+   "radius": 0.7,
+   "height": 1.0,
+   "weight": 1.6,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 10,
+   "attacks": [
+    {
+     "name": "서리 독니",
+     "windup": 0.45,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 2.4,
+     "shape": {
+      "type": "arc",
+      "range": 2.0,
+      "width": 110
+     },
+     "dmg": 1.3,
+     "kx": 3,
+     "stun": 26,
+     "lunge": 6,
+     "cd": 1.7
+    },
+    {
+     "name": "얼음 실",
+     "windup": 0.8,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 8,
+     "shape": {
+      "type": "box",
+      "range": 8.5,
+      "width": 1.1
+     },
+     "dmg": 1.5,
+     "kx": 4,
+     "stun": 40,
+     "cd": 4.5,
+     "fx": "wave"
+    },
+    {
+     "name": "얼음 가시밭",
+     "windup": 1.0,
+     "active": 0.3,
+     "recover": 1.1,
+     "range": 1.92,
+     "shape": {
+      "type": "circle",
+      "range": 3.2,
+      "width": 0,
+      "offset": 0.0
+     },
+     "dmg": 1.9,
+     "kx": 7,
+     "kz": 6,
+     "stun": 30,
+     "cd": 7.5,
+     "heavy": true
+    }
+   ],
+   "model": {
+    "shape": "spider",
+    "color": "#9ab8d8",
+    "scale": 1.15,
+    "deco": [
+     "frost"
+    ]
+   },
+   "hitMat": "stone"
   }
  ]
 }

@@ -33,6 +33,8 @@ export interface MonView {
   status: StatusId[];
   /** 지난 프레임에 공중이었나(착지 감지) */
   wasAir: boolean;
+  /** 처치되어 날아가는 속도(없으면 그 자리에 쓰러짐) */
+  fly?: { vx: number; vy: number; vz: number; spin: number };
 }
 
 /** 같은 존의 몬스터들. 서버 상태를 보간하고, 내가 때린 몬스터는 반응을 먼저 계산해서 즉시 보여 준다 */
@@ -107,10 +109,15 @@ export class Monsters {
     this.plates.setHp(`m${id}`, v.hp / v.mhp);
   }
 
-  die(id: number): void {
+  die(id: number, launch?: { dx: number; dz: number; power: number }): void {
     const v = this.list.get(id);
     if (!v) return;
     v.dying = 1.2;
+    // 가벼운 몬스터일수록 멀리 날아가며 빙글 돈다(보스·무거운 몬스터는 덜)
+    if (launch && !v.def.boss) {
+      const l = Math.hypot(launch.dx, launch.dz) || 1, k = launch.power / Math.sqrt(Math.max(0.7, v.def.weight));
+      v.fly = { vx: (launch.dx / l) * k, vz: (launch.dz / l) * k, vy: 3 + k * 0.45, spin: (Math.random() < 0.5 ? -1 : 1) * (6 + k) };
+    }
     v.atk = null;
     this.tele.hide(id);
     this.plates.remove(`m${id}`);
@@ -175,8 +182,26 @@ export class Monsters {
     for (const v of [...this.list.values()]) {
       if (v.dying > 0) {
         v.dying -= dt;
-        v.model.root.position.y -= dt * 0.8;
-        v.model.root.rotation.x = Math.min(1.4, v.model.root.rotation.x + dt * 3);
+        const f = v.fly;
+        if (f) {
+          // 포물선으로 날아가 땅에 튕긴다
+          const r = v.model.root;
+          r.position.x += f.vx * dt;
+          r.position.z += f.vz * dt;
+          f.vy -= 22 * dt;
+          r.position.y = Math.max(0, r.position.y + f.vy * dt);
+          if (r.position.y === 0 && f.vy < 0) {
+            if (Math.abs(f.vy) > 4) this.onLand(v, v.def.weight > 2);
+            f.vy = -f.vy * 0.3;
+            f.vx *= 0.5;
+            f.vz *= 0.5;
+            f.spin *= 0.4;
+          }
+          r.rotation.x += f.spin * dt;
+        } else {
+          v.model.root.position.y -= dt * 0.8;
+          v.model.root.rotation.x = Math.min(1.4, v.model.root.rotation.x + dt * 3);
+        }
         // 쓰러진 뒤 잠시 있다가 작아지며 사라진다
         const k = Math.max(0, 1 - v.dying / 1.2 - 0.45) / 0.55;
         v.model.root.scale.setScalar(Math.max(0.02, 1 - k));

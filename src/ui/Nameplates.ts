@@ -39,6 +39,11 @@ export class Nameplates {
     this.plates.set(key, { obj, height, el, hp, maxDist });
   }
 
+  /** 플레이어·NPC 이름 보이기(몬스터 이름표·체력은 그대로) */
+  setNames(on: boolean): void {
+    this.layer.classList.toggle('nonames', !on);
+  }
+
   setHtml(key: string, html: string): void {
     const p = this.plates.get(key);
     const nm = p?.el.querySelector('.nm');

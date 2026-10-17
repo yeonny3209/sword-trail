@@ -41,7 +41,7 @@ export class RemotePlayers {
   }
 
   private label(i: PlayerInfo): string {
-    return `<span class="lv">Lv${i.lv}</span> ${i.name}${i.guild ? ` <span class="gd">&lt;${i.guild}&gt;</span>` : ''}`;
+    return `${i.title ? `<span class="ttl">「${i.title}」</span><br>` : ''}<span class="lv">Lv${i.lv}</span> ${i.name}${i.guild ? ` <span class="gd">&lt;${i.guild}&gt;</span>` : ''}`;
   }
 
   /** 다른 플레이어가 행동을 시작(보이는 위치가 늦으므로 그만큼 기다렸다가 재생) */
@@ -89,6 +89,7 @@ export class RemotePlayers {
     const r = this.list.get(info.id);
     if (!r) return;
     r.info.guild = info.guild;
+    r.info.title = info.title;
     r.info.lv = info.lv;
     r.info.mhp = info.mhp;
     this.plates.setHtml(`p${info.id}`, this.label(r.info));

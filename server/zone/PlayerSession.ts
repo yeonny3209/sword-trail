@@ -2,6 +2,7 @@ import { MoveState, type PlayerInfo, type S2C, type SelfState } from '../../shar
 import { BOND, STATUS, type BuffView, type StatusId } from '../../shared/status';
 import { finalStats, type Stats } from '../../shared/rules';
 import { gearBonus } from '../../shared/items';
+import { ACHS, type AchType } from '../../shared/achievements';
 import type { ClassId } from '../../shared/types';
 import { migrateData, type CharData, type CharRow } from '../db';
 
@@ -46,6 +47,10 @@ export class PlayerSession {
   /** 가까이 있는 살아 있는 파티원 수(파티 결속) — 1초마다 갱신 */
   near = 0;
   lastRaiseAt = 0;
+  /** 마을 귀환을 시작한 시각(0 = 안 함) */
+  recallAt = 0;
+  /** 업적 진행 알리기(존 서버가 붙여 줌) */
+  achieve: (type: AchType, target?: string, amount?: number) => void = () => {};
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;
@@ -156,6 +161,7 @@ export class PlayerSession {
     return {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv,
       x: this.x, z: this.z, f: this.f, hp: this.data.hp, mhp: this.stats.mhp, guild: this.guild ?? undefined,
+      title: ACHS[this.data.title]?.title,
     };
   }
 

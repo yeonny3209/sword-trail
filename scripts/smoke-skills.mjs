@@ -129,7 +129,7 @@ check('쓰러진 채 들어온 파티원은 누워 있음', D.last('died')?.wait
 const hp0 = B.last('welcome').you.hp;
 await A.cast('bf_heal');
 const heal = A.all('heal', (m) => m.id === B.id)[0];
-check('치유: 낮은 체력 파티원 회복', !!heal && heal.n > 0, heal && `+${heal.n}`);
+check('치유: 낮은 체력 파티원 회복', !!heal && heal.n > 0, heal ? `+${heal.n}` : `hp0 ${hp0} cast ${JSON.stringify(A.all('cast').slice(-2))} err ${JSON.stringify(A.all('err').slice(-2))}`);
 check('치유: 체력이 실제로 올라감', (B.last('me', (m) => m.s.hp !== undefined)?.s.hp ?? hp0) > hp0);
 check('치유 연출 알림', !!A.last('cast', (m) => m.kind === 'heal' && m.ids.includes(B.id)));
 

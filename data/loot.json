@@ -354,6 +354,68 @@
     "chance": 1,
     "n": 24
    }
+  ],
+  "cave_bat": [
+   {
+    "item": "mat_batwing",
+    "chance": 0.45
+   },
+   {
+    "item": "pot_mp_s",
+    "chance": 0.08
+   }
+  ],
+  "forest_spider": [
+   {
+    "item": "mat_silk",
+    "chance": 0.42
+   },
+   {
+    "item": "pot_hp_m",
+    "chance": 0.06
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.05
+   }
+  ],
+  "temple_ghost": [
+   {
+    "item": "mat_soul",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_mp_l",
+    "chance": 0.05
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.08
+   }
+  ],
+  "cinder_bat": [
+   {
+    "item": "mat_cinder",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "frost_spider": [
+   {
+    "item": "mat_frostsilk",
+    "chance": 0.4
+   },
+   {
+    "item": "pot_hp_x",
+    "chance": 0.04
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
   ]
  },
  "equipChance": {

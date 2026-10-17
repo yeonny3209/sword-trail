@@ -1,0 +1,19 @@
+{
+  "floorSec": 150,
+  "breakSec": 5,
+  "checkpoint": 5,
+  "lvStart": 2,
+  "lvPerFloor": 2,
+  "baseCount": 4,
+  "countPer3Floors": 1,
+  "maxCount": 9,
+  "bossEvery": 5,
+  "overHp": 0.12,
+  "overAtk": 0.05,
+  "partyHp": 0.6,
+  "goldPerFloor": 60,
+  "expShare": 0.04,
+  "stonesPerBoss": 2,
+  "equipChanceBoss": 0.5,
+  "exclude": ["citadel_guard", "ember_cultist", "slime"]
+}

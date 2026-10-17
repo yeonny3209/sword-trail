@@ -620,6 +620,16 @@
     "w": 8,
     "d": 6
    }
+  },
+  {
+   "monster": "forest_spider",
+   "count": 7,
+   "area": {
+    "x": -30,
+    "z": -32,
+    "w": 26,
+    "d": 20
+   }
   }
  ],
  "nodes": [

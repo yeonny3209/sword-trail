@@ -5,7 +5,8 @@ export type Action =
   | 'up' | 'down' | 'left' | 'right' | 'attack' | 'jump' | 'back' | 'dash'
   | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 'pot1' | 'pot2'
   | 's7' | 's8' | 's9' | 's10'
-  | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'camreset' | 'debug';
+  | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'camreset' | 'debug'
+  | 'map' | 'help' | 'recall' | 'meter' | 'achieve' | 'settings';
 
 interface InputData {
   bindings: Record<string, string[]>;
@@ -39,6 +40,8 @@ export class Input {
   private rightMoved = 0;
   private dragDx = 0;
   private dragDy = 0;
+  /** 자동 이동 방향(세계 좌표 x, z). 이동 키를 누르지 않을 때만 쓴다 */
+  auto: { x: number; z: number } | null = null;
 
   constructor(private readonly canvas: HTMLElement) {
     for (const [action, codes] of Object.entries(this.data.bindings)) {
@@ -123,6 +126,11 @@ export class Input {
     this.queuedDash = null;
   }
 
+  /** 이동 키를 하나라도 누르고 있나(자동 이동 취소용) */
+  manualMove(): boolean {
+    return this.isDown('up') || this.isDown('down') || this.isDown('left') || this.isDown('right');
+  }
+
   /** 쌓인 입력 취소(NPC를 눌렀을 때 공격 무시 등) */
   cancel(a: Action): void {
     this.queued = this.queued.filter((q) => q !== a);
@@ -139,6 +147,7 @@ export class Input {
   moveAxis(): { x: number; y: number } {
     const x = (this.isDown('right') ? 1 : 0) - (this.isDown('left') ? 1 : 0);
     const y = (this.isDown('up') ? 1 : 0) - (this.isDown('down') ? 1 : 0);
+    if (!x && !y && this.auto) return { x: this.auto.x, y: -this.auto.z };
     const len = Math.hypot(x, y) || 1;
     const c = Math.cos(this.viewYaw), s = Math.sin(this.viewYaw);
     return { x: (x * c - y * s) / len, y: (x * s + y * c) / len };

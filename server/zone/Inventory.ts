@@ -1,6 +1,6 @@
 import { dist2 } from '../../shared/geom';
 import {
-  cannotEquip, enhanceCost, enhanceRate, ITEMS, LOOT, makeItem, rollRarity, SHOPS, sellPrice, type Item, type Slot,
+  SLOTS, cannotEquip, enhanceCost, enhanceRate, ITEMS, LOOT, makeItem, rollRarity, SHOPS, sellPrice, type Item, type Slot,
 } from '../../shared/items';
 import type { C2S } from '../../shared/protocol';
 import type { MonsterDef, NpcDef, ZoneDef } from '../../shared/types';
@@ -156,12 +156,57 @@ export function onInventory(p: PlayerSession, m: C2S, zone: ZoneDef): void {
     case 'buy': return buy(p, zone, m.npc, m.id, m.n);
     case 'sell': return sell(p, zone, m.uid, m.n);
     case 'enhance': return enhance(p, zone, m.uid);
+    case 'isort': return sortBag(p);
+    case 'sellall': return sellAll(p, zone, m.rar | 0);
     case 'discard': {
       const s = p.data.inv.find((x) => x.uid === m.uid);
       if (s) takeItem(p, s.uid, s.n);
       return syncInv(p);
     }
   }
+}
+
+const KIND_ORDER: Record<string, number> = { equip: 0, potion: 1, material: 2 };
+
+/** 가방 정리: 장비(부위·레벨 높은 순·등급) → 물약 → 재료, 같은 것끼리 합친다 */
+function sortBag(p: PlayerSession): void {
+  const merged: Item[] = [];
+  for (const s of p.data.inv) {
+    const d = ITEMS[s.id];
+    const into = d?.stack ? merged.find((x) => x.id === s.id && x.n < d.stack!) : null;
+    if (into && d?.stack) {
+      const put = Math.min(d.stack - into.n, s.n);
+      into.n += put;
+      if (s.n - put > 0) merged.push({ ...s, n: s.n - put });
+    } else merged.push(s);
+  }
+  const key = (s: Item) => {
+    const d = ITEMS[s.id];
+    return [KIND_ORDER[d?.kind ?? 'material'] ?? 3, d?.slot ? SLOTS.indexOf(d.slot) : 0, -(d?.lv ?? 0), -(s.rar ?? 0), -(s.enh ?? 0), s.id] as const;
+  };
+  merged.sort((a, b) => {
+    const ka = key(a), kb = key(b);
+    for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] < kb[i] ? -1 : 1;
+    return 0;
+  });
+  p.data.inv = merged;
+  p.dirty = true;
+  syncInv(p);
+}
+
+/** 상인 앞: 등급이 rar 이하이고 강화하지 않은 장비를 모두 판다 */
+function sellAll(p: PlayerSession, zone: ZoneDef, rar: number): void {
+  if (!nearNpc(p, zone, 'shop')) return p.send({ t: 'err', text: '상인 근처에서만 팔 수 있습니다.' });
+  const sell = p.data.inv.filter((s) => ITEMS[s.id]?.kind === 'equip' && (s.rar ?? 0) <= rar && !s.enh);
+  if (!sell.length) return p.send({ t: 'err', text: '팔 장비가 없습니다.' });
+  let gold = 0;
+  for (const s of sell) gold += sellPrice(s) * s.n;
+  p.data.inv = p.data.inv.filter((s) => !sell.includes(s));
+  p.data.gold += gold;
+  p.dirty = true;
+  syncInv(p);
+  p.send({ t: 'me', s: { gold: p.data.gold } });
+  p.send({ t: 'sys', text: `장비 ${sell.length}개를 ${gold.toLocaleString()} G에 팔았습니다.` });
 }
 
 function equip(p: PlayerSession, uid: string): void {
@@ -196,6 +241,9 @@ function drink(p: PlayerSession, s: Item): void {
   if (!d?.heal || p.dead) return;
   const now = Date.now();
   if (now - p.lastPotAt < LOOT.potionCooldown * 1000) return;
+  // 가득 찬데 마셔서 물약을 버리지 않게
+  const needHp = !!d.heal.hp && p.data.hp < p.stats.mhp - 0.5, needMp = !!d.heal.mp && p.data.mp < p.stats.mmp - 0.5;
+  if (!needHp && !needMp) return p.send({ t: 'err', text: d.heal.hp ? 'HP가 가득 찼습니다.' : 'MP가 가득 찼습니다.' });
   p.lastPotAt = now;
   takeItem(p, s.uid, 1);
   if (d.heal.hp) p.data.hp = Math.min(p.stats.mhp, p.data.hp + p.stats.mhp * d.heal.hp);
@@ -268,6 +316,7 @@ function enhance(p: PlayerSession, zone: ZoneDef, uid: string): void {
   else if (e >= LOOT.enhance.failDropFrom) it.enh = e - 1;
   p.dirty = true;
   p.send({ t: 'enh', ok, uid, enh: it.enh ?? 0 });
+  if (ok) p.achieve('enhance', undefined, it.enh ?? 0);
   syncInv(p);
   restat(p);
 }
