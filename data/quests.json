@@ -476,6 +476,347 @@
      ]
     ]
    }
+  },
+  {
+   "id": "m14",
+   "name": "잿빛 협곡",
+   "giver": "elder",
+   "lv": 28,
+   "req": "m13",
+   "desc": "정상 사원 북쪽에 잿빛 협곡이 열렸네. 그곳의 늑대들이 마을을 노리고 있어.",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "field5",
+     "n": 1
+    },
+    {
+     "type": "kill",
+     "target": "ash_wolf",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "exp": 3920,
+    "gold": 2520,
+    "items": [
+     [
+      "pot_hp_l",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m15",
+   "name": "끓는 슬라임",
+   "giver": "elder",
+   "lv": 29,
+   "req": "m14",
+   "desc": "협곡의 용암 슬라임이 땅을 녹이고 있네. 터지기 전에 처치해 주게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "magma_slime",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "exp": 4129,
+    "gold": 2610,
+    "items": [
+     [
+      "pot_mp_l",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m16",
+   "name": "약탈자 소탕",
+   "giver": "elder",
+   "lv": 30,
+   "req": "m15",
+   "desc": "협곡 약탈자들이 길을 막고 있어. 모조리 쫓아내 주게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "canyon_raider",
+     "n": 20
+    }
+   ],
+   "reward": {
+    "exp": 4342,
+    "gold": 2700,
+    "items": [
+     [
+      "enh_stone",
+      6
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m17",
+   "name": "불씨의 술사들",
+   "giver": "elder",
+   "lv": 32,
+   "req": "m16",
+   "desc": "불씨 술사들이 협곡 깊은 곳에서 불길을 일으키고 있네.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "ember_mage",
+     "n": 15
+    },
+    {
+     "type": "kill",
+     "target": "rock_titan",
+     "n": 8
+    }
+   ],
+   "reward": {
+    "exp": 4781,
+    "gold": 2880,
+    "items": [
+     [
+      "enh_stone",
+      8
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m18",
+   "name": "협곡의 군주",
+   "giver": "elder",
+   "lv": 34,
+   "req": "m17",
+   "desc": "협곡의 군주 바르가를 쓰러뜨리면 북쪽 길이 열릴 걸세.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "barga",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 8141,
+    "gold": 4000,
+    "equip": {
+     "lv": 35,
+     "rar": 3
+    }
+   }
+  },
+  {
+   "id": "m19",
+   "name": "서리 고원",
+   "giver": "elder",
+   "lv": 34,
+   "req": "m18",
+   "desc": "고원은 얼어붙었지만 그곳에 마지막 단서가 있다네.",
+   "obj": [
+    {
+     "type": "visit",
+     "target": "field6",
+     "n": 1
+    },
+    {
+     "type": "kill",
+     "target": "frost_wolf",
+     "n": 20
+    }
+   ],
+   "reward": {
+    "exp": 5234,
+    "gold": 3060,
+    "items": [
+     [
+      "pot_hp_l",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m20",
+   "name": "눈의 정령",
+   "giver": "elder",
+   "lv": 35,
+   "req": "m19",
+   "desc": "눈의 정령들이 눈보라를 일으키고 있네. 잠재워 주게.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "snow_wisp",
+     "n": 20
+    }
+   ],
+   "reward": {
+    "exp": 5465,
+    "gold": 3150,
+    "items": [
+     [
+      "pot_mp_l",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m21",
+   "name": "설인과 궁수",
+   "giver": "elder",
+   "lv": 37,
+   "req": "m20",
+   "desc": "설인과 얼음 궁수가 고원 길목을 지키고 있다네.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "yeti",
+     "n": 10
+    },
+    {
+     "type": "kill",
+     "target": "ice_archer",
+     "n": 15
+    }
+   ],
+   "reward": {
+    "exp": 5937,
+    "gold": 3330,
+    "items": [
+     [
+      "enh_stone",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "m22",
+   "name": "빙설의 여왕",
+   "giver": "elder",
+   "lv": 40,
+   "req": "m21",
+   "desc": "여왕 시리엔을 쓰러뜨리면 모든 것이 끝나네. 부탁하네.",
+   "obj": [
+    {
+     "type": "kill",
+     "target": "siryen",
+     "n": 1
+    }
+   ],
+   "reward": {
+    "exp": 10378,
+    "gold": 8000,
+    "equip": {
+     "lv": 40,
+     "rar": 4
+    }
+   }
+  },
+  {
+   "id": "s8",
+   "name": "재 늑대 가죽",
+   "giver": "captain",
+   "lv": 28,
+   "req": "s7",
+   "desc": "재 늑대의 가죽은 단단하다. 열두 장만 모아 오게.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_ash",
+     "n": 12
+    }
+   ],
+   "reward": {
+    "exp": 3920,
+    "gold": 2520,
+    "items": [
+     [
+      "enh_stone",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s9",
+   "name": "마그마 핵 수집",
+   "giver": "captain",
+   "lv": 29,
+   "req": "s8",
+   "desc": "마그마 핵은 강력한 무기의 재료다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_magma",
+     "n": 12
+    }
+   ],
+   "reward": {
+    "exp": 4129,
+    "gold": 2610,
+    "items": [
+     [
+      "enh_stone",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s10",
+   "name": "서리 가죽",
+   "giver": "captain",
+   "lv": 34,
+   "req": "s9",
+   "desc": "서리 늑대의 가죽을 모아 오면 방한복을 만들어 주지.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_frost",
+     "n": 12
+    }
+   ],
+   "reward": {
+    "exp": 5234,
+    "gold": 3060,
+    "items": [
+     [
+      "enh_stone",
+      6
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s11",
+   "name": "여왕의 눈물",
+   "giver": "captain",
+   "lv": 40,
+   "req": "s10",
+   "desc": "여왕의 눈물은 세상에 몇 개 없는 보석이다.",
+   "obj": [
+    {
+     "type": "collect",
+     "target": "mat_siryen",
+     "n": 3
+    }
+   ],
+   "reward": {
+    "exp": 8896,
+    "gold": 6000,
+    "items": [
+     [
+      "enh_stone",
+      12
+     ]
+    ]
+   }
   }
  ]
 }

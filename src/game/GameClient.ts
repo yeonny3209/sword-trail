@@ -19,6 +19,12 @@ import { UiHub } from './UiHub';
 import { SocialHub } from './SocialHub';
 import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
 import { ScreenFx } from '../ui/ScreenFx';
+import { Music } from '../audio/Music';
+import { MoveFx } from '../fx/MoveFx';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { BuffBar } from '../ui/BuffBar';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
@@ -43,6 +49,11 @@ export class GameClient {
   readonly monsters: Monsters;
   private readonly fx: Effects;
   private readonly particles: Particles;
+  private readonly moveFx: MoveFx;
+  /** 빛 번짐(블룸) 후처리. F4로 끄고 켠다 */
+  private readonly composer: EffectComposer;
+  private readonly bloom: UnrealBloomPass;
+  private fancy = true;
   private readonly minimap: Minimap;
   private readonly bossBar: BossBar;
   readonly combat: CombatClient;
@@ -93,6 +104,30 @@ export class GameClient {
       ally: (id) => !!this.social.ui.party?.members.some((p) => p.id === id),
     });
     this.remotes.onRemove = (r) => this.combat.forget(r.model);
+    this.moveFx = new MoveFx(this.fx, this.particles, this.cam);
+    this.monsters.onLand = (v, strong) => this.moveFx.land(v.pos.x, v.pos.z, strong);
+    // 후처리: 밝은 부분(번쩍임·불꽃·검기·수정)이 은은하게 번진다
+    try {
+      this.fancy = localStorage.getItem('sto-fancy') !== '0';
+    } catch {
+      /* 저장소를 못 쓰면 기본값 */
+    }
+    this.composer = new EffectComposer(this.renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.55, 0.6, 0.92);
+    this.composer.addPass(this.bloom);
+    this.composer.addPass(new OutputPass());
+    window.addEventListener('keydown', (e) => {
+      if (e.code !== 'F4') return;
+      e.preventDefault();
+      this.fancy = !this.fancy;
+      try {
+        localStorage.setItem('sto-fancy', this.fancy ? '1' : '0');
+      } catch {
+        /* 무시 */
+      }
+      bus.emit('toast', { text: this.fancy ? '고급 화면 효과 켬 (F4)' : '고급 화면 효과 끔 (F4) — 느린 컴퓨터에서 끄면 빨라집니다', kind: 'info' });
+    });
     this.skillbar = new SkillBar(ui);
     this.death = new DeathOverlay(ui, () => this.net.send({ t: 'revive' }));
     this.chat = new ChatBox(ui, (ch, text, to) => this.social.chat(ch, text, to) || this.net.send({ t: 'chat', ch, text, to }));
@@ -124,6 +159,7 @@ export class GameClient {
       if (this.zone && this.me) this.social.rightClick(this.input.mouseNdc(), this.camera, x, y);
     };
     new Audio();
+    new Music();
     this.overlay = document.createElement('div');
     this.overlay.className = 'conn-overlay';
     ui.appendChild(this.overlay);
@@ -230,9 +266,13 @@ export class GameClient {
     this.plates.clear('portal');
     const def = ZONES[id];
     this.zone = new ZoneScene(def);
+    this.zone.resize(this.mount.clientHeight || window.innerHeight, this.camera.fov, this.renderer.getPixelRatio());
     this.scene.add(this.zone.group);
     this.scene.background = new THREE.Color(def.sky);
-    this.scene.fog = new THREE.Fog(def.sky, 38, 75);
+    this.scene.fog = new THREE.Fog(def.sky, def.fog?.[0] ?? 38, def.fog?.[1] ?? 75);
+    this.sun.color.set(def.sun ?? '#fff2dc');
+    this.moveFx.setGround(def.ground);
+    bus.emit('zoneTheme', { type: def.type, ambient: def.ambient });
     for (const n of this.zone.npcs) {
       this.plates.add(`npc${n.def.id}`, n.model.root, 2.15, `<span class="title">${n.def.title}</span>${n.def.name}`, 'npc');
     }
@@ -309,7 +349,7 @@ export class GameClient {
       this.sun.position.set(p.x + 14, 26, p.z + 10);
       this.sun.target.position.set(p.x, 0, p.z);
     }
-    this.zone?.update(dt);
+    this.zone?.update(dt, this.camera.position, me?.model.root.position);
     const renderTime = this.net.serverNow() - this.interpDelay;
     this.remotes.render(renderTime, dt);
     // 슬로모션 중에는 연출·몬스터 동작도 느리게(위치는 서버 시간 그대로)
@@ -324,7 +364,9 @@ export class GameClient {
     this.plates.render();
     this.skillbar.render();
     this.hud.setNet(this.net.rtt, this.remotes.list.size + 1, this.social.ui.online);
-    this.renderer.render(this.scene, this.camera);
+    if (me) this.moveFx.update(dt, me.model.root.position, me.pstate !== 'dead');
+    if (this.fancy) this.composer.render();
+    else this.renderer.render(this.scene, this.camera);
   };
 
   /** 미니맵 점과 가까운 보스 체력 바 */
@@ -353,8 +395,11 @@ export class GameClient {
     const w = this.mount.clientWidth || window.innerWidth;
     const h = this.mount.clientHeight || window.innerHeight;
     this.renderer.setSize(w, h, false);
+    this.composer.setPixelRatio(this.renderer.getPixelRatio());
+    this.composer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.particles.resize(h, this.camera.fov, this.renderer.getPixelRatio());
+    this.zone?.resize(h, this.camera.fov, this.renderer.getPixelRatio());
   };
 }

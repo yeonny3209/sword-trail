@@ -329,3 +329,9 @@ input:focus { border-color: var(--gold); }
 .dmg.heal { color: #7dffa0; font-size: 28px; text-shadow: 0 0 12px rgba(60,255,120,.85), 0 3px 0 #000; }
 .dmg.dot { color: #a8f060; font-size: 17px; -webkit-text-stroke: 2px #000; text-shadow: 0 2px 0 #000; }
 .act-prompt.raise { bottom: 214px; border: 1px solid #7dffa0; }
+
+/* 연속 처치 */
+.streak { position: absolute; right: 7%; top: 44%; font-family: var(--title); font-size: 26px; color: #ffe8b0; -webkit-text-stroke: 2px #000; paint-order: stroke fill; text-shadow: 0 0 12px rgba(255,150,40,.9); opacity: 0; pointer-events: none; }
+.streak b { font-size: 62px; color: #fff; margin-right: 6px; }
+.streak.on { opacity: 1; animation: comboPop .3s cubic-bezier(.2,1.5,.4,1); }
+.streak.t2 b { color: #ffd24a; } .streak.t3 b { color: #ff5a3a; text-shadow: 0 0 22px rgba(255,60,20,1); }

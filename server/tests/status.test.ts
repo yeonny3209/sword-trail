@@ -57,7 +57,8 @@ describe('직업·스킬 데이터', () => {
     for (const c of ['buffer', 'debuffer']) {
       for (let n = 0; n < 6; n++) expect(ITEMS[`w_${c}_${n}`]?.cls, `${c}${n}`).toBe(c);
       expect(Object.values(SHOPS).some((s) => s.items.includes(`w_${c}_0`))).toBe(true);
-      expect(RECIPE_LIST.filter((r) => r.out.startsWith(`w_${c}_`)).length).toBe(5);
+      // 1~5단계 + 후반 6·7단계 제작법
+      expect(RECIPE_LIST.filter((r) => r.out.startsWith(`w_${c}_`)).length).toBe(7);
       expect(CLASS_BY_ID[c as ClassId].look).toBeTruthy();
     }
     expect(CLASS_BY_ID.buffer.weapon.kind).toBe('staff');

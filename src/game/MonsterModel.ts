@@ -15,6 +15,7 @@ export class MonsterModel {
   private legs: THREE.Object3D[] = [];
   private flashT = 0;
   private walk = 0;
+  private spin = 0;
   private glow: THREE.Mesh | null = null;
   /** 맞은 반응: 남은 시간·방향·세기 */
   private hitT = 0;
@@ -121,7 +122,9 @@ export class MonsterModel {
       this.human.applyPose();
       this.human.animate(dt, speed, air, down);
     } else {
-      this.inner.rotation.x = down > 0 ? -1.3 * down : -windup * 0.35 + (attacking ? 0.3 : 0);
+      // 공중에 띄워지면 뒤로 젖혀져 휘청(착지하면 눕는다)
+      this.spin += air ? dt * 8 : 0;
+      this.inner.rotation.x = down > 0 ? -1.3 * down : air ? -0.7 + Math.sin(this.spin) * 0.25 : -windup * 0.35 + (attacking ? 0.3 : 0);
       if (this.def.model.shape === 'slime') {
         const sq = 1 + Math.sin(this.walk * 1.2) * 0.08 + windup * 0.25;
         this.inner.scale.set(this.def.model.scale * (1 / Math.sqrt(sq)), this.def.model.scale * (1 / sq) * (attacking ? 1.25 : 1), this.def.model.scale * (1 / Math.sqrt(sq)));

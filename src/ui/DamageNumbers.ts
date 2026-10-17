@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { bus } from '../core/bus';
 
 interface Pop {
   el: HTMLDivElement;
@@ -19,6 +20,8 @@ export class DamageNumbers {
   private readonly combo: HTMLDivElement;
   private comboN = 0;
   private comboT = 0;
+  private readonly streakEl: HTMLDivElement;
+  private streakT = 0;
 
   constructor(ui: HTMLElement, private readonly camera: THREE.Camera) {
     this.layer = document.createElement('div');
@@ -27,6 +30,18 @@ export class DamageNumbers {
     this.combo = document.createElement('div');
     this.combo.className = 'combo';
     ui.appendChild(this.combo);
+    this.streakEl = document.createElement('div');
+    this.streakEl.className = 'streak';
+    ui.appendChild(this.streakEl);
+    bus.on('streak', ({ n }) => {
+      this.streakEl.innerHTML = `<b>${n}</b> KILL${n >= 10 ? '!!' : n >= 5 ? '!' : ''}`;
+      this.streakEl.className = `streak on t${n >= 10 ? 3 : n >= 5 ? 2 : 1}`;
+      this.streakT = 2.2;
+      this.streakEl.style.animation = 'none';
+      void this.streakEl.offsetWidth;
+      this.streakEl.style.animation = '';
+      bus.emit('sfx', { key: n >= 5 ? 'finisher' : 'gate', volume: 0.5 });
+    });
   }
 
   /** value: 피해량이면 클수록 숫자를 키운다 */
@@ -75,6 +90,10 @@ export class DamageNumbers {
       const pop = p.t < t0 ? (p.big ? 2.4 : 2.0) - (p.t / t0) * (p.big ? 1.4 : 1.0) : 1 + Math.max(0, 0.12 - (p.t - t0)) * 0.8;
       p.el.style.transform = `translate(${((this.v.x + 1) / 2) * w + p.dx}px, ${((1 - this.v.y) / 2) * h - rise}px) translate(-50%, -50%) scale(${pop})`;
       p.el.style.opacity = String(p.t > 0.6 ? 1 - (p.t - 0.6) / 0.35 : 1);
+    }
+    if (this.streakT > 0) {
+      this.streakT -= dt;
+      if (this.streakT <= 0) this.streakEl.classList.remove('on');
     }
     if (this.comboT > 0) {
       this.comboT -= dt;

@@ -1373,6 +1373,928 @@
     "addsPerPlayer": 2,
     "enrageSec": 540
    }
+  },
+  {
+   "id": "ash_wolf",
+   "name": "재 늑대",
+   "lv": 28,
+   "hp": 3400,
+   "atk": 78,
+   "def": 34,
+   "exp": 1427,
+   "gold": [
+    42,
+    84
+   ],
+   "speed": 4.9,
+   "radius": 0.6,
+   "height": 1.1,
+   "weight": 1.1,
+   "aggro": 10,
+   "leash": 22,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "재 늑대의 물기",
+     "windup": 0.35,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 2.4,
+     "shape": {
+      "type": "arc",
+      "range": 2.5,
+      "width": 110
+     },
+     "dmg": 1.2,
+     "kx": 4,
+     "stun": 26,
+     "cd": 1.8,
+     "lunge": 8
+    },
+    {
+     "name": "도약 할퀴기",
+     "windup": 0.6,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 4.0,
+     "shape": {
+      "type": "arc",
+      "range": 3.2,
+      "width": 130
+     },
+     "dmg": 1.7,
+     "kx": 7,
+     "stun": 32,
+     "cd": 4.5,
+     "lunge": 11
+    }
+   ],
+   "model": {
+    "shape": "beast",
+    "color": "#6a5a52",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "magma_slime",
+   "name": "마그마 슬라임",
+   "lv": 29,
+   "hp": 4200,
+   "atk": 82,
+   "def": 30,
+   "exp": 1530,
+   "gold": [
+    44,
+    88
+   ],
+   "speed": 2.8,
+   "radius": 0.7,
+   "height": 1.1,
+   "weight": 1.0,
+   "aggro": 9,
+   "leash": 20,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "끓는 박치기",
+     "windup": 0.5,
+     "active": 0.25,
+     "recover": 0.8,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.4,
+      "width": 120
+     },
+     "dmg": 1.3,
+     "kx": 5,
+     "stun": 28,
+     "cd": 2.4,
+     "lunge": 6
+    },
+    {
+     "name": "용암 터뜨리기",
+     "windup": 1.0,
+     "active": 0.3,
+     "recover": 1.2,
+     "range": 3.6,
+     "shape": {
+      "type": "circle",
+      "range": 3.6,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 1.9,
+     "kx": 8,
+     "stun": 40,
+     "cd": 6.0,
+     "heavy": true,
+     "kz": 8
+    }
+   ],
+   "model": {
+    "shape": "slime",
+    "color": "#ff6a2a",
+    "scale": 1.25
+   },
+   "hitMat": "slime"
+  },
+  {
+   "id": "canyon_raider",
+   "name": "협곡 약탈자",
+   "lv": 30,
+   "hp": 4600,
+   "atk": 86,
+   "def": 44,
+   "exp": 1638,
+   "gold": [
+    45,
+    90
+   ],
+   "speed": 3.4,
+   "radius": 0.55,
+   "height": 2.0,
+   "weight": 1.7,
+   "aggro": 10,
+   "leash": 22,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "약탈자의 베기",
+     "windup": 0.6,
+     "active": 0.3,
+     "recover": 1.0,
+     "range": 2.8,
+     "shape": {
+      "type": "arc",
+      "range": 2.9,
+      "width": 150
+     },
+     "dmg": 1.3,
+     "kx": 6,
+     "stun": 32,
+     "cd": 2.4
+    },
+    {
+     "name": "돌격 찌르기",
+     "windup": 0.9,
+     "active": 0.3,
+     "recover": 1.1,
+     "range": 5.0,
+     "shape": {
+      "type": "box",
+      "range": 5.0,
+      "width": 1.4
+     },
+     "dmg": 1.8,
+     "kx": 9,
+     "stun": 38,
+     "cd": 5.5,
+     "lunge": 11,
+     "heavy": true,
+     "kz": 7
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#8a4a3a",
+    "scale": 1.1,
+    "weapon": {
+     "kind": "sword",
+     "length": 1.2,
+     "width": 1.1,
+     "color": "#e0a070"
+    }
+   },
+   "hitMat": "metal"
+  },
+  {
+   "id": "rock_titan",
+   "name": "바위 거신",
+   "lv": 31,
+   "hp": 8400,
+   "atk": 92,
+   "def": 60,
+   "exp": 1749,
+   "gold": [
+    47,
+    94
+   ],
+   "speed": 2.2,
+   "radius": 0.85,
+   "height": 2.8,
+   "weight": 3,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 14,
+   "attacks": [
+    {
+     "name": "돌주먹",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.8,
+      "width": 120
+     },
+     "dmg": 1.4,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.6
+    },
+    {
+     "name": "붉은 지면 강타",
+     "windup": 1.2,
+     "active": 0.3,
+     "recover": 1.3,
+     "range": 3.5,
+     "shape": {
+      "type": "circle",
+      "range": 3.6,
+      "width": 0,
+      "offset": 0.5
+     },
+     "dmg": 1.9,
+     "kx": 7,
+     "stun": 34,
+     "cd": 6,
+     "heavy": true,
+     "kz": 9
+    }
+   ],
+   "model": {
+    "shape": "golem",
+    "color": "#7a6a62",
+    "scale": 1
+   },
+   "hitMat": "stone"
+  },
+  {
+   "id": "ember_mage",
+   "name": "불씨 술사",
+   "lv": 32,
+   "hp": 3000,
+   "atk": 98,
+   "def": 28,
+   "exp": 1863,
+   "gold": [
+    48,
+    96
+   ],
+   "speed": 3.4,
+   "radius": 0.42,
+   "height": 1.8,
+   "weight": 0.9,
+   "aggro": 11,
+   "leash": 20,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "불덩이",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 10.5,
+      "width": 1.5
+     },
+     "dmg": 1.4,
+     "kx": 5,
+     "stun": 30,
+     "cd": 3.0,
+     "fx": "wave"
+    },
+    {
+     "name": "불기둥",
+     "windup": 1.1,
+     "active": 0.35,
+     "recover": 1.2,
+     "range": 8,
+     "shape": {
+      "type": "circle",
+      "range": 2.8,
+      "width": 0,
+      "offset": 5.5
+     },
+     "dmg": 1.9,
+     "kx": 8,
+     "stun": 38,
+     "cd": 6.5,
+     "heavy": true,
+     "kz": 8
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#c8582a",
+    "scale": 1,
+    "weapon": {
+     "kind": "runeblade",
+     "length": 1.0,
+     "width": 0.8,
+     "color": "#ff9040"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "barga",
+   "name": "협곡의 군주 바르가",
+   "lv": 34,
+   "hp": 64000,
+   "atk": 116,
+   "def": 66,
+   "exp": 4200,
+   "gold": [
+    60,
+    130
+   ],
+   "speed": 3.1,
+   "radius": 0.9,
+   "height": 3.2,
+   "weight": 5,
+   "aggro": 13,
+   "leash": 26,
+   "respawn": 900,
+   "attacks": [
+    {
+     "name": "수호의 일격",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 3.4,
+     "shape": {
+      "type": "arc",
+      "range": 3.6,
+      "width": 120
+     },
+     "dmg": 1.5,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.2
+    },
+    {
+     "name": "검기 방출",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 11,
+      "width": 1.6
+     },
+     "dmg": 1.4,
+     "kx": 6,
+     "stun": 28,
+     "cd": 3.5,
+     "fx": "wave"
+    },
+    {
+     "name": "붉은 대회전",
+     "windup": 1.2,
+     "active": 0.45,
+     "recover": 1.3,
+     "range": 4.5,
+     "shape": {
+      "type": "circle",
+      "range": 4.8,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.0,
+     "kx": 11,
+     "stun": 36,
+     "cd": 7,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "붉은 돌진",
+     "windup": 1.0,
+     "active": 0.35,
+     "recover": 1.2,
+     "range": 9,
+     "shape": {
+      "type": "box",
+      "range": 9.5,
+      "width": 2.0
+     },
+     "dmg": 2.2,
+     "kx": 11,
+     "stun": 36,
+     "cd": 8,
+     "lunge": 18,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "운석 낙하",
+     "windup": 1.5,
+     "active": 0.4,
+     "recover": 1.4,
+     "range": 7.5,
+     "shape": {
+      "type": "circle",
+      "range": 7.5,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.4,
+     "kx": 12,
+     "stun": 38,
+     "cd": 9.0,
+     "heavy": true,
+     "kz": 11
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#9a4a2a",
+    "scale": 1.75,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 2.3,
+     "width": 2.1,
+     "color": "#ff9040"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true
+  },
+  {
+   "id": "frost_wolf",
+   "name": "서리 늑대",
+   "lv": 34,
+   "hp": 4400,
+   "atk": 98,
+   "def": 42,
+   "exp": 2104,
+   "gold": [
+    51,
+    102
+   ],
+   "speed": 5.0,
+   "radius": 0.6,
+   "height": 1.1,
+   "weight": 1.1,
+   "aggro": 10,
+   "leash": 22,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "서리 물기",
+     "windup": 0.35,
+     "active": 0.2,
+     "recover": 0.7,
+     "range": 2.4,
+     "shape": {
+      "type": "arc",
+      "range": 2.5,
+      "width": 110
+     },
+     "dmg": 1.2,
+     "kx": 4,
+     "stun": 26,
+     "cd": 1.8,
+     "lunge": 8
+    },
+    {
+     "name": "얼음 도약",
+     "windup": 0.6,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 4.0,
+     "shape": {
+      "type": "arc",
+      "range": 3.2,
+      "width": 130
+     },
+     "dmg": 1.7,
+     "kx": 7,
+     "stun": 32,
+     "cd": 4.5,
+     "lunge": 11
+    }
+   ],
+   "model": {
+    "shape": "beast",
+    "color": "#b8d0e8",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "snow_wisp",
+   "name": "눈의 정령",
+   "lv": 35,
+   "hp": 4800,
+   "atk": 104,
+   "def": 36,
+   "exp": 2230,
+   "gold": [
+    52,
+    105
+   ],
+   "speed": 2.8,
+   "radius": 0.65,
+   "height": 1.1,
+   "weight": 0.9,
+   "aggro": 9,
+   "leash": 20,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "냉기 박치기",
+     "windup": 0.5,
+     "active": 0.25,
+     "recover": 0.8,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.4,
+      "width": 120
+     },
+     "dmg": 1.3,
+     "kx": 5,
+     "stun": 28,
+     "cd": 2.4,
+     "lunge": 6
+    },
+    {
+     "name": "눈보라",
+     "windup": 1.0,
+     "active": 0.35,
+     "recover": 1.2,
+     "range": 4.0,
+     "shape": {
+      "type": "circle",
+      "range": 4.0,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 1.8,
+     "kx": 8,
+     "stun": 40,
+     "cd": 6.0,
+     "heavy": true,
+     "kz": 8
+    }
+   ],
+   "model": {
+    "shape": "slime",
+    "color": "#bfe8ff",
+    "scale": 1.2
+   },
+   "hitMat": "slime"
+  },
+  {
+   "id": "ice_archer",
+   "name": "얼음 궁수",
+   "lv": 36,
+   "hp": 3900,
+   "atk": 112,
+   "def": 34,
+   "exp": 2360,
+   "gold": [
+    54,
+    108
+   ],
+   "speed": 3.4,
+   "radius": 0.4,
+   "height": 1.75,
+   "weight": 0.9,
+   "aggro": 11,
+   "leash": 20,
+   "respawn": 12,
+   "attacks": [
+    {
+     "name": "빙결 화살",
+     "windup": 0.7,
+     "active": 0.2,
+     "recover": 1.0,
+     "range": 12,
+     "shape": {
+      "type": "box",
+      "range": 12.5,
+      "width": 0.9
+     },
+     "dmg": 1.4,
+     "kx": 4,
+     "stun": 28,
+     "cd": 2.4,
+     "fx": "arrow"
+    },
+    {
+     "name": "얼음 폭발",
+     "windup": 1.1,
+     "active": 0.3,
+     "recover": 1.2,
+     "range": 3.6,
+     "shape": {
+      "type": "circle",
+      "range": 3.6,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 1.7,
+     "kx": 8,
+     "stun": 36,
+     "cd": 7.0,
+     "heavy": true,
+     "kz": 7
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#6a8aaa",
+    "scale": 1,
+    "weapon": {
+     "kind": "sword",
+     "length": 0.7,
+     "width": 0.6,
+     "color": "#7a5a3a"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "yeti",
+   "name": "설인",
+   "lv": 37,
+   "hp": 11000,
+   "atk": 118,
+   "def": 70,
+   "exp": 2491,
+   "gold": [
+    55,
+    110
+   ],
+   "speed": 2.4,
+   "radius": 0.85,
+   "height": 2.8,
+   "weight": 3,
+   "aggro": 8,
+   "leash": 20,
+   "respawn": 14,
+   "attacks": [
+    {
+     "name": "돌주먹",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.8,
+      "width": 120
+     },
+     "dmg": 1.4,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.6
+    },
+    {
+     "name": "붉은 지면 강타",
+     "windup": 1.2,
+     "active": 0.3,
+     "recover": 1.3,
+     "range": 3.5,
+     "shape": {
+      "type": "circle",
+      "range": 3.6,
+      "width": 0,
+      "offset": 0.5
+     },
+     "dmg": 1.9,
+     "kx": 7,
+     "stun": 34,
+     "cd": 6,
+     "heavy": true,
+     "kz": 9
+    }
+   ],
+   "model": {
+    "shape": "golem",
+    "color": "#e8f0f8",
+    "scale": 1
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "frost_knight",
+   "name": "서리 기사",
+   "lv": 38,
+   "hp": 7600,
+   "atk": 120,
+   "def": 78,
+   "exp": 2628,
+   "gold": [
+    57,
+    114
+   ],
+   "speed": 3.2,
+   "radius": 0.6,
+   "height": 2.2,
+   "weight": 1.9,
+   "aggro": 10,
+   "leash": 22,
+   "respawn": 14,
+   "attacks": [
+    {
+     "name": "방패 밀치기",
+     "windup": 0.7,
+     "active": 0.2,
+     "recover": 0.9,
+     "range": 2.2,
+     "shape": {
+      "type": "arc",
+      "range": 2.2,
+      "width": 120
+     },
+     "dmg": 1.1,
+     "kx": 9,
+     "stun": 28,
+     "cd": 2.4
+    },
+    {
+     "name": "내려치기",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 2.6,
+     "shape": {
+      "type": "arc",
+      "range": 2.6,
+      "width": 90
+     },
+     "dmg": 1.5,
+     "kx": 5,
+     "stun": 26,
+     "cd": 3.4
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#8aa8c8",
+    "scale": 1.1,
+    "weapon": {
+     "kind": "sword",
+     "length": 1.3,
+     "width": 1.2,
+     "color": "#cfe8ff"
+    }
+   },
+   "hitMat": "metal"
+  },
+  {
+   "id": "siryen",
+   "name": "빙설의 여왕 시리엔",
+   "lv": 40,
+   "hp": 98000,
+   "atk": 138,
+   "def": 88,
+   "exp": 5800,
+   "gold": [
+    90,
+    180
+   ],
+   "speed": 3.2,
+   "radius": 0.9,
+   "height": 3.2,
+   "weight": 5,
+   "aggro": 13,
+   "leash": 26,
+   "respawn": 900,
+   "attacks": [
+    {
+     "name": "수호의 일격",
+     "windup": 0.8,
+     "active": 0.25,
+     "recover": 0.9,
+     "range": 3.4,
+     "shape": {
+      "type": "arc",
+      "range": 3.6,
+      "width": 120
+     },
+     "dmg": 1.5,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.2
+    },
+    {
+     "name": "검기 방출",
+     "windup": 0.9,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 11,
+      "width": 1.6
+     },
+     "dmg": 1.4,
+     "kx": 6,
+     "stun": 28,
+     "cd": 3.5,
+     "fx": "wave"
+    },
+    {
+     "name": "붉은 대회전",
+     "windup": 1.2,
+     "active": 0.45,
+     "recover": 1.3,
+     "range": 4.5,
+     "shape": {
+      "type": "circle",
+      "range": 4.8,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.0,
+     "kx": 11,
+     "stun": 36,
+     "cd": 7,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "붉은 돌진",
+     "windup": 1.0,
+     "active": 0.35,
+     "recover": 1.2,
+     "range": 9,
+     "shape": {
+      "type": "box",
+      "range": 9.5,
+      "width": 2.0
+     },
+     "dmg": 2.2,
+     "kx": 11,
+     "stun": 36,
+     "cd": 8,
+     "lunge": 18,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "눈보라 폭풍",
+     "windup": 1.7,
+     "active": 0.45,
+     "recover": 1.5,
+     "range": 8.5,
+     "shape": {
+      "type": "circle",
+      "range": 8.5,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.6,
+     "kx": 12,
+     "stun": 40,
+     "cd": 9.5,
+     "heavy": true,
+     "kz": 11
+    },
+    {
+     "name": "얼음 창",
+     "windup": 1.0,
+     "active": 0.25,
+     "recover": 1.1,
+     "range": 11,
+     "shape": {
+      "type": "box",
+      "range": 12,
+      "width": 2.0
+     },
+     "dmg": 1.8,
+     "kx": 8,
+     "stun": 34,
+     "cd": 6.0,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#cfe8ff",
+    "scale": 1.75,
+    "weapon": {
+     "kind": "runeblade",
+     "length": 2.2,
+     "width": 1.8,
+     "color": "#9fe0ff"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true
   }
  ]
 }

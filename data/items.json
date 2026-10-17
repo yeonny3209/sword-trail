@@ -1151,6 +1151,456 @@
     "atk": 90
    },
    "price": 16320
+  },
+  {
+   "id": "mat_ash",
+   "name": "재 늑대 가죽",
+   "kind": "material",
+   "lv": 28,
+   "price": 120,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_magma",
+   "name": "마그마 핵",
+   "kind": "material",
+   "lv": 29,
+   "price": 128,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_raider",
+   "name": "약탈자의 휘장",
+   "kind": "material",
+   "lv": 30,
+   "price": 136,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_titan",
+   "name": "거신의 파편",
+   "kind": "material",
+   "lv": 31,
+   "price": 144,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_ember",
+   "name": "불씨 수정",
+   "kind": "material",
+   "lv": 32,
+   "price": 152,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_barga",
+   "name": "바르가의 뿔",
+   "kind": "material",
+   "lv": 34,
+   "price": 220,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_frost",
+   "name": "서리 가죽",
+   "kind": "material",
+   "lv": 34,
+   "price": 168,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_wisp",
+   "name": "눈의 정수",
+   "kind": "material",
+   "lv": 35,
+   "price": 176,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_icetip",
+   "name": "얼음 화살촉",
+   "kind": "material",
+   "lv": 36,
+   "price": 184,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_yeti",
+   "name": "설인의 털",
+   "kind": "material",
+   "lv": 37,
+   "price": 192,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_knight",
+   "name": "서리 갑주 조각",
+   "kind": "material",
+   "lv": 38,
+   "price": 200,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "mat_siryen",
+   "name": "여왕의 눈물",
+   "kind": "material",
+   "lv": 40,
+   "price": 280,
+   "stack": 999,
+   "desc": "몬스터에게서 얻은 재료. 제작에 쓴다."
+  },
+  {
+   "id": "ore_4",
+   "name": "붉은 강철광",
+   "kind": "material",
+   "lv": 28,
+   "price": 96,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "herb_4",
+   "name": "화염초",
+   "kind": "material",
+   "lv": 28,
+   "price": 96,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "wood_4",
+   "name": "재나무",
+   "kind": "material",
+   "lv": 28,
+   "price": 96,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "ore_5",
+   "name": "서리 은광",
+   "kind": "material",
+   "lv": 34,
+   "price": 120,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "herb_5",
+   "name": "설화",
+   "kind": "material",
+   "lv": 34,
+   "price": 120,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "wood_5",
+   "name": "서리 고목",
+   "kind": "material",
+   "lv": 34,
+   "price": 120,
+   "stack": 999,
+   "desc": "채집 재료. 제작에 쓴다."
+  },
+  {
+   "id": "helmet_6",
+   "name": "협곡 수호자의 투구",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 35,
+   "stats": {
+    "def": 39,
+    "mhp": 195
+   },
+   "price": 20672
+  },
+  {
+   "id": "armor_6",
+   "name": "협곡 수호자의 갑주",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 35,
+   "stats": {
+    "def": 65,
+    "mhp": 325
+   },
+   "price": 20672
+  },
+  {
+   "id": "gloves_6",
+   "name": "협곡 수호자의 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 35,
+   "stats": {
+    "def": 21,
+    "atk": 26
+   },
+   "price": 20672
+  },
+  {
+   "id": "boots_6",
+   "name": "협곡 수호자의 걸음",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 35,
+   "stats": {
+    "def": 21,
+    "speed": 0.52
+   },
+   "price": 20672
+  },
+  {
+   "id": "ring_6",
+   "name": "용암의 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 35,
+   "stats": {
+    "atk": 32,
+    "crit": 0.05
+   },
+   "price": 20672
+  },
+  {
+   "id": "necklace_6",
+   "name": "불씨의 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 35,
+   "stats": {
+    "mhp": 247,
+    "mmp": 130
+   },
+   "price": 20672
+  },
+  {
+   "id": "w_swordsman_6",
+   "name": "협곡의 칼날",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 35,
+   "stats": {
+    "atk": 117
+   },
+   "price": 31008
+  },
+  {
+   "id": "w_berserker_6",
+   "name": "협곡 파쇄검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 35,
+   "stats": {
+    "atk": 122
+   },
+   "price": 31008
+  },
+  {
+   "id": "w_blademaster_6",
+   "name": "재의 쌍단검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 35,
+   "stats": {
+    "atk": 117
+   },
+   "price": 31008
+  },
+  {
+   "id": "w_spellblade_6",
+   "name": "용암 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 35,
+   "stats": {
+    "atk": 117
+   },
+   "price": 31008
+  },
+  {
+   "id": "w_buffer_6",
+   "name": "불씨의 지팡이",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 35,
+   "stats": {
+    "atk": 117
+   },
+   "price": 31008
+  },
+  {
+   "id": "w_debuffer_6",
+   "name": "재의 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 35,
+   "stats": {
+    "atk": 117
+   },
+   "price": 31008
+  },
+  {
+   "id": "helmet_7",
+   "name": "빙설 여왕의 면류관",
+   "kind": "equip",
+   "slot": "helmet",
+   "lv": 40,
+   "stats": {
+    "def": 50,
+    "mhp": 248
+   },
+   "price": 32640
+  },
+  {
+   "id": "armor_7",
+   "name": "빙설 여왕의 갑주",
+   "kind": "equip",
+   "slot": "armor",
+   "lv": 40,
+   "stats": {
+    "def": 82,
+    "mhp": 412
+   },
+   "price": 32640
+  },
+  {
+   "id": "gloves_7",
+   "name": "빙설 여왕의 장갑",
+   "kind": "equip",
+   "slot": "gloves",
+   "lv": 40,
+   "stats": {
+    "def": 26,
+    "atk": 33
+   },
+   "price": 32640
+  },
+  {
+   "id": "boots_7",
+   "name": "빙설 여왕의 걸음",
+   "kind": "equip",
+   "slot": "boots",
+   "lv": 40,
+   "stats": {
+    "def": 26,
+    "speed": 0.66
+   },
+   "price": 32640
+  },
+  {
+   "id": "ring_7",
+   "name": "서리의 반지",
+   "kind": "equip",
+   "slot": "ring",
+   "lv": 40,
+   "stats": {
+    "atk": 41,
+    "crit": 0.07
+   },
+   "price": 32640
+  },
+  {
+   "id": "necklace_7",
+   "name": "설화의 목걸이",
+   "kind": "equip",
+   "slot": "necklace",
+   "lv": 40,
+   "stats": {
+    "mhp": 314,
+    "mmp": 165
+   },
+   "price": 32640
+  },
+  {
+   "id": "w_swordsman_7",
+   "name": "빙설의 검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "swordsman",
+   "lv": 40,
+   "stats": {
+    "atk": 148
+   },
+   "price": 48960
+  },
+  {
+   "id": "w_berserker_7",
+   "name": "빙하 대검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "berserker",
+   "lv": 40,
+   "stats": {
+    "atk": 155
+   },
+   "price": 48960
+  },
+  {
+   "id": "w_blademaster_7",
+   "name": "서리 쌍검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "blademaster",
+   "lv": 40,
+   "stats": {
+    "atk": 148
+   },
+   "price": 48960
+  },
+  {
+   "id": "w_spellblade_7",
+   "name": "설원의 룬검",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "spellblade",
+   "lv": 40,
+   "stats": {
+    "atk": 148
+   },
+   "price": 48960
+  },
+  {
+   "id": "w_buffer_7",
+   "name": "설화의 홀",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 40,
+   "stats": {
+    "atk": 148
+   },
+   "price": 48960
+  },
+  {
+   "id": "w_debuffer_7",
+   "name": "서리 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 40,
+   "stats": {
+    "atk": 148
+   },
+   "price": 48960
   }
  ]
 }

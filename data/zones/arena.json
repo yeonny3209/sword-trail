@@ -71,5 +71,7 @@
  ],
  "npcs": [],
  "spawns": [],
- "nodes": []
+ "nodes": [],
+ "sun": "#ffe0b8",
+ "ambient": "dust"
 }

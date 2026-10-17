@@ -111,7 +111,7 @@ export function rollLoot(p: PlayerSession, mon: MonsterDef): void {
   const chance = mon.boss ? LOOT.equipChance.boss : LOOT.equipChance.default * (1 + mon.lv * 0.04);
   if (Math.random() < chance) {
     // 몬스터 레벨 + 2까지의 장비, 무기는 내 직업 것이 더 잘 나온다
-    const pool = Object.values(ITEMS).filter((d) => d.kind === 'equip' && d.lv <= mon.lv + 2 && (!d.cls || d.cls === p.cls || Math.random() < 0.25));
+    const pool = Object.values(ITEMS).filter((d) => d.kind === 'equip' && d.lv <= mon.lv + 2 && d.lv >= mon.lv - 12 && (!d.cls || d.cls === p.cls || Math.random() < 0.25));
     const d = pool[Math.floor(Math.random() * pool.length)];
     if (d) {
       const rar = rollRarity(Math.random(), mon.boss ? 1.5 : 0);

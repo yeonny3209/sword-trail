@@ -7,6 +7,8 @@ import arena from '../data/zones/arena.json';
 import field2 from '../data/zones/field2.json';
 import field3 from '../data/zones/field3.json';
 import field4 from '../data/zones/field4.json';
+import field5 from '../data/zones/field5.json';
+import field6 from '../data/zones/field6.json';
 import raid1 from '../data/zones/raid1.json';
 import raid2 from '../data/zones/raid2.json';
 import swordsman from '../data/kits/swordsman.json';
@@ -21,7 +23,7 @@ export const CLASSES = classesJson.list as ClassDef[];
 export const CLASS_BY_ID = Object.fromEntries(CLASSES.map((c) => [c.id, c])) as Record<ClassId, ClassDef>;
 
 export const ZONES: Record<string, ZoneDef> = Object.fromEntries(
-  ([town, field1, field2, field3, field4, arena, raid1, raid2] as unknown as ZoneDef[]).map((z) => [z.id, z]),
+  ([town, field1, field2, field3, field4, field5, field6, arena, raid1, raid2] as unknown as ZoneDef[]).map((z) => [z.id, z]),
 );
 
 export const START_ZONE = 'town';

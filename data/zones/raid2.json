@@ -138,5 +138,11 @@
    }
   }
  ],
- "nodes": []
+ "nodes": [],
+ "sun": "#ff8a50",
+ "ambient": "ember",
+ "fog": [
+  30,
+  85
+ ]
 }

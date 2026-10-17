@@ -114,5 +114,11 @@
    }
   }
  ],
- "nodes": []
+ "nodes": [],
+ "sun": "#b8a0ff",
+ "ambient": "wisp",
+ "fog": [
+  30,
+  80
+ ]
 }

@@ -230,6 +230,130 @@
     "chance": 1,
     "n": 15
    }
+  ],
+  "ash_wolf": [
+   {
+    "item": "mat_ash",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "magma_slime": [
+   {
+    "item": "mat_magma",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "canyon_raider": [
+   {
+    "item": "mat_raider",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "rock_titan": [
+   {
+    "item": "mat_titan",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "ember_mage": [
+   {
+    "item": "mat_ember",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "frost_wolf": [
+   {
+    "item": "mat_frost",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "snow_wisp": [
+   {
+    "item": "mat_wisp",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "ice_archer": [
+   {
+    "item": "mat_icetip",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "yeti": [
+   {
+    "item": "mat_yeti",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "frost_knight": [
+   {
+    "item": "mat_knight",
+    "chance": 0.4
+   },
+   {
+    "item": "enh_stone",
+    "chance": 0.12
+   }
+  ],
+  "barga": [
+   {
+    "item": "mat_barga",
+    "chance": 1,
+    "n": 3
+   },
+   {
+    "item": "enh_stone",
+    "chance": 1,
+    "n": 18
+   }
+  ],
+  "siryen": [
+   {
+    "item": "mat_siryen",
+    "chance": 1,
+    "n": 3
+   },
+   {
+    "item": "enh_stone",
+    "chance": 1,
+    "n": 24
+   }
   ]
  },
  "equipChance": {
@@ -244,7 +368,9 @@
    "field1": 1,
    "field2": 1,
    "field3": 2,
-   "field4": 3
+   "field4": 3,
+   "field5": 4,
+   "field6": 5
   },
   "doubleChancePerLevel": 0.04,
   "expPerLevel": 40

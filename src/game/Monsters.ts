@@ -31,6 +31,8 @@ export interface MonView {
   /** 이름표 글자와 걸려 있는 디버프 */
   label: string;
   status: StatusId[];
+  /** 지난 프레임에 공중이었나(착지 감지) */
+  wasAir: boolean;
 }
 
 /** 같은 존의 몬스터들. 서버 상태를 보간하고, 내가 때린 몬스터는 반응을 먼저 계산해서 즉시 보여 준다 */
@@ -40,6 +42,8 @@ export class Monsters {
   private readonly s: Sample = { t: 0, x: 0, z: 0, y: 0, f: 0, st: 0 };
   /** 공격 판정이 시작될 때(화살·검기 연출) */
   onAttackFx: (v: MonView, a: MonsterAttackDef) => void = () => {};
+  /** 띄워졌던 몬스터가 땅에 떨어졌다(strong: 큰 몬스터) */
+  onLand: (v: MonView, strong: boolean) => void = () => {};
 
   constructor(private readonly scene: THREE.Scene, private readonly plates: Nameplates, private readonly delayMs: () => number) {
     this.tele = new Telegraphs(scene);
@@ -57,7 +61,7 @@ export class Monsters {
     const v: MonView = {
       id: info.id, def, model, buf, hp: info.hp, mhp: info.mhp, st: MonState.Idle,
       body: newBody(info.x, info.z), predict: 0, blend: 1, pos: new THREE.Vector3(info.x, 0, info.z),
-      yaw: info.f, speed: 0, atk: null, dying: 0, label: `<span class="lv">Lv${def.lv}</span> ${def.name}`, status: [],
+      yaw: info.f, speed: 0, atk: null, dying: 0, label: `<span class="lv">Lv${def.lv}</span> ${def.name}`, status: [], wasAir: false,
     };
     this.list.set(info.id, v);
     this.plates.add(`m${info.id}`, model.root, def.height * def.model.scale + 0.45, v.label, 'monster', true, 30);
@@ -173,6 +177,9 @@ export class Monsters {
         v.dying -= dt;
         v.model.root.position.y -= dt * 0.8;
         v.model.root.rotation.x = Math.min(1.4, v.model.root.rotation.x + dt * 3);
+        // 쓰러진 뒤 잠시 있다가 작아지며 사라진다
+        const k = Math.max(0, 1 - v.dying / 1.2 - 0.45) / 0.55;
+        v.model.root.scale.setScalar(Math.max(0.02, 1 - k));
         if (v.dying <= 0) this.remove(v.id);
         continue;
       }
@@ -208,6 +215,8 @@ export class Monsters {
       }
       const down = v.predict > 0 ? (v.body.down > 0 ? 1 : 0) : v.st === MonState.Down ? 1 : 0;
       const air = v.predict > 0 ? v.body.air : v.st === MonState.Air;
+      if (v.wasAir && !air && !v.def.boss) this.onLand(v, v.def.weight > 2);
+      v.wasAir = air;
       v.model.animate(dt, v.predict > 0 ? 0 : v.speed, air, down, windup, attacking);
       root.position.add(v.model.recoil);
       v.model.telegraph(windup > 0 ? (v.atk!.a.heavy ? '#ff3020' : '#fff4d0') : null, windup);

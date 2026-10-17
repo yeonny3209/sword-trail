@@ -21,7 +21,7 @@ export interface WallDef extends Rect {
 }
 
 export interface PropDef {
-  kind: 'tree' | 'rock' | 'lamp' | 'crate' | 'fence' | 'well' | 'grass' | 'pillar';
+  kind: 'tree' | 'rock' | 'lamp' | 'crate' | 'fence' | 'well' | 'grass' | 'pillar' | 'deadtree' | 'snowpine' | 'crystal' | 'lava';
   x: number;
   z: number;
   s?: number;
@@ -78,6 +78,12 @@ export interface ZoneDef {
   groundAccent?: string;
   sky: string;
   light?: number;
+  /** 햇빛(달빛) 색 */
+  sun?: string;
+  /** 떠다니는 입자(분위기) */
+  ambient?: 'dust' | 'leaf' | 'firefly' | 'mist' | 'ash' | 'snow' | 'ember' | 'wisp';
+  /** 안개가 시작되는 거리·완전히 덮는 거리 */
+  fog?: [number, number];
   walls: WallDef[];
   props: PropDef[];
   portals: PortalDef[];

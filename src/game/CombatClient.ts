@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { bus } from '../core/bus';
 import { shapeHits } from '../../shared/geom';
 import { MoveState, type S2C } from '../../shared/protocol';
-import { ACTIONS } from '../../shared/data';
+import { ACTIONS, CLASS_BY_ID } from '../../shared/data';
+import type { ClassId } from '../../shared/types';
 import type { HitDef, MonsterAttackDef, ZoneDef } from '../../shared/types';
 import type { Effects } from '../fx/Effects';
 import type { Particles, BurstSpec } from '../fx/Particles';
@@ -206,6 +207,7 @@ export class CombatClient {
         if (v && !v.dying) {
           const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.55, v.pos.z);
           this.hitstop = Math.max(this.hitstop, this.hitfx.kill(at, !!v.def.boss, m.by === me?.self.id));
+          if (m.by === me?.self.id) this.streakCount();
         }
         this.c.monsters.die(m.id);
         break;
@@ -281,11 +283,33 @@ export class CombatClient {
       this.glowT -= dt;
       if (this.glowT <= 0) me?.model.setGlow(null);
     }
-    if (me) this.trail(me.model, !!me.action?.trailOn(), dt, '#cfe6ff');
-    for (const r of this.c.remotes.list.values()) this.trail(r.model, !!r.action?.trailOn(), dt, '#e0e8ff');
+    // 검 궤적은 직업 색을 밝게 섞은 색
+    if (me) this.trail(me.model, !!me.action?.trailOn(), dt, this.trailColor(me.self.cls));
+    for (const r of this.c.remotes.list.values()) this.trail(r.model, !!r.action?.trailOn(), dt, this.trailColor(r.info.cls));
     this.c.fx.update(dt);
     this.c.particles.update(dt);
     this.c.numbers.render(dt);
+  }
+
+  private streakN = 0;
+  private streakAt = 0;
+  private readonly trailColors = new Map<string, string>();
+
+  /** 6초 안에 이어서 잡으면 연속 처치 */
+  private streakCount(): void {
+    const now = performance.now();
+    this.streakN = now - this.streakAt < 6000 ? this.streakN + 1 : 1;
+    this.streakAt = now;
+    if (this.streakN >= 3) bus.emit('streak', { n: this.streakN });
+  }
+
+  private trailColor(cls: ClassId): string {
+    let c = this.trailColors.get(cls);
+    if (!c) {
+      c = `#${new THREE.Color(CLASS_BY_ID[cls].color).lerp(new THREE.Color('#ffffff'), 0.55).getHexString()}`;
+      this.trailColors.set(cls, c);
+    }
+    return c;
   }
 
   private trail(model: CharacterModel, on: boolean, dt: number, color: string): void {

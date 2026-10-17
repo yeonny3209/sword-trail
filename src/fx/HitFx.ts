@@ -69,6 +69,15 @@ export class HitFx {
       this.particles.burst(new THREE.Vector3(at.x, 0.1, at.z), this.bursts.dust);
     }
     const stop = this.stopFrames(hit);
+    // 마무리 일격(묵직한 타격): 순간 느려지고 하얗게 번쩍, 충격 고리가 크게 퍼진다
+    if (hit.stop >= 10) {
+      this.fx.ring(at.x, at.z, 1.5 + hit.stop * 0.05, '#ffffff');
+      this.fx.flash(at.x, at.y, at.z, 1.6, color);
+      bus.emit('slowmo', { scale: 0.3, ms: 130 });
+      bus.emit('screen', { kind: 'flash', alpha: 0.12 + hit.stop * 0.004, ms: 140 });
+      bus.emit('sfx', { key: 'finisher', volume: 0.55 });
+      this.cam.addKick(dx, dz, 0.18, 0.035);
+    }
     const shake = Math.max(this.juice.shakeBase + hit.stop * this.juice.shakePerStop, (hit.shake ?? 0) * 1.6);
     this.cam.addShake(shake);
     this.cam.addKick(dx, dz, this.juice.kickBase + hit.stop * this.juice.kickPerStop, hit.stop * this.juice.zoomPerStop);

@@ -1,29 +1,88 @@
 import * as THREE from 'three';
 import type { NodeDef, NpcDef, PortalDef, PropDef, ZoneDef } from '../../shared/types';
 import { LOOT } from '../../shared/items';
+import { AmbientParticles, SkyDome } from '../fx/Atmosphere';
 import { CharacterModel } from './CharacterModel';
 
-/** 땅에 얼룩을 뿌린 반복 텍스처 */
-function groundTexture(base: string, accent: string): THREE.CanvasTexture {
+type GroundStyle = 'grass' | 'snow' | 'ash' | 'plain';
+
+/** 땅에 얼룩과 지역 분위기(풀잎·눈 반짝임·재 균열)를 뿌린 반복 텍스처 */
+function groundTexture(base: string, accent: string, style: GroundStyle): THREE.CanvasTexture {
+  const S = 512;
   const c = document.createElement('canvas');
-  c.width = c.height = 256;
+  c.width = c.height = S;
   const g = c.getContext('2d')!;
   g.fillStyle = base;
-  g.fillRect(0, 0, 256, 256);
+  g.fillRect(0, 0, S, S);
   let seed = 7;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  for (let i = 0; i < 220; i++) {
+  for (let i = 0; i < 520; i++) {
     g.globalAlpha = 0.04 + rnd() * 0.07;
     g.fillStyle = rnd() < 0.6 ? accent : '#000000';
-    const x = rnd() * 256, y = rnd() * 256, r = 2 + rnd() * 12;
+    const x = rnd() * S, y = rnd() * S, r = 3 + rnd() * 24;
     g.beginPath();
     g.ellipse(x, y, r, r * (0.5 + rnd() * 0.5), rnd() * 3, 0, Math.PI * 2);
     g.fill();
   }
+  if (style === 'grass') {
+    for (let i = 0; i < 1400; i++) {
+      g.globalAlpha = 0.16 + rnd() * 0.2;
+      g.strokeStyle = rnd() < 0.5 ? accent : '#1c3a14';
+      g.lineWidth = 1 + rnd();
+      const x = rnd() * S, y = rnd() * S, h = 4 + rnd() * 7;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x + (rnd() - 0.5) * 4, y - h);
+      g.stroke();
+    }
+  } else if (style === 'snow') {
+    for (let i = 0; i < 700; i++) {
+      g.globalAlpha = 0.25 + rnd() * 0.5;
+      g.fillStyle = rnd() < 0.7 ? '#ffffff' : '#a8c8f0';
+      g.beginPath();
+      g.arc(rnd() * S, rnd() * S, 0.6 + rnd() * 1.6, 0, Math.PI * 2);
+      g.fill();
+    }
+  } else if (style === 'ash') {
+    for (let i = 0; i < 60; i++) {
+      g.globalAlpha = 0.35;
+      g.strokeStyle = '#140c0a';
+      g.lineWidth = 1 + rnd() * 1.5;
+      let x = rnd() * S, y = rnd() * S;
+      g.beginPath();
+      g.moveTo(x, y);
+      for (let k = 0; k < 5; k++) {
+        x += (rnd() - 0.5) * 36;
+        y += (rnd() - 0.5) * 36;
+        g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    for (let i = 0; i < 90; i++) {
+      g.globalAlpha = 0.5;
+      g.fillStyle = rnd() < 0.5 ? '#ff7a30' : '#ffb060';
+      g.fillRect(rnd() * S, rnd() * S, 1.5, 1.5);
+    }
+  }
+  g.globalAlpha = 1;
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 4;
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
+}
+
+/** 위치에서 정해지는 0~1 값(같은 자리는 늘 같은 모습) */
+function hash2(x: number, z: number): number {
+  const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+/** 색을 위치에 따라 살짝 밝게·어둡게 */
+function shade(color: string, x: number, z: number, amount = 0.18): string {
+  const c = new THREE.Color(color);
+  c.offsetHSL((hash2(x, z) - 0.5) * 0.04, 0, (hash2(z, x) - 0.5) * amount);
+  return `#${c.getHexString()}`;
 }
 
 export interface PortalView {
@@ -46,9 +105,9 @@ export interface NodeView {
 }
 
 const NODE_TINT: Record<string, string[]> = {
-  ore: ['#c8b090', '#e8eef4', '#7fd8ff'],
-  herb: ['#7ccf5a', '#5ab0ff', '#f4f0ff'],
-  wood: ['#8a6440', '#4a3a30', '#b89a70'],
+  ore: ['#c8b090', '#e8eef4', '#7fd8ff', '#ff8a50', '#bfe8ff'],
+  herb: ['#7ccf5a', '#5ab0ff', '#f4f0ff', '#ff9a40', '#e8f8ff'],
+  wood: ['#8a6440', '#4a3a30', '#b89a70', '#6a4a40', '#d8e8f0'],
 };
 
 /** 존 정의(JSON)로 3D 장면을 만든다. 존을 옮기면 dispose하고 새로 만든다. */
@@ -59,10 +118,17 @@ export class ZoneScene {
   readonly nodes: NodeView[] = [];
   private readonly disposables: { dispose(): void }[] = [];
   private time = 0;
+  private readonly sky: SkyDome;
+  private readonly ambient: AmbientParticles | null;
 
   constructor(readonly def: ZoneDef) {
     const [w, d] = def.size;
-    const tex = groundTexture(def.ground, def.groundAccent ?? def.ground);
+    const style: GroundStyle = def.ambient === 'snow' ? 'snow' : def.ambient === 'ash' || def.ambient === 'ember' ? 'ash' : def.ambient === 'leaf' || def.ambient === 'firefly' ? 'grass' : 'plain';
+    const tex = groundTexture(def.ground, def.groundAccent ?? def.ground, style);
+    this.sky = new SkyDome(def.sky, def.sun ?? '#fff2dc');
+    this.group.add(this.sky.mesh);
+    this.ambient = def.ambient ? new AmbientParticles(def.ambient) : null;
+    if (this.ambient) this.group.add(this.ambient.points);
     tex.repeat.set(w / 12, d / 12);
     const groundMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 1 });
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(w + 60, d + 60), groundMat);
@@ -108,7 +174,7 @@ export class ZoneScene {
         this.track(door.geometry, door.material as THREE.Material);
       }
     }
-    for (const p of def.props) this.prop(p);
+    for (const p of def.props) this.prop(p, def);
     for (const p of def.portals) this.portal(p);
     const tier = (LOOT as unknown as { gather: { tiers: Record<string, number> } }).gather.tiers[def.id] ?? 1;
     def.nodes.forEach((n, i) => this.node(n, i, tier));
@@ -127,7 +193,7 @@ export class ZoneScene {
 
   /** 채집 노드: 광석(바위+결정), 약초(덤불+꽃), 나무(그루터기+통나무) */
   private node(n: NodeDef, i: number, tier: number): void {
-    const tint = NODE_TINT[n.kind][Math.min(2, tier - 1)];
+    const tint = NODE_TINT[n.kind][Math.min(NODE_TINT[n.kind].length - 1, tier - 1)];
     const base = new THREE.Group();
     base.position.set(n.x, 0, n.z);
     const res = new THREE.Group();
@@ -172,7 +238,7 @@ export class ZoneScene {
     n.res.visible = up;
   }
 
-  private prop(p: PropDef): void {
+  private prop(p: PropDef, def: ZoneDef): void {
     const s = p.s ?? 1;
     const add = (geo: THREE.BufferGeometry, color: string, x: number, y: number, z: number, shadow = true, extra: THREE.MeshStandardMaterialParameters = {}) => {
       const m = new THREE.MeshStandardMaterial({ color, roughness: 0.9, ...extra });
@@ -185,13 +251,48 @@ export class ZoneScene {
       return mesh;
     };
     switch (p.kind) {
-      case 'tree':
-        add(new THREE.CylinderGeometry(0.18 * s, 0.25 * s, 1.6 * s, 6), '#5a4030', p.x, 0.8 * s, p.z);
-        add(new THREE.ConeGeometry(1.3 * s, 2.6 * s, 7), '#3f6b3a', p.x, 2.6 * s, p.z);
-        add(new THREE.ConeGeometry(1.0 * s, 2.0 * s, 7), '#4a7a42', p.x, 3.5 * s, p.z);
+      case 'tree': {
+        add(new THREE.CylinderGeometry(0.18 * s, 0.25 * s, 1.6 * s, 6), shade('#5a4030', p.x, p.z), p.x, 0.8 * s, p.z);
+        add(new THREE.ConeGeometry(1.3 * s, 2.6 * s, 7), shade('#3f6b3a', p.x, p.z, 0.3), p.x, 2.6 * s, p.z);
+        add(new THREE.ConeGeometry(1.0 * s, 2.0 * s, 7), shade('#4a7a42', p.z, p.x, 0.3), p.x, 3.5 * s, p.z);
+        add(new THREE.ConeGeometry(0.6 * s, 1.2 * s, 7), shade('#5a8a4c', p.x, p.z, 0.3), p.x, 4.3 * s, p.z);
         break;
+      }
+      case 'snowpine': {
+        add(new THREE.CylinderGeometry(0.18 * s, 0.24 * s, 1.4 * s, 6), '#4a3a30', p.x, 0.7 * s, p.z);
+        add(new THREE.ConeGeometry(1.35 * s, 2.4 * s, 8), shade('#2f5a48', p.x, p.z, 0.2), p.x, 2.3 * s, p.z);
+        add(new THREE.ConeGeometry(1.05 * s, 1.9 * s, 8), shade('#3a6a54', p.z, p.x, 0.2), p.x, 3.3 * s, p.z);
+        add(new THREE.ConeGeometry(0.72 * s, 1.5 * s, 8), '#f4f8ff', p.x, 4.2 * s, p.z);
+        add(new THREE.ConeGeometry(1.2 * s, 0.7 * s, 8), '#eef4fa', p.x, 2.95 * s, p.z);
+        break;
+      }
+      case 'deadtree': {
+        add(new THREE.CylinderGeometry(0.1 * s, 0.26 * s, 3.2 * s, 6), shade('#2e2622', p.x, p.z), p.x, 1.6 * s, p.z);
+        for (let i = 0; i < 3; i++) {
+          const a = hash2(p.x + i, p.z) * Math.PI * 2;
+          const br = add(new THREE.CylinderGeometry(0.03 * s, 0.09 * s, 1.5 * s, 5), '#2a221e', p.x + Math.sin(a) * 0.4 * s, (1.9 + i * 0.45) * s, p.z + Math.cos(a) * 0.4 * s);
+          br.rotation.set(Math.cos(a) * 0.9, 0, -Math.sin(a) * 0.9);
+        }
+        break;
+      }
+      case 'crystal': {
+        // 지역 분위기에 따라 얼음·불씨 수정
+        const tint = def.ambient === 'snow' ? '#8fd8ff' : def.ambient === 'ash' ? '#ff7a3a' : '#b8a0ff';
+        for (let i = 0; i < 4; i++) {
+          const a = i * 1.7 + hash2(p.x, p.z) * 3, h = (0.9 + hash2(p.z + i, p.x) * 1.2) * s;
+          const c = add(new THREE.ConeGeometry(0.22 * s, h * 1.6, 5), tint, p.x + Math.sin(a) * 0.32 * s, h * 0.7, p.z + Math.cos(a) * 0.32 * s, true, { emissive: tint, emissiveIntensity: 0.9, roughness: 0.25, metalness: 0.2 });
+          c.rotation.set(Math.cos(a) * 0.25, 0, -Math.sin(a) * 0.25);
+        }
+        break;
+      }
+      case 'lava': {
+        add(new THREE.CircleGeometry(1.5 * s, 14), '#2a1410', p.x, 0.03, p.z, false).rotation.x = -Math.PI / 2;
+        add(new THREE.CircleGeometry(1.15 * s, 14), '#ff6a20', p.x, 0.05, p.z, false, { emissive: '#ff5a10', emissiveIntensity: 1.6 }).rotation.x = -Math.PI / 2;
+        add(new THREE.CircleGeometry(0.6 * s, 12), '#ffd060', p.x, 0.06, p.z, false, { emissive: '#ffc040', emissiveIntensity: 2 }).rotation.x = -Math.PI / 2;
+        break;
+      }
       case 'rock': {
-        const r = add(new THREE.DodecahedronGeometry(0.7 * s, 0), '#8a8680', p.x, 0.35 * s, p.z);
+        const r = add(new THREE.DodecahedronGeometry(0.7 * s, 0), shade(def.ambient === 'snow' ? '#a8b0b8' : '#8a8680', p.x, p.z, 0.3), p.x, 0.35 * s, p.z);
         r.rotation.set(p.x, p.z, 0);
         r.scale.y = 0.7;
         break;
@@ -233,7 +334,14 @@ export class ZoneScene {
     this.portals.push({ def: p, ring, beam });
   }
 
-  update(dt: number): void {
+  resize(heightPx: number, fovDeg: number, pixelRatio: number): void {
+    this.ambient?.resize(heightPx, fovDeg, pixelRatio);
+  }
+
+  /** camPos: 카메라 위치(하늘이 따라옴), center: 입자가 모이는 곳(플레이어) */
+  update(dt: number, camPos?: THREE.Vector3, center?: THREE.Vector3): void {
+    if (camPos) this.sky.update(dt, camPos);
+    if (center) this.ambient?.update(dt, center);
     this.time += dt;
     for (const p of this.portals) {
       p.ring.rotation.z += dt * 0.8;
@@ -244,6 +352,8 @@ export class ZoneScene {
 
   dispose(): void {
     for (const d of this.disposables) d.dispose();
+    this.sky.dispose();
+    this.ambient?.dispose();
     for (const n of this.npcs) n.model.dispose();
     this.group.removeFromParent();
   }

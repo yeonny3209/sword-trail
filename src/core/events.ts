@@ -24,6 +24,10 @@ export interface GameEvents {
   toast: { text: string; kind?: 'info' | 'warn' | 'good' };
   /** 소셜 서버에서 받은 메시지 */
   social: Social2C;
+  /** 지역에 들어옴: 배경음악 선택용 */
+  zoneTheme: { type: string; ambient?: string };
+  /** 연속 처치 알림(n번째) */
+  streak: { n: number };
   /** 채팅 입력창을 이 내용으로 연다(귓속말 등) */
   chatPrefill: { text: string };
   /** 화면 전체 번쩍임(flash) 또는 붉은 테두리(hurt) */

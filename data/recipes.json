@@ -1455,6 +1455,630 @@
    "gold": 5000,
    "lv": 30,
    "minRar": 1
+  },
+  {
+   "id": "r_helmet_6",
+   "out": "helmet_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_armor_6",
+   "out": "armor_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_gloves_6",
+   "out": "gloves_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_boots_6",
+   "out": "boots_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_ring_6",
+   "out": "ring_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_necklace_6",
+   "out": "necklace_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     12
+    ],
+    [
+     "mat_ash",
+     12
+    ],
+    [
+     "mat_magma",
+     8
+    ],
+    [
+     "mat_raider",
+     6
+    ]
+   ],
+   "gold": 6500,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_swordsman_6",
+   "out": "w_swordsman_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_berserker_6",
+   "out": "w_berserker_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_blademaster_6",
+   "out": "w_blademaster_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_spellblade_6",
+   "out": "w_spellblade_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_6",
+   "out": "w_buffer_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_6",
+   "out": "w_debuffer_6",
+   "n": 1,
+   "need": [
+    [
+     "ore_4",
+     15
+    ],
+    [
+     "mat_titan",
+     12
+    ],
+    [
+     "mat_ember",
+     10
+    ],
+    [
+     "enh_stone",
+     8
+    ]
+   ],
+   "gold": 9000,
+   "lv": 35,
+   "minRar": 1
+  },
+  {
+   "id": "r_helmet_7",
+   "out": "helmet_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_armor_7",
+   "out": "armor_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_gloves_7",
+   "out": "gloves_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_boots_7",
+   "out": "boots_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_ring_7",
+   "out": "ring_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_necklace_7",
+   "out": "necklace_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     12
+    ],
+    [
+     "mat_frost",
+     12
+    ],
+    [
+     "mat_knight",
+     8
+    ],
+    [
+     "mat_icetip",
+     6
+    ]
+   ],
+   "gold": 10000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_swordsman_7",
+   "out": "w_swordsman_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_berserker_7",
+   "out": "w_berserker_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_blademaster_7",
+   "out": "w_blademaster_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_spellblade_7",
+   "out": "w_spellblade_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_buffer_7",
+   "out": "w_buffer_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
+  },
+  {
+   "id": "r_w_debuffer_7",
+   "out": "w_debuffer_7",
+   "n": 1,
+   "need": [
+    [
+     "ore_5",
+     15
+    ],
+    [
+     "mat_yeti",
+     12
+    ],
+    [
+     "mat_wisp",
+     10
+    ],
+    [
+     "enh_stone",
+     10
+    ]
+   ],
+   "gold": 14000,
+   "lv": 40,
+   "minRar": 2
   }
  ]
 }

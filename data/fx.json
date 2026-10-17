@@ -25,6 +25,7 @@
     "from": 0.3
   },
   "particles": {
+    "footDust": { "count": 5, "color": "#b8a890", "speed": 1.7, "life": 0.5, "size": 0.24, "gravity": -0.6 },
     "max": 600,
     "hit": {
       "count": 26,
