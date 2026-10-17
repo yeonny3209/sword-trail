@@ -283,6 +283,11 @@ export class SocialDO extends DurableObject<Env> {
     await this.ctx.storage.put('parties', [...this.parties.values()]);
   }
 
+  /** RPC: 접속 중이면 알림 한 줄(경매 판매·우편 도착 등) */
+  async notify(id: number, text: string): Promise<void> {
+    this.send(id, { t: 'sys', text });
+  }
+
   /** RPC: 존 DO가 접속한 플레이어의 파티를 물어본다 */
   async partyMembers(id: number): Promise<number[]> {
     const p = this.parties.get(this.partyOf.get(id) ?? -1);

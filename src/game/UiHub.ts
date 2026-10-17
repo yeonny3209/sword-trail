@@ -8,6 +8,8 @@ import { CharacterWindow, SkillWindow, Window } from '../ui/CharWindows';
 import { InventoryWindow } from '../ui/InventoryWindow';
 import { ShopWindow, SmithWindow } from '../ui/NpcWindows';
 import { QuestUi } from '../ui/QuestUi';
+import { AuctionWindow, MailWindow } from '../ui/MarketWindows';
+import { TradeWindow } from '../ui/TradeWindow';
 import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
 import type { NpcView, ZoneScene } from './ZoneScene';
@@ -26,6 +28,9 @@ export class UiHub {
   readonly shopWin: ShopWindow;
   readonly smithWin: SmithWindow;
   readonly quests: QuestUi;
+  readonly auctionWin: AuctionWindow;
+  readonly mailWin: MailWindow;
+  readonly tradeWin: TradeWindow;
   /** NPC를 만났을 때 처리할 역할(이후 단계: 퀘스트·경매장·길드·우편 등) */
   readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
   private readonly ray = new THREE.Raycaster();
@@ -47,6 +52,12 @@ export class UiHub {
     this.npcHandlers.shop = (n) => this.shopWin.openShop(n.id, n.ref ?? 'general');
     this.npcHandlers.smith = () => this.smithWin.openSmith();
     this.smithWin.lv = () => this.me?.self.lv ?? 1;
+    this.auctionWin = new AuctionWindow(ui, send, this.invWin);
+    this.mailWin = new MailWindow(ui, send, this.invWin);
+    this.tradeWin = new TradeWindow(ui, send, this.invWin, say);
+    this.tradeWin.onOpen = () => [this.auctionWin, this.mailWin, this.shopWin, this.smithWin].forEach((w) => w.isOpen && w.close());
+    this.npcHandlers.auction = () => this.auctionWin.openAuction();
+    this.npcHandlers.mail = () => this.mailWin.openMail();
     this.quests = new QuestUi(ui, send);
     this.quests.count = (id) => this.invWin.count(id);
     this.npcHandlers.quest = (n) => this.quests.openGiver(n.id, n.name);
@@ -75,6 +86,9 @@ export class UiHub {
         this.smithWin.onCrafted(m.id, m.n, m.rar);
         this.say(`제작 완료: ${ITEMS[m.id]?.name ?? m.id}${m.n > 1 ? ` ${m.n}개` : ''}`);
         bus.emit('sfx', { key: 'gate' });
+        break;
+      case 'mailnew':
+        this.say(`📬 읽지 않은 우편이 <b>${m.n}통</b> 있습니다. 마을의 우체부 고미에게 가 보세요.`);
         break;
       case 'qdone':
         this.say(`<b>퀘스트 완료: ${QUESTS[m.id]?.name ?? m.id}</b>`);

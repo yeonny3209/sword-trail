@@ -14,6 +14,8 @@ import { guildNameOf } from '../social/Guilds';
 import { GUILD_COST, GUILD_MIN_LV } from '../../shared/social';
 import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
+import { Market, MARKET_MSGS, type MarketMsg } from './Market';
+import { TradeSystem, TRADE_MSGS, type TradeMsg } from './Trade';
 
 const PLAYER_RADIUS = 0.4;
 const SAVE_EVERY_MS = 10_000;
@@ -35,6 +37,8 @@ export class ZoneDO extends DurableObject<Env> {
   private combat: Combat | null = null;
   private quests: QuestSystem | null = null;
   private gather: GatherSystem | null = null;
+  private market: Market | null = null;
+  private trade: TradeSystem | null = null;
 
   /** 존을 처음 열 때 몬스터를 배치한다 */
   private init(zoneId: string): boolean {
@@ -57,6 +61,11 @@ export class ZoneDO extends DurableObject<Env> {
     });
     this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
     this.gather = new GatherSystem(z, (m) => self.broadcast(m));
+    this.market = new Market({
+      env: this.env, zone: z, save: (p) => self.save(p),
+      notify: (id, text) => void self.social().notify(id, text).catch(() => undefined),
+    });
+    this.trade = new TradeSystem(this.players, (p) => self.save(p), (id) => self.market!.isBusy(id));
     return true;
   }
 
@@ -94,6 +103,7 @@ export class ZoneDO extends DurableObject<Env> {
     this.quests!.onEnterZone(p);
     p.send({ t: 'nodes', down: this.gather!.downList() });
     if (p.dead) p.send({ t: 'died', wait: 0 });
+    void this.market!.onConnect(p).catch(() => undefined);
     this.broadcast({ t: 'join', p: p.info() }, p);
     this.broadcast({ t: 'sys', text: `${p.name}님이 ${z.name}에 들어왔습니다.` }, p);
     this.start();
@@ -140,6 +150,9 @@ export class ZoneDO extends DurableObject<Env> {
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });
+      default:
+        if (MARKET_MSGS.has(msg.t)) return this.market?.on(p, msg as MarketMsg);
+        if (TRADE_MSGS.has(msg.t)) return this.trade?.on(p, msg as TradeMsg);
     }
   }
 
@@ -244,6 +257,7 @@ export class ZoneDO extends DurableObject<Env> {
     if (!this.players.has(p.id) || this.players.get(p.id) !== p) return;
     this.players.delete(p.id);
     this.bySocket.delete(p.ws);
+    this.trade?.onLeave(p);
     if (reason) p.send({ t: 'err', text: reason });
     try {
       p.ws.close(1000, 'bye');
@@ -331,6 +345,7 @@ export class ZoneDO extends DurableObject<Env> {
     if (this.tickCount % ZONE_HZ === 0) {
       for (const p of this.players.values()) this.combat?.regen(p);
       this.gather?.update(now);
+      this.trade?.update();
     }
     if (now - this.lastSave > SAVE_EVERY_MS) {
       this.lastSave = now;

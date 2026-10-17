@@ -43,7 +43,7 @@ export function addItem(p: PlayerSession, it: Item): number {
   return left;
 }
 
-function takeItem(p: PlayerSession, uid: string, n = 1): Item | null {
+export function takeItem(p: PlayerSession, uid: string, n = 1): Item | null {
   const i = p.data.inv.findIndex((s) => s.uid === uid);
   if (i < 0) return null;
   const s = p.data.inv[i];
@@ -52,6 +52,38 @@ function takeItem(p: PlayerSession, uid: string, n = 1): Item | null {
   if (s.n <= 0) p.data.inv.splice(i, 1);
   p.dirty = true;
   return { ...s, n };
+}
+
+/** 이 아이템들을 (removing을 뺀 뒤) 가방에 다 넣을 수 있나 */
+export function canHold(p: PlayerSession, items: Item[], removing: { uid: string; n: number }[] = []): boolean {
+  const bag = p.data.inv.map((s) => ({ ...s }));
+  for (const r of removing) {
+    const s = bag.find((x) => x.uid === r.uid);
+    if (s) s.n -= r.n;
+  }
+  const inv = bag.filter((s) => s.n > 0);
+  for (const it of items) {
+    const d = ITEMS[it.id];
+    if (!d) return false;
+    let left = it.n;
+    if (d.stack) {
+      for (const s of inv) {
+        if (s.id !== it.id) continue;
+        const put = Math.min(d.stack - s.n, left);
+        if (put > 0) {
+          s.n += put;
+          left -= put;
+        }
+      }
+    }
+    while (left > 0) {
+      if (inv.length >= LOOT.invSize) return false;
+      const put = d.stack ? Math.min(d.stack, left) : 1;
+      inv.push({ ...it, n: put });
+      left -= put;
+    }
+  }
+  return true;
 }
 
 export function countItem(p: PlayerSession, id: string): number {
@@ -94,7 +126,7 @@ export function rollLoot(p: PlayerSession, mon: MonsterDef): void {
   }
 }
 
-function nearNpc(p: PlayerSession, zone: ZoneDef, role: NpcDef['role'], id?: string): NpcDef | null {
+export function nearNpc(p: PlayerSession, zone: ZoneDef, role: NpcDef['role'], id?: string): NpcDef | null {
   return zone.npcs.find((n) => n.role === role && (!id || n.id === id) && dist2(p.x, p.z, n.x, n.z) <= NPC_RANGE * NPC_RANGE) ?? null;
 }
 

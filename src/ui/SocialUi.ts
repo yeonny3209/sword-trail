@@ -59,7 +59,7 @@ export class SocialUi {
   }
 
   /** 수락·거절 팝업(30초 뒤 자동 거절) */
-  private popup(html: string, answer: (ok: boolean) => void): void {
+  popup(html: string, answer: (ok: boolean) => void): void {
     const el = document.createElement('div');
     el.className = 'invite';
     el.innerHTML = `<div>${html}</div><div class="row"><button class="btn small yes">수락</button><button class="btn small no">거절</button><span class="left"></span></div>`;

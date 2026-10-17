@@ -2,6 +2,7 @@ import type { Alloc, StatKey } from './rules';
 import type { ClassId } from './types';
 import type { Equip, Item, Slot } from './items';
 import type { QuestState } from './quests';
+import type { AhCategory, AuctionRow, MailRow, TradeSide } from './market';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -115,6 +116,23 @@ export type C2S =
   | { t: 'craft'; id: string }
   /** 길드 창설(길드 관리인 앞) */
   | { t: 'gcreate'; name: string }
+  /** 경매장(경매인 앞): 검색·내 물품·등록·구매·취소 */
+  | { t: 'ahsearch'; q: string; cat: AhCategory; page: number }
+  | { t: 'ahmine' }
+  | { t: 'ahsell'; uid: string; n: number; price: number }
+  | { t: 'ahbuy'; id: number }
+  | { t: 'ahcancel'; id: number }
+  /** 우편함(우체부 앞): 목록·첨부 받기·지우기·보내기 */
+  | { t: 'mlist' }
+  | { t: 'mtake'; id: number }
+  | { t: 'mdel'; id: number }
+  | { t: 'msend'; to: string; subject: string; body: string; gold: number; uid?: string; n?: number }
+  /** 1:1 거래: 신청·응답·내놓을 것·준비·취소 */
+  | { t: 'treq'; id: number }
+  | { t: 'tans'; id: number; ok: boolean }
+  | { t: 'tset'; items: { uid: string; n: number }[]; gold: number }
+  | { t: 'tready'; ok: boolean }
+  | { t: 'tcancel' }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -154,6 +172,15 @@ export type S2C =
   | { t: 'crafted'; id: string; n: number; rar?: number }
   /** 퀘스트 완료 연출 */
   | { t: 'qdone'; id: string }
+  /** 경매장 목록(mine: 내 등록 물품). total = -1 이면 목록이 바뀌었으니 다시 검색 */
+  | { t: 'ah'; rows: AuctionRow[]; total: number; page: number; mine: boolean }
+  | { t: 'mail'; rows: MailRow[] }
+  /** 읽지 않은 우편 수 */
+  | { t: 'mailnew'; n: number }
+  | { t: 'treq'; from: number; name: string }
+  /** 거래 창 상태 */
+  | { t: 'trade'; name: string; mine: TradeSide; theirs: TradeSide }
+  | { t: 'tend'; ok: boolean; text: string }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
   | { t: 'pos'; x: number; z: number }

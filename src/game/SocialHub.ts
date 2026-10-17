@@ -20,7 +20,7 @@ export class SocialHub {
   private zone = '';
   private hpTimer = 0;
 
-  constructor(ui: HTMLElement, chat: ChatBox, private readonly remotes: RemotePlayers, sendZone: (m: C2S) => void) {
+  constructor(ui: HTMLElement, chat: ChatBox, private readonly remotes: RemotePlayers, private readonly sendZone: (m: C2S) => void) {
     this.ui = new SocialUi(ui, (m) => this.conn.send(m), sendZone);
     this.ui.hpOf = (id) => {
       if (id === this.me?.self.id) return this.me.self.hp / this.me.self.mhp;
@@ -39,6 +39,7 @@ export class SocialHub {
         this.where(m.you.lv);
       } else if (m.t === 'lvup' && m.id === this.me?.self.id) this.where(m.lv);
       else if (m.t === 'pinfo') this.remotes.setInfo(m.p);
+      else if (m.t === 'treq') this.ui.popup(`<b>${m.name}</b>님이 거래를 신청했습니다.`, (ok) => this.sendZone({ t: 'tans', id: m.from, ok }));
     });
   }
 
@@ -85,7 +86,8 @@ export class SocialHub {
       let o: THREE.Object3D | null = hit.object;
       while (o && o !== r.model.root) o = o.parent;
       if (o) {
-        this.ui.playerMenu(r.info.name, sx, sy);
+        const id = r.info.id;
+        this.ui.playerMenu(r.info.name, sx, sy, [['거래 신청', () => this.sendZone({ t: 'treq', id })]]);
         return true;
       }
     }
