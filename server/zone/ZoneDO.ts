@@ -1,8 +1,8 @@
 import { DurableObject } from 'cloudflare:workers';
-import { MONSTERS, ZONES } from '../../shared/data';
-import { dist2, resolveCircle } from '../../shared/geom';
+import { baseZone, MONSTERS, ZONES } from '../../shared/data';
+import { resolveCircle } from '../../shared/geom';
 import { SNAP_HZ, ZONE_HZ, type C2S, type S2C } from '../../shared/protocol';
-import type { ZoneDef } from '../../shared/types';
+import type { MonsterDef, ZoneDef } from '../../shared/types';
 import { loadCharacter, saveCharacter } from '../db';
 import type { Env } from '../env';
 import { Combat } from './Combat';
@@ -11,7 +11,8 @@ import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
 import { onInventory, syncInv } from './Inventory';
 import { guildNameOf } from '../social/Guilds';
-import { GUILD_COST, GUILD_MIN_LV } from '../../shared/social';
+import { createGuildAt, portalTarget } from './Travel';
+import { RaidSystem } from './Raid';
 import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
 import { Market, MARKET_MSGS, type MarketMsg } from './Market';
@@ -28,6 +29,9 @@ const CHAT_MAX = 120;
  */
 export class ZoneDO extends DurableObject<Env> {
   private zone: ZoneDef | null = null;
+  /** 존 서버 이름: 마을·필드는 존 id, 레이드는 `raid1~파티번호` */
+  private key = '';
+  private raid: RaidSystem | null = null;
   private readonly players = new Map<number, PlayerSession>();
   private readonly bySocket = new Map<WebSocket, PlayerSession>();
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -45,9 +49,10 @@ export class ZoneDO extends DurableObject<Env> {
   /** 존을 처음 열 때 몬스터를 배치한다 */
   private init(zoneId: string): boolean {
     if (this.zone) return true;
-    const z = ZONES[zoneId];
+    const z = ZONES[baseZone(zoneId)];
     if (!z) return false;
     this.zone = z;
+    this.key = zoneId;
     for (const s of z.spawns) {
       const def = MONSTERS[s.monster];
       if (!def) continue;
@@ -60,6 +65,7 @@ export class ZoneDO extends DurableObject<Env> {
     this.combat = new Combat({
       zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), players: this.players,
       onKill: (p, id) => self.quests?.onKill(p, id),
+      onRaidClear: (m) => self.raid?.clear(m),
     });
     this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
     this.gather = new GatherSystem(z, (m) => self.broadcast(m));
@@ -68,6 +74,7 @@ export class ZoneDO extends DurableObject<Env> {
       notify: (id, text) => void self.social().notify(id, text).catch(() => undefined),
     });
     this.trade = new TradeSystem(this.players, (p) => self.save(p), (id) => self.market!.isBusy(id));
+    if (z.type === 'raid') this.initRaid(z);
     this.pvp = new PvpSystem({ env: this.env, zone: z, players: this.players, combat: this.combat, broadcast: (m, e) => self.broadcast(m, e) });
     return true;
   }
@@ -87,14 +94,15 @@ export class ZoneDO extends DurableObject<Env> {
     this.ctx.acceptWebSocket(server);
 
     const z = this.zone;
-    const inZone = row.zone === z.id;
+    const inZone = row.zone === this.key;
     const [x, zz] = resolveCircle(inZone ? row.x : z.spawn[0], inZone ? row.z : z.spawn[1], PLAYER_RADIUS, z.walls, z.size);
-    const p = new PlayerSession(server, row, z.id, x, zz);
+    const p = new PlayerSession(server, row, this.key, x, zz);
     // 길드 이름과 파티 구성을 먼저 알아 둔다(소셜 DO가 없거나 늦으면 건너뜀)
     p.guild = await guildNameOf(this.env, p.id).catch(() => null);
-    p.party = await this.social().entered(p.id, z.id, p.lv).catch(() => [] as number[]);
+    p.party = await this.social().entered(p.id, this.key, p.lv).catch(() => [] as number[]);
     this.players.set(p.id, p);
     this.bySocket.set(server, p);
+    this.raid?.scale(this.players.size, p);
 
     p.send({
       t: 'welcome', you: p.self(), zone: z.id, time: Date.now(),
@@ -149,7 +157,7 @@ export class ZoneDO extends DurableObject<Env> {
       case 'gather': return this.gather?.onStart(p, msg.i | 0);
       case 'gatherdone': return this.gather?.onDone(p, msg.i | 0);
       case 'craft': return onCraft(p, this.zone!, String(msg.id));
-      case 'gcreate': return this.createGuild(p, String(msg.name));
+      case 'gcreate': return createGuildAt(this.env, this.zone, p, String(msg.name), (q) => this.save(q));
       case 'phit': return this.pvp?.onHit(p, msg);
       case 'phurt': return this.pvp?.onHurt(p, msg);
       case 'pvprank': return this.pvp?.onRank(p);
@@ -189,18 +197,33 @@ export class ZoneDO extends DurableObject<Env> {
     this.broadcast({ t: 'pinfo', p: p.info() });
   }
 
-  /** 길드 관리인 앞에서 골드를 내고 길드 창설 */
-  private async createGuild(p: PlayerSession, name: string): Promise<void> {
-    const npc = this.zone?.npcs.find((n) => n.role === 'guild' && dist2(p.x, p.z, n.x, n.z) <= 25);
-    if (!npc) return p.send({ t: 'err', text: '길드 관리인 근처에서만 창설할 수 있습니다.' });
-    if (p.lv < GUILD_MIN_LV) return p.send({ t: 'err', text: `레벨 ${GUILD_MIN_LV}부터 길드를 만들 수 있습니다.` });
-    if (p.data.gold < GUILD_COST) return p.send({ t: 'err', text: `골드가 ${GUILD_COST.toLocaleString()} 필요합니다.` });
-    const r = await this.social().createGuild(p.id, name);
-    if (!r.ok) return p.send({ t: 'err', text: r.error ?? '창설에 실패했습니다.' });
-    p.data.gold -= GUILD_COST;
-    p.dirty = true;
-    await this.save(p);
-    p.send({ t: 'me', s: { gold: p.data.gold } });
+  /** 레이드 존: 보스 진행 시스템을 붙인다 */
+  private initRaid(z: ZoneDef): void {
+    const self = this;
+    this.raid = new RaidSystem({
+      zone: z, players: this.players, broadcast: (m, e) => self.broadcast(m, e),
+      spawn: (def, x, zz) => self.spawnMonster(def, x, zz),
+      gainExp: (p, n) => self.combat!.gainExp(p, n),
+      onKill: (p, id) => self.quests?.onKill(p, id),
+      mailItem: (p, it, subject) => self.market!.mailItem(p.id, it, subject),
+      save: (p) => self.save(p),
+    });
+    const boss = [...this.monsters.values()].find((m) => m.def.raid);
+    if (boss) this.raid.bind(boss);
+  }
+
+  /** 모두 나간 레이드 방을 처음 상태로 되돌린다(다음 입장 때 init이 새로 만든다) */
+  private resetRaid(): void {
+    this.zone = null;
+    this.raid = this.combat = this.quests = this.gather = this.market = this.trade = this.pvp = null;
+    this.monsters.clear();
+  }
+
+  private spawnMonster(def: MonsterDef, x: number, z: number): Monster {
+    const m = new Monster(def, { x, z, w: 1, d: 1 }, this.zone!);
+    this.monsters.set(m.id, m);
+    this.broadcast({ t: 'mspawn', m: m.info() });
+    return m;
   }
 
   private onMove(p: PlayerSession, m: Extract<C2S, { t: 'move' }>): void {
@@ -243,19 +266,16 @@ export class ZoneDO extends DurableObject<Env> {
   }
 
   private async onPortal(p: PlayerSession, portalId: string): Promise<void> {
-    const z = this.zone;
-    const portal = z?.portals.find((pt) => pt.id === portalId);
-    if (!z || !portal || p.leaving) return;
-    if (dist2(p.x, p.z, portal.x, portal.z) > (portal.r + 1.5) ** 2) return p.send({ t: 'err', text: '포탈에서 너무 멉니다.' });
-    const dest = ZONES[portal.to];
-    const arrive = dest?.portals.find((pt) => pt.id === portal.toPortal);
-    if (!dest || !arrive) return;
+    if (!this.zone || p.leaving) return;
+    const t = portalTarget(this.zone, p, portalId);
+    if (!t) return;
+    if (typeof t === 'string') return p.send({ t: 'err', text: t });
     p.leaving = true;
-    p.zone = dest.id;
-    p.x = arrive.exit[0];
-    p.z = arrive.exit[1];
+    p.zone = t.key;
+    p.x = t.x;
+    p.z = t.z;
     await this.save(p);
-    p.send({ t: 'goto', zone: dest.id });
+    p.send({ t: 'goto', zone: t.id });
     await this.remove(p);
   }
 
@@ -264,6 +284,7 @@ export class ZoneDO extends DurableObject<Env> {
     this.players.delete(p.id);
     this.bySocket.delete(p.ws);
     this.trade?.onLeave(p);
+    this.raid?.scale(this.players.size);
     if (reason) p.send({ t: 'err', text: reason });
     try {
       p.ws.close(1000, 'bye');
@@ -272,7 +293,11 @@ export class ZoneDO extends DurableObject<Env> {
     }
     if (!p.leaving) await this.save(p);
     this.broadcast({ t: 'leave', id: p.id });
-    if (this.players.size === 0) this.stop();
+    if (this.players.size === 0) {
+      this.stop();
+      // 레이드 방은 모두 나가면 처음 상태로(다음에 들어오면 새 보스)
+      if (this.zone?.type === 'raid') this.resetRaid();
+    }
   }
 
   private async save(p: PlayerSession): Promise<void> {
@@ -333,6 +358,10 @@ export class ZoneDO extends DurableObject<Env> {
       if (m.dead) {
         m.respawnT -= dt;
         if (m.respawnT <= 0) {
+          if (m.summoned) {
+            this.monsters.delete(m.id);
+            continue;
+          }
           m.respawn(z);
           this.broadcast({ t: 'mspawn', m: m.info() });
         }
@@ -341,6 +370,7 @@ export class ZoneDO extends DurableObject<Env> {
       m.update(dt, z, this.players.values(), emit);
     }
     this.separate();
+    this.raid?.update(now);
     if (this.tickCount % (ZONE_HZ / SNAP_HZ) === 0) {
       this.broadcast({
         t: 'snap', time: now,

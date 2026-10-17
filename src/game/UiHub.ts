@@ -11,6 +11,7 @@ import { QuestUi } from '../ui/QuestUi';
 import { AuctionWindow, MailWindow } from '../ui/MarketWindows';
 import { TradeWindow } from '../ui/TradeWindow';
 import { ArenaUi } from '../ui/ArenaUi';
+import { Banner } from '../ui/Banner';
 import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
 import type { NpcView, ZoneScene } from './ZoneScene';
@@ -61,6 +62,7 @@ export class UiHub {
     this.npcHandlers.auction = () => this.auctionWin.openAuction();
     this.npcHandlers.mail = () => this.mailWin.openMail();
     this.arena = new ArenaUi(ui, send, say);
+    new Banner(ui);
     this.npcHandlers.arena = () => this.arena.openRank();
     this.quests = new QuestUi(ui, send);
     this.quests.count = (id) => this.invWin.count(id);

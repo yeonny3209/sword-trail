@@ -18,6 +18,8 @@ export interface CombatHost {
   /** 처치 알림(퀘스트 진행) */
   onKill(p: PlayerSession, monsterId: string): void;
   players: Map<number, PlayerSession>;
+  /** 레이드 보스를 쓰러뜨렸다(참여한 모두에게 보상) */
+  onRaidClear?(mon: Monster): void;
 }
 
 const SLACK_RANGE = 3;
@@ -80,7 +82,8 @@ export class Combat {
     const n = rollDamage(p.stats.atk, mult, mon.def.def, Math.random(), { crit, critMul: 1.5, back, counter });
     mon.hp -= n;
     mon.lastAttacker = p.id;
-    mon.target = p;
+    mon.addDamage(p.id, n);
+    if (!mon.def.raid) mon.target = p;
     // 밀어내는 방향: 찌르기·직선은 내가 바라보는 쪽, 그 외는 나 → 대상
     const dir = hit.shape.type === 'box' ? [Math.sin(p.f), Math.cos(p.f)] : [mon.body.x - p.x, mon.body.z - p.z];
     applyReaction(mon.body, hit, dir[0], dir[1], mon.def.weight, mon.def.superArmor);
@@ -97,18 +100,23 @@ export class Combat {
     mon.respawnT = mon.def.respawn;
     mon.window = null;
     this.host.broadcast({ t: 'mdie', id: mon.id, by: killer.id });
-    const [g0, g1] = mon.def.gold;
-    const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
-    killer.data.gold += gold;
-    rollLoot(killer, mon.def);
-    // 같은 존에서 가까이 있는 파티원과 경험치를 나누고, 퀘스트 처치도 함께 센다
+    if (mon.summoned) {
+      mon.respawnT = 3;
+      return;
+    }
+    if (mon.def.raid && this.host.onRaidClear) return this.host.onRaidClear(mon);
+    // 같은 존에서 가까이 있는 파티원과 경험치를 나누고, 드랍·골드·퀘스트 처치는 각자 따로 받는다
     const mates = killer.party
       .map((id) => this.host.players.get(id))
       .filter((q): q is PlayerSession => !!q && !q.dead && !q.leaving && dist2(q.x, q.z, mon.body.x, mon.body.z) <= PARTY_SHARE_RANGE ** 2);
     if (!mates.includes(killer)) mates.push(killer);
+    const [g0, g1] = mon.def.gold;
     for (const q of mates) {
+      const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
+      q.data.gold += gold;
+      rollLoot(q, mon.def);
       const exp = partyExp(Math.max(1, Math.round(mon.def.exp * expFactor(q.lv, mon.def.lv))), mates.length);
-      q.send({ t: 'reward', exp, gold: q === killer ? gold : 0, name: mon.def.name });
+      q.send({ t: 'reward', exp, gold, name: mon.def.name });
       this.gainExp(q, exp);
       this.host.onKill(q, mon.def.id);
     }
@@ -148,7 +156,7 @@ export class Combat {
     const reach = a.range + (a.lunge ?? 0) * a.active + mon.def.radius + SLACK_RANGE;
     if (dist2(p.x, p.z, mon.body.x, mon.body.z) > reach * reach) return;
     w.hurt.add(p.id);
-    const n = rollDamage(mon.def.atk, a.dmg, p.stats.def, Math.random(), { crit: false, critMul: 1, back: false, counter: false });
+    const n = rollDamage(mon.def.atk * mon.atkMul, a.dmg, p.stats.def, Math.random(), { crit: false, critMul: 1, back: false, counter: false });
     this.damagePlayer(p, n, mon.id);
   }
 

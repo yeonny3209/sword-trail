@@ -37,7 +37,7 @@ export class Hud {
 
   setZone(id: string): void {
     const z = ZONES[id];
-    this.q('.zone-name').innerHTML = z ? `${z.name}${z.type === 'field' ? ` <small>Lv ${z.level[0]}~${z.level[1]}</small>` : ''}${z.pvp ? ' <small class="pvp">PvP</small>' : ''}` : '';
+    this.q('.zone-name').innerHTML = z ? `${z.name}${z.type === 'field' ? ` <small>Lv ${z.level[0]}~${z.level[1]}</small>` : z.type === 'raid' ? ' <small class="pvp">레이드 · 파티 전용</small>' : ''}${z.pvp ? ' <small class="pvp">PvP</small>' : ''}` : '';
   }
 
   setNet(rtt: number, players: number, online = 0): void {

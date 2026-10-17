@@ -188,6 +188,8 @@ export type S2C =
   /** 거래 창 상태 */
   | { t: 'trade'; name: string; mine: TradeSide; theirs: TradeSide }
   | { t: 'tend'; ok: boolean; text: string }
+  /** 화면 가운데 큰 알림(레이드 단계·격노·클리어) */
+  | { t: 'banner'; text: string; kind?: 'warn' | 'good' }
   /** 결투장: 플레이어 by가 나를 행동 a의 h번째 판정으로 맞혔다(x, z: 공격자 위치). 맞았으면 phurt k로 확인 */
   | { t: 'phit'; k: number; by: number; a: string; h: number; x: number; z: number }
   /** 내 결투장 기록이 바뀜(delta: 점수 변화) */

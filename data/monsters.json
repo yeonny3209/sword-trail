@@ -962,6 +962,211 @@
    "hitMat": "metal",
    "boss": true,
    "superArmor": true
+  },
+  {
+   "id": "citadel_guard",
+   "name": "성채 수호병",
+   "lv": 30,
+   "hp": 3200,
+   "atk": 70,
+   "def": 36,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "speed": 3.7,
+   "radius": 0.75,
+   "height": 2.6,
+   "weight": 2.2,
+   "aggro": 60,
+   "leash": 120,
+   "respawn": 3,
+   "attacks": [
+    {
+     "name": "수호병 휘두르기",
+     "windup": 0.9,
+     "active": 0.3,
+     "recover": 1.1,
+     "range": 3.2,
+     "shape": {
+      "type": "arc",
+      "range": 3.4,
+      "width": 180
+     },
+     "dmg": 1.4,
+     "kx": 8,
+     "stun": 28,
+     "cd": 2.8
+    },
+    {
+     "name": "붉은 내려찍기",
+     "windup": 1.2,
+     "active": 0.25,
+     "recover": 1.3,
+     "range": 3.0,
+     "shape": {
+      "type": "circle",
+      "range": 2.8,
+      "width": 0,
+      "offset": 1.5
+     },
+     "dmg": 2.0,
+     "kx": 6,
+     "stun": 34,
+     "cd": 5,
+     "heavy": true,
+     "kz": 9
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#5a4a78",
+    "scale": 1.4,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 1.7,
+     "width": 1.8,
+     "color": "#9a8c78"
+    }
+   },
+   "hitMat": "flesh",
+   "superArmor": true
+  },
+  {
+   "id": "gargon",
+   "name": "폐허의 군주 가르곤",
+   "lv": 32,
+   "hp": 60000,
+   "atk": 104,
+   "def": 55,
+   "exp": 6500,
+   "gold": [
+    400,
+    700
+   ],
+   "speed": 3.2,
+   "radius": 1.1,
+   "height": 3.6,
+   "weight": 6,
+   "aggro": 70,
+   "leash": 120,
+   "respawn": 999999,
+   "attacks": [
+    {
+     "name": "파쇄 일격",
+     "windup": 0.8,
+     "active": 0.3,
+     "recover": 0.9,
+     "range": 4.2,
+     "shape": {
+      "type": "arc",
+      "range": 4.4,
+      "width": 140
+     },
+     "dmg": 1.6,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.2
+    },
+    {
+     "name": "폭풍 베기",
+     "windup": 1.0,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 11,
+     "shape": {
+      "type": "box",
+      "range": 12,
+      "width": 2.4
+     },
+     "dmg": 1.5,
+     "kx": 6,
+     "stun": 28,
+     "cd": 3.6,
+     "fx": "wave"
+    },
+    {
+     "name": "대지 강타",
+     "windup": 1.7,
+     "active": 0.4,
+     "recover": 1.5,
+     "range": 7.5,
+     "shape": {
+      "type": "circle",
+      "range": 7.5,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.6,
+     "kx": 12,
+     "stun": 38,
+     "cd": 9,
+     "heavy": true,
+     "kz": 12
+    },
+    {
+     "name": "회전 참격",
+     "windup": 1.1,
+     "active": 0.45,
+     "recover": 1.3,
+     "range": 5.5,
+     "shape": {
+      "type": "circle",
+      "range": 5.6,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.0,
+     "kx": 11,
+     "stun": 36,
+     "cd": 6.5,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "맹렬한 돌진",
+     "windup": 1.0,
+     "active": 0.4,
+     "recover": 1.3,
+     "range": 10,
+     "shape": {
+      "type": "box",
+      "range": 10.5,
+      "width": 2.6
+     },
+     "dmg": 2.4,
+     "kx": 11,
+     "stun": 36,
+     "cd": 8,
+     "lunge": 20,
+     "heavy": true,
+     "kz": 10
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#6a4a7a",
+    "scale": 2.1,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 2.6,
+     "width": 2.4,
+     "color": "#c8a0ff"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true,
+   "raid": {
+    "adds": "citadel_guard",
+    "phases": [
+     0.66,
+     0.33
+    ],
+    "addsPerPlayer": 2,
+    "enrageSec": 480
+   }
   }
  ]
 }

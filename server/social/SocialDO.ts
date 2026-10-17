@@ -125,7 +125,6 @@ export class SocialDO extends DurableObject<Env> {
     switch (m.t) {
       case 'ping': return this.send(a.id, { t: 'pong' });
       case 'where': {
-        a.zone = String(m.zone).slice(0, 20);
         a.lv = m.lv | 0;
         ws.serializeAttachment(a);
         const pid = this.partyOf.get(a.id);

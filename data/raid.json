@@ -1,0 +1,31 @@
+{
+  "zone": "raid1",
+  "minLevel": 10,
+  "maxPlayers": 4,
+  "hpPerExtraPlayer": 0.75,
+  "rewardRarityBonus": 2.5,
+  "minRarity": 2,
+  "mats": [
+    {
+      "item": "enh_stone",
+      "n": [
+        3,
+        6
+      ]
+    },
+    {
+      "item": "pot_hp_m",
+      "n": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "pot_mp_m",
+      "n": [
+        2,
+        4
+      ]
+    }
+  ]
+}

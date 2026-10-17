@@ -1,4 +1,4 @@
-import { isClassId, ZONES, START_ZONE } from '../shared/data';
+import { baseZone, isClassId, ZONES, START_ZONE } from '../shared/data';
 import { NAME_RE } from '../shared/protocol';
 import { accountFromToken, login, register, validateCredentials } from './auth';
 import { createCharacter, deleteCharacter, listCharacters, loadCharacter } from './db';
@@ -71,7 +71,7 @@ async function connect(req: Request, env: Env, url: URL): Promise<Response> {
   const charId = Number(url.searchParams.get('char'));
   const row = Number.isInteger(charId) ? await loadCharacter(env, charId) : null;
   if (!row || row.account_id !== account) return fail('캐릭터를 찾을 수 없습니다.', 404);
-  const zone = ZONES[row.zone] ? row.zone : START_ZONE;
+  const zone = ZONES[baseZone(row.zone)] ? row.zone : START_ZONE;
   const headers = new Headers(req.headers);
   headers.set('X-Char-Id', String(row.id));
   headers.set('X-Zone', zone);

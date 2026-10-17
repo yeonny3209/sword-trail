@@ -1,4 +1,4 @@
-import { CLASSES, CLASS_BY_ID, ZONES } from '../../shared/data';
+import { baseZone, CLASSES, CLASS_BY_ID, ZONES } from '../../shared/data';
 import type { CharacterSummary } from '../../shared/protocol';
 import type { ClassId } from '../../shared/types';
 import { ApiError, createCharacter, deleteCharacter, listCharacters, logout, savedAccount } from '../net/api';
@@ -37,7 +37,7 @@ export class CharSelect {
       return `<div class="char-card" data-id="${c.id}" style="--c:${cls.color}">
         <div class="cname">${c.name}</div>
         <div class="cmeta">Lv ${c.lv} · ${cls.name}</div>
-        <div class="czone">${ZONES[c.zone]?.name ?? ''}</div>
+        <div class="czone">${ZONES[baseZone(c.zone)]?.name ?? ''}</div>
         <div class="row"><button class="btn primary enter">접속</button><button class="btn small del">삭제</button></div>
       </div>`;
     }).join('');

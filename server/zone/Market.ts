@@ -88,6 +88,11 @@ export class Market {
     }
   }
 
+  /** 다른 곳(레이드 보상 등)에서 아이템을 우편으로 보낸다 */
+  async mailItem(to: number, it: Item, subject: string): Promise<void> {
+    await this.mailStmt(to, '레이드', subject, '', 0, it).run();
+  }
+
   /** 접속할 때: 읽지 않은 우편 수 */
   async onConnect(p: PlayerSession): Promise<void> {
     const r = await this.db.prepare('SELECT COUNT(*) AS c FROM mail WHERE to_id = ? AND read = 0').bind(p.id).first<{ c: number }>();

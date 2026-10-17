@@ -1,5 +1,5 @@
 import { bus } from '../core/bus';
-import { CLASS_BY_ID, ZONES } from '../../shared/data';
+import { baseZone, CLASS_BY_ID, ZONES } from '../../shared/data';
 import type { C2S } from '../../shared/protocol';
 import { GUILD_COST, GUILD_MIN_LV, MAX_PARTY, type C2Social, type GuildInfo, type PartyMember } from '../../shared/social';
 import { Window } from './Window';
@@ -93,7 +93,7 @@ export class SocialUi {
       ? `<div class="ph">파티 <small>${p.members.length}/${MAX_PARTY}</small></div>` +
         p.members.map((m) => `<div class="pm" data-id="${m.id}" style="--c:${CLASS_BY_ID[m.cls].color}">
           <div class="pn">${m.id === p.leader ? '<span class="crown">♛</span>' : ''}<b>${esc(m.name)}</b> <small>Lv${m.lv} ${CLASS_BY_ID[m.cls].name}</small></div>
-          <div class="php"><div></div></div><div class="pz">${ZONES[m.zone]?.name ?? ''}</div></div>`).join('')
+          <div class="php"><div></div></div><div class="pz">${ZONES[baseZone(m.zone)]?.name ?? ''}</div></div>`).join('')
       : '';
     this.updateParty();
     this.partyWin.draw();
@@ -116,7 +116,7 @@ export class SocialUi {
     b.innerHTML = `
       ${leader ? `<div class="row"><input class="pinv" maxlength="12" placeholder="초대할 캐릭터 이름"><button class="btn small invite">초대</button></div>` : ''}
       ${p ? `<div class="gm-list">${p.members.map((m) => `<div class="gm on"><span class="dot"></span>${m.id === p.leader ? '♛ ' : ''}<b>${esc(m.name)}</b>
-        <small>Lv${m.lv} ${CLASS_BY_ID[m.cls].name} · ${ZONES[m.zone]?.name ?? ''}</small>
+        <small>Lv${m.lv} ${CLASS_BY_ID[m.cls].name} · ${ZONES[baseZone(m.zone)]?.name ?? ''}</small>
         ${leader && m.id !== this.myId ? `<button class="kick" data-id="${m.id}" title="추방">✕</button>` : ''}</div>`).join('')}</div>
         <div class="row end"><button class="btn small pleave">파티 나가기</button></div>`
         : '<div class="hint">파티에 들어가 있지 않습니다.</div>'}
@@ -157,7 +157,7 @@ export class SocialUi {
       ${rank >= 1 ? `<div class="row"><input class="ginv" maxlength="12" placeholder="초대할 캐릭터 이름"><button class="btn small invite">초대</button></div>
         <div class="row"><input class="gnote" maxlength="120" placeholder="공지 바꾸기"><button class="btn small note">공지</button></div>` : ''}
       <div class="gm-list">${members.map((m) => `<div class="gm ${m.online ? 'on' : ''}">
-        <span class="dot"></span><b>${esc(m.name)}</b> <small>Lv${m.lv} ${CLASS_BY_ID[m.cls].name} · ${RANK[m.rank]}${m.online ? ` · ${ZONES[m.zone]?.name ?? ''}` : ''}</small>
+        <span class="dot"></span><b>${esc(m.name)}</b> <small>Lv${m.lv} ${CLASS_BY_ID[m.cls].name} · ${RANK[m.rank]}${m.online ? ` · ${ZONES[baseZone(m.zone)]?.name ?? ''}` : ''}</small>
         ${rank >= 1 && m.rank < rank ? `<button class="kick" data-id="${m.id}" title="추방">✕</button>` : ''}</div>`).join('')}</div>
       <div class="row end"><button class="btn small gleave">${rank === 2 && g.members.length === 1 ? '길드 해산' : '탈퇴'}</button></div>
       <div class="hint">길드 채팅은 <b>/길드 내용</b></div>`;

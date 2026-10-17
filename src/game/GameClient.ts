@@ -317,7 +317,7 @@ export class GameClient {
       dots.push({ x: v.pos.x, z: v.pos.z, kind: v.def.boss ? 'boss' : 'monster' });
       if (v.def.boss) {
         const d = Math.hypot(v.pos.x - me.pos.x, v.pos.z - me.pos.z);
-        if (d < 30 && (!boss || d < boss.d)) boss = { name: v.def.name, lv: v.def.lv, hp: v.hp, mhp: v.mhp, d };
+        if (d < (v.def.raid ? 90 : 30) && (!boss || d < boss.d)) boss = { name: v.def.name, lv: v.def.lv, hp: v.hp, mhp: v.mhp, d };
       }
     }
     for (const r of this.remotes.list.values()) dots.push({ x: r.model.root.position.x, z: r.model.root.position.z, kind: 'player' });

@@ -113,8 +113,9 @@ await wait(300);
 const ra = a.zin.filter((m) => m.t === 'reward');
 const rb = b.zin.filter((m) => m.t === 'reward');
 console.log('A reward:', JSON.stringify(ra), '\nB reward:', JSON.stringify(rb));
-const ok = ra.length > 0 && rb.length > 0 && rb[0].exp > 0 && rb[0].gold === 0;
-console.log(ok ? 'PASS 파티 경험치 나눔' : 'FAIL 파티 경험치 나눔');
+// 경험치는 나누고(같은 값), 골드·드랍은 파티원 각자 따로 받는다
+const ok = ra.length > 0 && rb.length > 0 && rb[0].exp > 0 && rb[0].exp === ra[0].exp && rb[0].gold > 0;
+console.log(ok ? 'PASS 파티 경험치 나눔·각자 골드' : 'FAIL 파티 경험치 나눔·각자 골드');
 for (const p of [a, b]) {
   p.zone.close();
   p.social.close();

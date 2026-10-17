@@ -6,6 +6,7 @@ import { MonState, type MonsterInfo } from '../../shared/protocol';
 import type { HitDef, MonsterAttackDef, MonsterDef, ZoneDef } from '../../shared/types';
 import { InterpBuffer, type Sample } from '../net/Interp';
 import type { Nameplates } from '../ui/Nameplates';
+import { Telegraphs } from '../fx/Telegraph';
 import { MonsterModel } from './MonsterModel';
 
 export interface MonView {
@@ -31,11 +32,14 @@ export interface MonView {
 /** 같은 존의 몬스터들. 서버 상태를 보간하고, 내가 때린 몬스터는 반응을 먼저 계산해서 즉시 보여 준다 */
 export class Monsters {
   readonly list = new Map<number, MonView>();
+  private readonly tele: Telegraphs;
   private readonly s: Sample = { t: 0, x: 0, z: 0, y: 0, f: 0, st: 0 };
   /** 공격 판정이 시작될 때(화살·검기 연출) */
   onAttackFx: (v: MonView, a: MonsterAttackDef) => void = () => {};
 
-  constructor(private readonly scene: THREE.Scene, private readonly plates: Nameplates, private readonly delayMs: () => number) {}
+  constructor(private readonly scene: THREE.Scene, private readonly plates: Nameplates, private readonly delayMs: () => number) {
+    this.tele = new Telegraphs(scene);
+  }
 
   add(info: MonsterInfo, time: number): void {
     this.remove(info.id);
@@ -62,6 +66,7 @@ export class Monsters {
     this.scene.remove(v.model.root);
     v.model.dispose();
     this.plates.remove(`m${id}`);
+    this.tele.hide(id);
     this.list.delete(id);
   }
 
@@ -90,6 +95,7 @@ export class Monsters {
     if (!v) return;
     v.dying = 1.2;
     v.atk = null;
+    this.tele.hide(id);
     this.plates.remove(`m${id}`);
   }
 
@@ -192,6 +198,9 @@ export class Monsters {
       v.model.animate(dt, v.predict > 0 ? 0 : v.speed, air, down, windup, attacking);
       root.position.add(v.model.recoil);
       v.model.telegraph(windup > 0 ? (v.atk!.a.heavy ? '#ff3020' : '#fff4d0') : null, windup);
+      // 강한 공격(붉은 빛)·보스 공격은 맞는 범위를 바닥에 미리 보여 준다
+      if (windup > 0 && (v.atk!.a.heavy || v.def.boss)) this.tele.show(v.id, v.atk!.a.shape, v.pos.x, v.pos.z, v.yaw, windup);
+      else this.tele.hide(v.id);
     }
   }
 }

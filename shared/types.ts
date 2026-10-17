@@ -66,7 +66,7 @@ export interface NodeDef {
 export interface ZoneDef {
   id: string;
   name: string;
-  type: 'town' | 'field' | 'arena';
+  type: 'town' | 'field' | 'arena' | 'raid';
   level: [number, number];
   pvp: boolean;
   size: [number, number];
@@ -216,6 +216,8 @@ export interface MonsterDef {
   superArmor?: boolean;
   boss?: boolean;
   respawn: number;
+  /** 레이드 보스: 부하 소환·체력 단계·격노 */
+  raid?: { adds: string; phases: number[]; addsPerPlayer: number; enrageSec: number };
   attacks: MonsterAttackDef[];
   model: { shape: 'slime' | 'beast' | 'humanoid' | 'golem'; color: string; scale: number; weapon?: { kind: 'sword' | 'greatsword' | 'dual' | 'runeblade'; length: number; width: number; color: string } };
   hitMat?: 'flesh' | 'metal' | 'slime' | 'stone';

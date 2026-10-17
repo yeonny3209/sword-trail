@@ -310,3 +310,8 @@ input:focus { border-color: var(--gold); }
 .arena-top th { color: var(--gold); font-weight: 400; text-align: left; border-bottom: 1px solid var(--line); padding: 4px; }
 .arena-top td { padding: 4px; border-bottom: 1px solid #2a2a2a; }
 .arena-top tr.me td { background: rgba(240,208,144,.08); color: var(--gold); }
+
+/* 레이드 알림 */
+.banner { position: absolute; left: 50%; top: 22%; transform: translate(-50%, -20px) scale(.9); font-family: var(--title); font-size: 40px; font-weight: 900; letter-spacing: 3px; color: #ffd0b0; -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 0 0 22px rgba(255,60,30,.9), 0 4px 0 #000; opacity: 0; pointer-events: none; white-space: nowrap; transition: opacity .25s, transform .25s; }
+.banner.on { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.banner.good { color: #fff0b0; text-shadow: 0 0 22px rgba(255,200,40,.95), 0 4px 0 #000; }
