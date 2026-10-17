@@ -14,6 +14,8 @@ export interface Remote {
   buf: InterpBuffer;
   last: THREE.Vector3;
   speed: number;
+  /** 보이는 이동 상태(MoveState) */
+  st: number;
 }
 
 /** 같은 존의 다른 플레이어. 서버 스냅샷을 보간해서 부드럽게 움직인다 */
@@ -32,7 +34,7 @@ export class RemotePlayers {
     this.scene.add(model.root);
     const buf = new InterpBuffer();
     buf.push({ t: time, x: info.x, z: info.z, y: 0, f: info.f, st: 0 });
-    this.list.set(info.id, { info, model, buf, last: new THREE.Vector3(info.x, 0, info.z), speed: 0, action: null });
+    this.list.set(info.id, { info, model, buf, last: new THREE.Vector3(info.x, 0, info.z), speed: 0, action: null, st: 0 });
     this.plates.add(`p${info.id}`, model.root, 2.15, this.label(info), 'player', true);
     this.plates.setHp(`p${info.id}`, info.hp / info.mhp);
   }
@@ -103,6 +105,7 @@ export class RemotePlayers {
       const root = r.model.root;
       root.position.set(s.x, s.y, s.z);
       root.rotation.y = s.f;
+      r.st = s.st;
       const moved = Math.hypot(s.x - r.last.x, s.z - r.last.z) / Math.max(dt, 1e-3);
       r.speed += (moved - r.speed) * Math.min(1, dt * 10);
       r.last.set(s.x, 0, s.z);

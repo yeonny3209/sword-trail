@@ -16,6 +16,7 @@ import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
 import { Market, MARKET_MSGS, type MarketMsg } from './Market';
 import { TradeSystem, TRADE_MSGS, type TradeMsg } from './Trade';
+import { PvpSystem } from './Pvp';
 
 const PLAYER_RADIUS = 0.4;
 const SAVE_EVERY_MS = 10_000;
@@ -39,6 +40,7 @@ export class ZoneDO extends DurableObject<Env> {
   private gather: GatherSystem | null = null;
   private market: Market | null = null;
   private trade: TradeSystem | null = null;
+  private pvp: PvpSystem | null = null;
 
   /** 존을 처음 열 때 몬스터를 배치한다 */
   private init(zoneId: string): boolean {
@@ -66,6 +68,7 @@ export class ZoneDO extends DurableObject<Env> {
       notify: (id, text) => void self.social().notify(id, text).catch(() => undefined),
     });
     this.trade = new TradeSystem(this.players, (p) => self.save(p), (id) => self.market!.isBusy(id));
+    this.pvp = new PvpSystem({ env: this.env, zone: z, players: this.players, combat: this.combat, broadcast: (m, e) => self.broadcast(m, e) });
     return true;
   }
 
@@ -89,7 +92,7 @@ export class ZoneDO extends DurableObject<Env> {
     const p = new PlayerSession(server, row, z.id, x, zz);
     // 길드 이름과 파티 구성을 먼저 알아 둔다(소셜 DO가 없거나 늦으면 건너뜀)
     p.guild = await guildNameOf(this.env, p.id).catch(() => null);
-    p.party = await this.social().partyMembers(p.id).catch(() => [] as number[]);
+    p.party = await this.social().entered(p.id, z.id, p.lv).catch(() => [] as number[]);
     this.players.set(p.id, p);
     this.bySocket.set(server, p);
 
@@ -147,6 +150,9 @@ export class ZoneDO extends DurableObject<Env> {
       case 'gatherdone': return this.gather?.onDone(p, msg.i | 0);
       case 'craft': return onCraft(p, this.zone!, String(msg.id));
       case 'gcreate': return this.createGuild(p, String(msg.name));
+      case 'phit': return this.pvp?.onHit(p, msg);
+      case 'phurt': return this.pvp?.onHurt(p, msg);
+      case 'pvprank': return this.pvp?.onRank(p);
       case 'chat': return this.onChat(p, msg);
       case 'portal': return this.onPortal(p, msg.id);
       case 'ping': return p.send({ t: 'pong', c: msg.c, time: Date.now() });

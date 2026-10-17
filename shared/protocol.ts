@@ -3,6 +3,7 @@ import type { ClassId } from './types';
 import type { Equip, Item, Slot } from './items';
 import type { QuestState } from './quests';
 import type { AhCategory, AuctionRow, MailRow, TradeSide } from './market';
+import type { PvpRankRow, PvpRecord } from './pvp';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -56,6 +57,7 @@ export interface SelfState {
   skillPoints: number;
   /** 스킬 id → 레벨(0 = 안 배움) */
   skills: Record<string, number>;
+  pvp?: PvpRecord;
 }
 
 /** 이동 상태 코드(원격 애니메이션용) */
@@ -133,6 +135,11 @@ export type C2S =
   | { t: 'tset'; items: { uid: string; n: number }[]; gold: number }
   | { t: 'tready'; ok: boolean }
   | { t: 'tcancel' }
+  /** 결투장: 내가 플레이어 p를 맞혔다(행동 i의 h번째 판정) */
+  | { t: 'phit'; i: number; h: number; p: number }
+  /** 결투장: 서버가 알린 공격 k에 내가 맞았다 */
+  | { t: 'phurt'; k: number }
+  | { t: 'pvprank' }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -145,7 +152,7 @@ export type S2C =
   | { t: 'leave'; id: number }
   | { t: 'act'; id: number; a: string; f: number }
   /** 피해 숫자. tk: 'm' 몬스터 / 'p' 플레이어 */
-  | { t: 'dmg'; tk: 'm' | 'p'; id: number; n: number; crit?: boolean; back?: boolean; counter?: boolean; by: number }
+  | { t: 'dmg'; tk: 'm' | 'p'; id: number; n: number; crit?: boolean; back?: boolean; counter?: boolean; by: number; pvp?: boolean }
   /** 내 상태 일부 갱신 */
   | { t: 'me'; s: Partial<SelfState> }
   | { t: 'mspawn'; m: MonsterInfo }
@@ -181,6 +188,11 @@ export type S2C =
   /** 거래 창 상태 */
   | { t: 'trade'; name: string; mine: TradeSide; theirs: TradeSide }
   | { t: 'tend'; ok: boolean; text: string }
+  /** 결투장: 플레이어 by가 나를 행동 a의 h번째 판정으로 맞혔다(x, z: 공격자 위치). 맞았으면 phurt k로 확인 */
+  | { t: 'phit'; k: number; by: number; a: string; h: number; x: number; z: number }
+  /** 내 결투장 기록이 바뀜(delta: 점수 변화) */
+  | { t: 'pvp'; me: PvpRecord; delta: number }
+  | { t: 'pvprank'; me: PvpRecord; top: PvpRankRow[] }
   | { t: 'chat'; ch: ChatChannel; from: string; text: string }
   | { t: 'goto'; zone: string }
   | { t: 'pos'; x: number; z: number }

@@ -85,6 +85,7 @@ export class PlayerSession {
       hp: this.data.hp, mhp: this.stats.mhp, mp: this.data.mp, mmp: this.stats.mmp, x: this.x, z: this.z,
       atk: this.stats.atk, def: this.stats.def, crit: this.stats.crit, speed: this.stats.speed,
       alloc: { ...this.data.alloc }, statPoints: this.data.statPoints, skillPoints: this.data.skillPoints, skills: { ...this.data.skills },
+      pvp: { ...this.data.pvp },
     };
   }
 

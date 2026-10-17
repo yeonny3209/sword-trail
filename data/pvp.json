@@ -1,0 +1,8 @@
+{
+  "damageScale": 0.5,
+  "reviveWait": 3,
+  "ratingStart": 1000,
+  "ratingK": 24,
+  "repeatCooldownSec": 120,
+  "top": 10
+}

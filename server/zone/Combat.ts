@@ -8,6 +8,7 @@ import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
 import { rollLoot } from './Inventory';
 import { PARTY_SHARE_RANGE, partyExp } from '../../shared/social';
+import { PVP } from '../../shared/pvp';
 
 /** 존 DO가 전투에 넘겨주는 기능 */
 export interface CombatHost {
@@ -151,27 +152,34 @@ export class Combat {
     this.damagePlayer(p, n, mon.id);
   }
 
-  damagePlayer(p: PlayerSession, n: number, by: number): void {
+  private reviveWait(): number {
+    return this.host.zone.pvp ? PVP.reviveWait : REVIVE_WAIT;
+  }
+
+  /** 플레이어 피해(몬스터 by 또는 결투장에서 플레이어 by) */
+  damagePlayer(p: PlayerSession, n: number, by: number, o: { crit?: boolean; pvp?: boolean } = {}): void {
     p.gathering = null;
     p.data.hp = Math.max(0, p.data.hp - n);
     p.lastHurtAt = Date.now();
     p.dirty = true;
-    this.host.broadcast({ t: 'dmg', tk: 'p', id: p.id, n, by });
+    this.host.broadcast({ t: 'dmg', tk: 'p', id: p.id, n, by, crit: o.crit || undefined, pvp: o.pvp || undefined });
     p.send({ t: 'me', s: { hp: p.data.hp } });
     if (p.data.hp <= 0) {
       p.dead = true;
       p.deadAt = Date.now();
-      p.send({ t: 'died', wait: REVIVE_WAIT });
-      this.host.broadcast({ t: 'sys', text: `${p.name}님이 쓰러졌습니다.` });
+      p.send({ t: 'died', wait: this.reviveWait() });
+      // 결투장은 처치 알림을 따로 띄운다
+      if (!o.pvp) this.host.broadcast({ t: 'sys', text: `${p.name}님이 쓰러졌습니다.` });
     }
   }
 
-  /** 부활: 존 입구에서 체력 절반으로 */
+  /** 부활: 존 입구에서 체력 절반으로(결투장은 가득) */
   onRevive(p: PlayerSession): void {
-    if (!p.dead || Date.now() - p.deadAt < REVIVE_WAIT * 1000 - 300) return;
+    if (!p.dead || Date.now() - p.deadAt < this.reviveWait() * 1000 - 300) return;
     p.dead = false;
-    p.data.hp = Math.round(p.stats.mhp * 0.5);
-    p.data.mp = Math.max(p.data.mp, Math.round(p.stats.mmp * 0.5));
+    const full = !!this.host.zone.pvp;
+    p.data.hp = Math.round(p.stats.mhp * (full ? 1 : 0.5));
+    p.data.mp = full ? p.stats.mmp : Math.max(p.data.mp, Math.round(p.stats.mmp * 0.5));
     p.x = this.host.zone.spawn[0];
     p.z = this.host.zone.spawn[1];
     p.send({ t: 'pos', x: p.x, z: p.z });

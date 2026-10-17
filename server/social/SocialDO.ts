@@ -288,9 +288,18 @@ export class SocialDO extends DurableObject<Env> {
     this.send(id, { t: 'sys', text });
   }
 
-  /** RPC: 존 DO가 접속한 플레이어의 파티를 물어본다 */
-  async partyMembers(id: number): Promise<number[]> {
-    const p = this.parties.get(this.partyOf.get(id) ?? -1);
+  /** RPC: 존 DO가 플레이어 입장을 알린다(있는 곳·레벨 갱신) → 파티 구성을 돌려준다 */
+  async entered(id: number, zone: string, lv: number): Promise<number[]> {
+    const ws = this.online.get(id);
+    const a = this.att(id);
+    if (ws && a) {
+      a.zone = zone;
+      a.lv = lv;
+      ws.serializeAttachment(a);
+    }
+    const pid = this.partyOf.get(id);
+    if (pid) this.pushParty(pid);
+    const p = this.parties.get(pid ?? -1);
     return p ? [...p.members] : [];
   }
 

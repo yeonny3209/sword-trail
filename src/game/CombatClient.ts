@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { bus } from '../core/bus';
 import { shapeHits } from '../../shared/geom';
-import type { S2C } from '../../shared/protocol';
+import { MoveState, type S2C } from '../../shared/protocol';
+import { ACTIONS } from '../../shared/data';
 import type { HitDef, MonsterAttackDef, ZoneDef } from '../../shared/types';
 import type { Effects } from '../fx/Effects';
 import type { Particles, BurstSpec } from '../fx/Particles';
@@ -27,6 +28,8 @@ export interface CombatCtx {
   bursts: Record<string, BurstSpec>;
   me: () => LocalPlayer | null;
   zone: () => ZoneDef | null;
+  /** 같은 편(파티원)이면 결투장에서도 때리지 않는다 */
+  ally: (id: number) => boolean;
 }
 
 const FX_COLOR: Record<string, string> = { slash: '#cfe6ff', heavy: '#ffd890', pierce: '#e0f4ff', x: '#ff9070', magic: '#c4a0ff' };
@@ -83,7 +86,40 @@ export class CombatClient {
         run.markHit(hi, `m${v.id}`);
         this.onLocalHit(me, v, hit, hi, run);
       }
+      if (this.c.zone()?.pvp) this.pvpHits(me, run, hi, hit);
     }
+  }
+
+  /** 결투장: 다른 플레이어를 맞혔는지(보이는 위치 기준) → 서버에 보고 */
+  private pvpHits(me: LocalPlayer, run: ActionRunner, hi: number, hit: HitDef): void {
+    for (const r of this.c.remotes.list.values()) {
+      const p = r.model.root.position;
+      if (r.st === MoveState.Dead || r.st === MoveState.Down || r.info.hp <= 0 || this.c.ally(r.info.id) || !run.canHit(hi, `p${r.info.id}`)) continue;
+      if (!shapeHits(hit.shape, me.pos.x, me.pos.z, me.yaw, p.x, p.z, 0.45, p.y)) continue;
+      run.markHit(hi, `p${r.info.id}`);
+      this.c.net.send({ t: 'phit', i: run.instance, h: hi, p: r.info.id });
+      this.hitstop = Math.max(this.hitstop, hit.stop);
+      this.c.cam.addShake(hit.shake ?? 0.05);
+      const dir = new THREE.Vector3(p.x - me.pos.x, 0.3, p.z - me.pos.z).normalize();
+      const strong = hit.stop >= 8;
+      this.c.particles.burst(new THREE.Vector3(p.x, p.y + 1.1, p.z), strong ? this.c.bursts.heavyHit : this.c.bursts.hit, dir);
+      r.model.flash(0.12);
+      bus.emit('sfx', { key: strong ? 'slashHeavy' : 'slash' });
+      this.c.numbers.hit();
+    }
+  }
+
+  /** 결투장: 다른 플레이어에게 맞았다는 알림 → 무적이 아니면 반응하고 확인을 보낸다 */
+  private onPvpHit(m: Extract<S2C, { t: 'phit' }>): void {
+    const me = this.c.me(), zone = this.c.zone();
+    const hit = ACTIONS[m.a]?.hits[m.h];
+    if (!me || !zone || !hit || me.pstate === 'dead' || me.invulnerable()) return;
+    me.hurt(hit, m.x, m.z, zone);
+    me.model.flash(0.15);
+    this.c.net.send({ t: 'phurt', k: m.k });
+    this.c.cam.addShake(Math.min(0.35, 0.12 + hit.stop * 0.02));
+    this.hitstop = Math.max(this.hitstop, 3);
+    bus.emit('sfx', { key: 'hurt' });
   }
 
   private onLocalHit(me: LocalPlayer, v: MonView, hit: HitDef, hi: number, run: ActionRunner): void {
@@ -134,8 +170,8 @@ export class CombatClient {
           if (m.by !== me?.self.id) v?.model.flash();
         }
         if (!pos) return;
-        const mine = m.by === me?.self.id;
-        const kind = m.tk === 'p' ? 'p' : !mine ? 'o' : m.crit ? 'c' : 'n';
+        const mine = m.by === me?.self.id && (m.tk === 'm' || !!m.pvp);
+        const kind = m.tk === 'p' && !mine ? 'p' : !mine ? 'o' : m.crit ? 'c' : 'n';
         const tag = mine && m.tk === 'm' ? [m.counter ? 'COUNTER' : '', m.back ? 'BACK' : ''].filter(Boolean).join(' ') : '';
         this.c.numbers.add(pos, String(m.n), kind, tag);
         break;
@@ -170,6 +206,9 @@ export class CombatClient {
       }
       case 'act':
         this.c.remotes.play(m.id, m.a, m.f);
+        break;
+      case 'phit':
+        this.onPvpHit(m);
         break;
     }
   }

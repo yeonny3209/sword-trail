@@ -10,6 +10,7 @@ import { ShopWindow, SmithWindow } from '../ui/NpcWindows';
 import { QuestUi } from '../ui/QuestUi';
 import { AuctionWindow, MailWindow } from '../ui/MarketWindows';
 import { TradeWindow } from '../ui/TradeWindow';
+import { ArenaUi } from '../ui/ArenaUi';
 import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
 import type { NpcView, ZoneScene } from './ZoneScene';
@@ -31,6 +32,7 @@ export class UiHub {
   readonly auctionWin: AuctionWindow;
   readonly mailWin: MailWindow;
   readonly tradeWin: TradeWindow;
+  readonly arena: ArenaUi;
   /** NPC를 만났을 때 처리할 역할(이후 단계: 퀘스트·경매장·길드·우편 등) */
   readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
   private readonly ray = new THREE.Raycaster();
@@ -58,6 +60,8 @@ export class UiHub {
     this.tradeWin.onOpen = () => [this.auctionWin, this.mailWin, this.shopWin, this.smithWin].forEach((w) => w.isOpen && w.close());
     this.npcHandlers.auction = () => this.auctionWin.openAuction();
     this.npcHandlers.mail = () => this.mailWin.openMail();
+    this.arena = new ArenaUi(ui, send, say);
+    this.npcHandlers.arena = () => this.arena.openRank();
     this.quests = new QuestUi(ui, send);
     this.quests.count = (id) => this.invWin.count(id);
     this.npcHandlers.quest = (n) => this.quests.openGiver(n.id, n.name);

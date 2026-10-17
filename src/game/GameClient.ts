@@ -85,6 +85,7 @@ export class GameClient {
       scene: this.scene, net: this.net, monsters: this.monsters, remotes: this.remotes, cam: this.cam,
       fx: (this.fx = new Effects(this.scene)), particles: new Particles(this.scene), numbers: new DamageNumbers(ui, this.camera),
       bursts, me: () => this.me, zone: () => this.zone?.def ?? null,
+      ally: (id) => !!this.social.ui.party?.members.some((p) => p.id === id),
     });
     this.remotes.onRemove = (r) => this.combat.forget(r.model);
     this.skillbar = new SkillBar(ui);

@@ -30,7 +30,7 @@
 - `npm run dev` : 로컬 서버(wrangler dev :8787) + 클라이언트(vite :5173, /api·/ws 프록시)
 - `npm run db:migrate` : 로컬 D1 테이블 생성
 - `npm run check` : 클라이언트·서버 타입 검사, `npm test` : 공용 로직 단위 테스트
-- `node scripts/smoke.mjs` · `smoke-social.mjs` · `smoke-party.mjs` · `smoke-market.mjs` : 로컬 서버 연기 테스트(접속·이동 / 채팅·파티·길드 / 파티 경험치 / 경매·우편·거래)
+- `node scripts/smoke.mjs` · `smoke-social.mjs` · `smoke-party.mjs` · `smoke-market.mjs` · `smoke-pvp.mjs` : 로컬 서버 연기 테스트(접속·이동 / 채팅·파티·길드 / 파티 경험치 / 경매·우편·거래 / 결투장)
 - `npm run deploy` : 빌드 후 Cloudflare 배포(먼저 `npx wrangler login`)
 
 ## 코딩 규칙
@@ -52,7 +52,8 @@ M7 거래·경매장·우편함 / M8 PvP 결투장 / M9 Cloudflare 배포
 
 ## 진행 상황 (2026-10-17)
 - 완료: M1~M5. 필드 4개(Lv1~30)·몬스터 14종·필드 보스 3, 퀘스트 20(촌장 이야기·경비대장 수집), 채집(스페이스·클릭, 1.6초), 대장간 강화·제작 탭, 미니맵, 보스 체력 바
-- 완료: M6. SocialDO 하나(`/social` 웹소켓)가 전체 채팅·귓속말(/w, /r)·파티(최대 4, 같은 존 40m 안 경험치 나눔 +20%/인)·길드(D1, 하론 앞 Lv5·2000G 창설, 직위 3단계)를 맡고, 존 DO와는 RPC(setParty·setGuild·partyMembers·createGuild)로 주고받는다. 클라이언트: 파티 프레임, P 파티 창, N 길드 창, 초대 팝업, 다른 플레이어 오른쪽 클릭 메뉴
+- 완료: M6. SocialDO 하나(`/social` 웹소켓)가 전체 채팅·귓속말(/w, /r)·파티(최대 4, 같은 존 40m 안 경험치 나눔 +20%/인)·길드(D1, 하론 앞 Lv5·2000G 창설, 직위 3단계)를 맡고, 존 DO와는 RPC(setParty·setGuild·entered·createGuild·notify)로 주고받는다. 클라이언트: 파티 프레임, P 파티 창, N 길드 창, 초대 팝업, 다른 플레이어 오른쪽 클릭 메뉴
 - 완료: M7. 경매장(세이, 즉시 구매가·24시간·수수료 5%·1인 10개, 기한 지나면 우편 반환), 우편함(고미, 골드·아이템 1개 첨부, 10G), 1:1 거래(오른쪽 클릭 → 거래 신청, 양쪽 준비하면 교환). D1 `auctions`·`mail`(0003). 한 사람만 가져가도록 DELETE/UPDATE ... RETURNING, 플레이어별 요청은 차례로 처리(`server/zone/Market.ts`), 거래는 존 DO 안에서 한 번에(`Trade.ts`)
-- 다음: M8 PvP 결투장 → M9 Cloudflare 배포(사용자가 `npx wrangler login`)
+- 완료: M8. 결투장(마을 북쪽 문, 파티원 빼고 모두 적). 공격자가 `phit` 보고 → 서버가 거리·시간·무적(백스텝 무적 프레임, 다운) 검사 후 맞은 사람에게 알림 → 맞은 사람 클라이언트가 무적이 아니면 반응하고 `phurt`로 확인 → 서버가 피해(×0.5) 계산. 처치·쓰러짐·점수(엘로 K24, 같은 상대 2분 반복은 0점)는 CharData v5 `pvp`, 카론에게서 순위표. 쓰러지면 3초 뒤 체력 가득 부활. 수치는 `data/pvp.json`
+- 다음: M9 Cloudflare 배포(사용자가 `npx wrangler login`)
 - 자동 저장 10초(서버 코드가 다시 올라가면 저장 안 된 진행은 사라지므로)

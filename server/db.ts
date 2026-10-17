@@ -4,6 +4,7 @@ import { baseStats, emptyAlloc, SKILL_POINTS_PER_LEVEL, STAT_POINTS_PER_LEVEL, t
 import type { ClassId } from '../shared/types';
 import { makeItem, type Equip, type Item } from '../shared/items';
 import { emptyQuests, type QuestState } from '../shared/quests';
+import { emptyPvp, type PvpRecord } from '../shared/pvp';
 import type { Env } from './env';
 
 /** 캐릭터의 진행 정보(JSON 한 칸에 저장). 필드를 추가하면 migrateData에 기본값을 넣는다 */
@@ -22,6 +23,8 @@ export interface CharData {
   quests: QuestState;
   /** 채집 숙련도 */
   gather: { lv: number; exp: number };
+  /** 결투장 기록 */
+  pvp: PvpRecord;
 }
 
 export function newUid(): string {
@@ -48,7 +51,7 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
   // v1 → v2: 스탯·스킬 포인트 도입. 이미 오른 레벨만큼 포인트를 돌려준다
   const fresh = !d.alloc;
   return {
-    v: 4,
+    v: 5,
     exp: d.exp ?? 0,
     gold: d.gold ?? 100,
     hp: d.hp ?? s.mhp,
@@ -63,6 +66,8 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
     // v3 → v4: 퀘스트·채집
     quests: d.quests ?? emptyQuests(),
     gather: d.gather ?? { lv: 1, exp: 0 },
+    // v4 → v5: 결투장 기록
+    pvp: { ...emptyPvp(), ...(d.pvp ?? {}) },
   };
 }
 

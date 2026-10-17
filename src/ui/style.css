@@ -298,3 +298,13 @@ input:focus { border-color: var(--gold); }
 .tside .tg { display: block; margin-top: 6px; color: #ffd760; font-size: 13px; }
 .tside .tgold { width: 100px; background: #111; color: #eee; border: 1px solid #4a3e2c; padding: 3px 5px; font: inherit; }
 .tside .tlist { font-size: 11px; margin-top: 4px; color: #bbb; }
+
+/* 결투장 */
+.arena-panel { position: absolute; top: 44px; left: 50%; transform: translateX(-50%); font-size: 13px; background: rgba(60,10,10,.6); border: 1px solid #a04030; padding: 4px 14px; border-radius: 12px; text-shadow: 0 0 3px #000; color: #f0d0c0; }
+.arena-panel .r, .arena-win .r { color: #ffd760; }
+.arena-win { width: 420px; }
+.arena-me { font-size: 14px; margin-bottom: 8px; }
+.arena-top { width: 100%; border-collapse: collapse; font-size: 13px; }
+.arena-top th { color: var(--gold); font-weight: 400; text-align: left; border-bottom: 1px solid var(--line); padding: 4px; }
+.arena-top td { padding: 4px; border-bottom: 1px solid #2a2a2a; }
+.arena-top tr.me td { background: rgba(240,208,144,.08); color: var(--gold); }
