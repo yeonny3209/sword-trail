@@ -15,9 +15,9 @@ function objText(q: QuestDef, p: number[]): string {
   }).join('');
 }
 
-function rewardText(q: QuestDef): string {
+function rewardText(q: QuestDef, lv: number): string {
   const r = q.reward;
-  const parts = [r.exp ? `경험치 ${questExp(r.exp).toLocaleString()}` : '', r.gold ? `${r.gold.toLocaleString()} G` : '',
+  const parts = [r.exp ? `경험치 ${questExp(r.exp, lv).toLocaleString()}` : '', r.gold ? `${r.gold.toLocaleString()} G` : '',
     ...(r.items ?? []).map(([id, n]) => `${ITEMS[id]?.name ?? id} ${n}개`), r.equip ? `Lv${r.equip.lv} 장비(등급 보장)` : ''];
   return parts.filter(Boolean).join(' · ');
 }
@@ -88,7 +88,7 @@ export class QuestUi {
       const q = QUESTS[id];
       const p = progressOf(q, this.qs, this.count);
       return `<div class="qrow"><div class="qn">${q.name} <small>Lv${q.lv}</small></div><div class="qd">${q.desc}</div>${objText(q, p)}
-        <div class="qr">보상: ${rewardText(q)}</div><div class="row end"><button class="btn small ab" data-id="${id}">포기</button></div></div>`;
+        <div class="qr">보상: ${rewardText(q, this.lv)}</div><div class="row end"><button class="btn small ab" data-id="${id}">포기</button></div></div>`;
     }).join('') : '<div class="hint">진행 중인 퀘스트가 없습니다. 마을의 <b>촌장 오윤</b>과 <b>경비대장 루크</b>에게 말을 걸어 보세요.</div>')
       + `<div class="hint">완료한 퀘스트 ${this.qs.done.length}개</div>`;
     this.win.body.querySelectorAll<HTMLButtonElement>('.ab').forEach((b) => b.addEventListener('click', () => {
@@ -103,7 +103,7 @@ export class QuestUi {
     const later = Object.values(QUESTS).filter((q) => q.giver === this.giver && !this.qs.done.includes(q.id) && !(q.id in this.qs.active)
       && (!q.req || this.qs.done.includes(q.req)) && q.lv > this.lv);
     const block = (q: QuestDef, btn: string) => `<div class="qrow"><div class="qn">${q.name} <small>Lv${q.lv}</small></div>
-      <div class="qd">${q.desc}</div>${objText(q, progressOf(q, this.qs, this.count))}<div class="qr">보상: ${rewardText(q)}</div>${btn}</div>`;
+      <div class="qd">${q.desc}</div>${objText(q, progressOf(q, this.qs, this.count))}<div class="qr">보상: ${rewardText(q, this.lv)}</div>${btn}</div>`;
     this.dialog.body.innerHTML = [
       ...mine.map((q) => block(q, isComplete(q, this.qs, this.count)
         ? `<div class="row end"><button class="btn primary small turn" data-id="${q.id}">완료 보고</button></div>`

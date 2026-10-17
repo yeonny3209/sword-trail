@@ -2,7 +2,7 @@ import { MONSTERS } from '../../shared/data';
 import { ITEMS, makeItem, rollRarity, type Item } from '../../shared/items';
 import type { S2C } from '../../shared/protocol';
 import { RAID, raidHp } from '../../shared/raid';
-import { PROGRESSION } from '../../shared/rules';
+import { expBoost, PROGRESSION } from '../../shared/rules';
 import type { MonsterDef, ZoneDef } from '../../shared/types';
 import { newUid } from '../db';
 import { addItem, syncInv } from './Inventory';
@@ -98,7 +98,7 @@ export class RaidSystem {
       const [g0, g1] = def.gold;
       const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
       p.data.gold += gold;
-      const exp = Math.round(def.exp * PROGRESSION.monsterExpRate);
+      const exp = Math.round(def.exp * PROGRESSION.monsterExpRate * expBoost(p.lv));
       p.send({ t: 'reward', exp, gold, name: def.name });
       this.h.gainExp(p, exp);
       this.h.onKill(p, def.id);

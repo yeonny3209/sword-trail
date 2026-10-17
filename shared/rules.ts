@@ -2,7 +2,22 @@ import { CLASS_BY_ID } from './data';
 import progJson from '../data/progression.json';
 
 /** 성장 속도(data/progression.json): 경험치 곡선과 몬스터·퀘스트 경험치 배율 */
-export const PROGRESSION = progJson as { expCurve: { a: number; p: number; b: number }; monsterExpRate: number; questExpRate: number };
+export const PROGRESSION = progJson as {
+  expCurve: { a: number; p: number; b: number };
+  monsterExpRate: number;
+  questExpRate: number;
+  /** 중반 레벨 경험치 보너스: from에서 서서히 늘어 full~until은 mul배, end까지 서서히 1배로 */
+  midBoost: { from: number; full: number; until: number; end: number; mul: number };
+};
+
+/** 이 레벨의 플레이어가 받는 경험치 배율(중반을 더 빠르게) */
+export function expBoost(lv: number): number {
+  const b = PROGRESSION.midBoost;
+  if (lv <= b.from || lv >= b.end) return 1;
+  if (lv < b.full) return 1 + ((b.mul - 1) * (lv - b.from)) / (b.full - b.from);
+  if (lv <= b.until) return b.mul;
+  return b.mul - ((b.mul - 1) * (lv - b.until)) / (b.end - b.until);
+}
 import type { ActionDef, ClassId } from './types';
 
 /** 레벨·직업·스탯으로 정해지는 능력치 */
@@ -84,8 +99,8 @@ export function expToNext(lv: number): number {
 }
 
 /** 퀘스트 보상 경험치(배율 적용) */
-export function questExp(base: number): number {
-  return Math.round(base * PROGRESSION.questExpRate);
+export function questExp(base: number, lv = 1): number {
+  return Math.round(base * PROGRESSION.questExpRate * expBoost(lv));
 }
 
 export function skillMax(def: ActionDef): number {

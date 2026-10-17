@@ -1,5 +1,16 @@
 {
-  "expCurve": { "a": 22, "p": 1.55, "b": 18 },
+  "expCurve": {
+    "a": 22,
+    "p": 1.55,
+    "b": 18
+  },
   "monsterExpRate": 1.5,
-  "questExpRate": 1.5
+  "questExpRate": 1.5,
+  "midBoost": {
+    "from": 8,
+    "full": 12,
+    "until": 25,
+    "end": 32,
+    "mul": 1.5
+  }
 }

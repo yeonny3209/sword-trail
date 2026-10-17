@@ -125,5 +125,5 @@ export function isBackAttack(targetYaw: number, fromX: number, fromZ: number, tx
 export function expFactor(playerLv: number, monsterLv: number): number {
   const d = monsterLv - playerLv;
   if (d >= 0) return Math.min(1.3, 1 + d * 0.06);
-  return Math.max(0.1, 1 + d * 0.15);
+  return Math.max(0.2, 1 + d * 0.1);
 }

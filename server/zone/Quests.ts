@@ -87,6 +87,6 @@ export class QuestSystem {
     p.send({ t: 'qdone', id });
     syncInv(p);
     p.send({ t: 'me', s: { gold: p.data.gold } });
-    if (r.exp) this.gainExp(p, questExp(r.exp));
+    if (r.exp) this.gainExp(p, questExp(r.exp, p.lv));
   }
 }
