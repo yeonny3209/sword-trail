@@ -15,7 +15,7 @@ interface PlayerTuning { radius: number; acceleration: number; dashMul: number; 
 
 export type PState = 'free' | 'action' | 'hurt' | 'dead';
 
-const SKILL_KEYS: Action[] = ['s1', 's2', 's3', 's4', 's5', 's6'];
+const SKILL_KEYS: Action[] = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
 const BUFFERED: Action[] = ['attack', 'back', 'jump', ...SKILL_KEYS];
 
 /**

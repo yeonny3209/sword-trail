@@ -1,28 +1,92 @@
 {
   "bindings": {
-    "up": ["KeyW", "ArrowUp"],
-    "down": ["KeyS", "ArrowDown"],
-    "left": ["KeyA", "ArrowLeft"],
-    "right": ["KeyD", "ArrowRight"],
-    "attack": ["Mouse0", "KeyX", "KeyJ"],
-    "jump": ["Space"],
-    "back": ["KeyZ"],
-    "s1": ["KeyQ"],
-    "s2": ["KeyE"],
-    "s3": ["KeyT"],
-    "s4": ["KeyF"],
-    "s5": ["KeyG"],
-    "s6": ["KeyR"],
-    "pot1": ["KeyC", "Digit1"],
-    "pot2": ["KeyV", "Digit2"],
-    "inventory": ["KeyI"],
-    "skills": ["KeyK"],
-    "character": ["KeyU"],
-    "quests": ["KeyL"],
-    "party": ["KeyP"],
-    "guild": ["KeyN"],
-    "camreset": ["Home"],
-    "debug": ["F2"]
+    "up": [
+      "KeyW",
+      "ArrowUp"
+    ],
+    "down": [
+      "KeyS",
+      "ArrowDown"
+    ],
+    "left": [
+      "KeyA",
+      "ArrowLeft"
+    ],
+    "right": [
+      "KeyD",
+      "ArrowRight"
+    ],
+    "attack": [
+      "Mouse0",
+      "KeyX",
+      "KeyJ"
+    ],
+    "jump": [
+      "Space"
+    ],
+    "back": [
+      "KeyZ"
+    ],
+    "s1": [
+      "KeyQ"
+    ],
+    "s2": [
+      "KeyE"
+    ],
+    "s3": [
+      "KeyT"
+    ],
+    "s4": [
+      "KeyF"
+    ],
+    "s5": [
+      "KeyG"
+    ],
+    "s6": [
+      "KeyR"
+    ],
+    "pot1": [
+      "KeyC"
+    ],
+    "pot2": [
+      "KeyV"
+    ],
+    "inventory": [
+      "KeyI"
+    ],
+    "skills": [
+      "KeyK"
+    ],
+    "character": [
+      "KeyU"
+    ],
+    "quests": [
+      "KeyL"
+    ],
+    "party": [
+      "KeyP"
+    ],
+    "guild": [
+      "KeyN"
+    ],
+    "camreset": [
+      "Home"
+    ],
+    "debug": [
+      "F2"
+    ],
+    "s7": [
+      "Digit1"
+    ],
+    "s8": [
+      "Digit2"
+    ],
+    "s9": [
+      "Digit3"
+    ],
+    "s10": [
+      "Digit4"
+    ]
   },
   "doubleTapMs": 240
 }

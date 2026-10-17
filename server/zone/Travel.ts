@@ -1,6 +1,6 @@
 import { ZONES } from '../../shared/data';
 import { dist2 } from '../../shared/geom';
-import { RAID, raidKey } from '../../shared/raid';
+import { raidKey, raidOf } from '../../shared/raid';
 import { GUILD_COST, GUILD_MIN_LV } from '../../shared/social';
 import type { ZoneDef } from '../../shared/types';
 import type { Env } from '../env';
@@ -16,7 +16,8 @@ export function portalTarget(zone: ZoneDef, p: PlayerSession, portalId: string):
   if (!dest || !arrive) return null;
   let key = dest.id;
   if (dest.type === 'raid') {
-    if (p.lv < RAID.minLevel) return `레이드는 레벨 ${RAID.minLevel}부터 들어갈 수 있습니다.`;
+    const need = raidOf(dest.id)?.minLevel ?? 1;
+    if (p.lv < need) return `이 레이드는 레벨 ${need}부터 들어갈 수 있습니다.`;
     key = raidKey(dest.id, p.party, p.id);
   }
   return { key, id: dest.id, x: arrive.exit[0], z: arrive.exit[1] };

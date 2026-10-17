@@ -11,15 +11,18 @@ import { PlayerSession } from './PlayerSession';
 import { onReset, onSkill, onStat } from './Progress';
 import { onInventory, syncInv } from './Inventory';
 import { guildNameOf } from '../social/Guilds';
+import { applyMove, PLAYER_RADIUS } from './Movement';
 import { createGuildAt, portalTarget } from './Travel';
 import { RaidSystem } from './Raid';
+import { StatusSystem } from './Status';
+import { EliteSystem } from './Elite';
 import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
 import { Market, MARKET_MSGS, type MarketMsg } from './Market';
 import { TradeSystem, TRADE_MSGS, type TradeMsg } from './Trade';
 import { PvpSystem } from './Pvp';
 
-const PLAYER_RADIUS = 0.4;
+
 const SAVE_EVERY_MS = 10_000;
 const CHAT_MAX = 120;
 
@@ -32,6 +35,8 @@ export class ZoneDO extends DurableObject<Env> {
   /** 존 서버 이름: 마을·필드는 존 id, 레이드는 `raid1~파티번호` */
   private key = '';
   private raid: RaidSystem | null = null;
+  private status: StatusSystem | null = null;
+  private elite: EliteSystem | null = null;
   private readonly players = new Map<number, PlayerSession>();
   private readonly bySocket = new Map<WebSocket, PlayerSession>();
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -66,7 +71,10 @@ export class ZoneDO extends DurableObject<Env> {
       zone: z, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), players: this.players,
       onKill: (p, id) => self.quests?.onKill(p, id),
       onRaidClear: (m) => self.raid?.clear(m),
+      onCast: (p, a, slv) => self.status?.schedule(p, a, slv),
     });
+    this.status = new StatusSystem({ players: this.players, monsters: this.monsters, broadcast: (m, e) => self.broadcast(m, e), combat: this.combat });
+    this.elite = new EliteSystem({ zone: z, players: this.players, broadcast: (m) => self.broadcast(m), spawn: (def, x, zz) => self.spawnMonster(def, x, zz) });
     this.quests = new QuestSystem(z, (p, n) => self.combat!.gainExp(p, n));
     this.gather = new GatherSystem(z, (m) => self.broadcast(m));
     this.market = new Market({
@@ -134,7 +142,7 @@ export class ZoneDO extends DurableObject<Env> {
       return;
     }
     switch (msg.t) {
-      case 'move': return this.onMove(p, msg);
+      case 'move': return void (this.zone && applyMove(this.zone, p, msg));
       case 'act': return this.combat?.onAct(p, msg);
       case 'hit': return this.combat?.onHit(p, msg);
       case 'hurt': return this.combat?.onHurt(p, msg);
@@ -158,6 +166,7 @@ export class ZoneDO extends DurableObject<Env> {
       case 'gatherdone': return this.gather?.onDone(p, msg.i | 0);
       case 'craft': return onCraft(p, this.zone!, String(msg.id));
       case 'gcreate': return createGuildAt(this.env, this.zone, p, String(msg.name), (q) => this.save(q));
+      case 'raise': return this.status?.raise(p, msg.id | 0);
       case 'phit': return this.pvp?.onHit(p, msg);
       case 'phurt': return this.pvp?.onHurt(p, msg);
       case 'pvprank': return this.pvp?.onRank(p);
@@ -215,7 +224,7 @@ export class ZoneDO extends DurableObject<Env> {
   /** 모두 나간 레이드 방을 처음 상태로 되돌린다(다음 입장 때 init이 새로 만든다) */
   private resetRaid(): void {
     this.zone = null;
-    this.raid = this.combat = this.quests = this.gather = this.market = this.trade = this.pvp = null;
+    this.raid = this.combat = this.quests = this.gather = this.market = this.trade = this.pvp = this.status = this.elite = null;
     this.monsters.clear();
   }
 
@@ -224,36 +233,6 @@ export class ZoneDO extends DurableObject<Env> {
     this.monsters.set(m.id, m);
     this.broadcast({ t: 'mspawn', m: m.info() });
     return m;
-  }
-
-  private onMove(p: PlayerSession, m: Extract<C2S, { t: 'move' }>): void {
-    if (p.leaving || p.dead || !this.zone) return;
-    const now = Date.now();
-    const dt = Math.min(1, Math.max(0.05, (now - p.lastMoveAt) / 1000));
-    p.lastMoveAt = now;
-    let x = Number(m.x), z = Number(m.z);
-    if (!Number.isFinite(x) || !Number.isFinite(z)) return;
-    // 속도 검사: 대시·밀림을 감안해 넉넉하게, 넘으면 이동 방향으로 잘라낸다
-    const base = p.stats.speed * 2.4 * dt + 0.8;
-    const maxStep = base + p.moveBudget;
-    const dx = x - p.x, dz = z - p.z;
-    const d = Math.hypot(dx, dz);
-    p.moveBudget = Math.max(0, p.moveBudget - Math.max(0, d - base));
-    let corrected = false;
-    if (d > maxStep) {
-      x = p.x + (dx / d) * maxStep;
-      z = p.z + (dz / d) * maxStep;
-      corrected = true;
-    }
-    const [rx, rz] = resolveCircle(x, z, PLAYER_RADIUS, this.zone.walls, this.zone.size);
-    if (Math.hypot(rx - x, rz - z) > 0.4) corrected = true;
-    p.x = rx;
-    p.z = rz;
-    p.y = Math.max(0, Math.min(8, Number(m.y) || 0));
-    p.f = Number(m.f) || 0;
-    p.st = m.st | 0;
-    p.dirty = true;
-    if (corrected) p.send({ t: 'pos', x: p.x, z: p.z });
   }
 
   private onChat(p: PlayerSession, m: Extract<C2S, { t: 'chat' }>): void {
@@ -358,7 +337,7 @@ export class ZoneDO extends DurableObject<Env> {
       if (m.dead) {
         m.respawnT -= dt;
         if (m.respawnT <= 0) {
-          if (m.summoned) {
+          if (m.summoned || m.temporary) {
             this.monsters.delete(m.id);
             continue;
           }
@@ -371,6 +350,13 @@ export class ZoneDO extends DurableObject<Env> {
     }
     this.separate();
     this.raid?.update(now);
+    // 효과·이벤트 처리에서 오류가 나도 존 진행(몬스터·스냅샷)은 멈추지 않게 한다
+    try {
+      this.status?.update(now);
+      this.elite?.update(now);
+    } catch (e) {
+      console.error('status/elite update', e);
+    }
     if (this.tickCount % (ZONE_HZ / SNAP_HZ) === 0) {
       this.broadcast({
         t: 'snap', time: now,

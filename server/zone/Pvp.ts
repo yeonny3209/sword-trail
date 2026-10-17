@@ -86,8 +86,8 @@ export class PvpSystem {
     if (!pd || pd.vic !== v.id || Date.now() - pd.at > CONFIRM_MS || v.dead) return;
     const p = this.h.players.get(pd.att);
     if (!p) return;
-    const crit = Math.random() < p.stats.crit;
-    const n = Math.max(1, Math.round(rollDamage(p.stats.atk, pd.mult, v.stats.def, Math.random(), { crit, critMul: 1.5, back: false, counter: false }) * PVP.damageScale));
+    const crit = Math.random() < p.eff.crit;
+    const n = Math.max(1, Math.round(rollDamage(p.eff.atk, pd.mult, v.eff.def, Math.random(), { crit, critMul: 1.5, back: false, counter: false }) * PVP.damageScale));
     this.h.combat.damagePlayer(v, n, p.id, { crit, pvp: true });
     if (v.dead) this.onKill(p, v);
   }

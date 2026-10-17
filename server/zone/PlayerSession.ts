@@ -1,4 +1,5 @@
 import { MoveState, type PlayerInfo, type S2C, type SelfState } from '../../shared/protocol';
+import { BOND, STATUS, type BuffView, type StatusId } from '../../shared/status';
 import { finalStats, type Stats } from '../../shared/rules';
 import { gearBonus } from '../../shared/items';
 import type { ClassId } from '../../shared/types';
@@ -40,6 +41,11 @@ export class PlayerSession {
   /** 파티원 id(나 포함, 없으면 빈 배열) — 소셜 DO가 알려 준다 */
   party: number[] = [];
   guild: string | null = null;
+  /** 걸려 있는 버프(효과 id → 세기·끝나는 시각·보호막 남은 양) */
+  readonly buffs = new Map<StatusId, { power: number; until: number; val: number }>();
+  /** 가까이 있는 살아 있는 파티원 수(파티 결속) — 1초마다 갱신 */
+  near = 0;
+  lastRaiseAt = 0;
 
   constructor(readonly ws: WebSocket, row: CharRow, zone: string, x: number, z: number) {
     this.id = row.id;
@@ -72,6 +78,80 @@ export class PlayerSession {
     }
   }
 
+  /** 버프·파티 결속을 반영한 지금 능력치(공격·방어·치명타·이동 속도) */
+  get eff(): Stats {
+    const now = Date.now();
+    let atk = 1, def = 1, spd = 1, crit = 0;
+    for (const [id, b] of this.buffs) {
+      if (b.until <= now) continue;
+      if (id === 'atkUp') atk += b.power;
+      else if (id === 'defUp') def += b.power;
+      else if (id === 'speedUp') spd += b.power;
+      else if (id === 'critUp') crit += b.power;
+    }
+    const bond = Math.min(BOND.max, this.near);
+    atk += BOND.atk * bond;
+    def += BOND.def * bond;
+    const s = this.stats;
+    return { ...s, atk: Math.round(s.atk * atk), def: Math.round(s.def * def), crit: s.crit + crit, speed: s.speed * spd };
+  }
+
+  /** 받는 피해 배율(수호 버프) */
+  get damageTaken(): number {
+    const g = this.buffs.get('guard');
+    return g && g.until > Date.now() ? 1 - g.power : 1;
+  }
+
+  /** 효과를 건다(같은 효과는 센 쪽·긴 쪽을 따름). 바뀌었으면 true */
+  addBuff(id: StatusId, power: number, durSec: number, val = 0): boolean {
+    const until = Date.now() + durSec * 1000;
+    const cur = this.buffs.get(id);
+    if (cur && cur.until > Date.now()) {
+      const stronger = power > cur.power || val > cur.val;
+      this.buffs.set(id, { power: Math.max(cur.power, power), until: Math.max(cur.until, until), val: stronger ? val : cur.val });
+      return stronger || until > cur.until;
+    }
+    this.buffs.set(id, { power, until, val });
+    return true;
+  }
+
+  /** 끝난 버프를 지운다. 지웠으면 true */
+  pruneBuffs(now: number): boolean {
+    let changed = false;
+    for (const [id, b] of this.buffs) {
+      if (b.until <= now || (id === 'shield' && b.val <= 0)) {
+        this.buffs.delete(id);
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  /** 보호막이 피해를 대신 받는다. 남은 피해를 돌려줌 */
+  absorb(n: number): number {
+    const sh = this.buffs.get('shield');
+    if (!sh || sh.until <= Date.now() || sh.val <= 0) return n;
+    const took = Math.min(sh.val, n);
+    sh.val -= took;
+    return n - took;
+  }
+
+  buffViews(): BuffView[] {
+    const now = Date.now();
+    const out: BuffView[] = [];
+    for (const [id, b] of this.buffs) if (b.until > now && STATUS[id]) out.push({ id, left: b.until - now, power: b.power, val: b.val || undefined });
+    const bond = Math.min(BOND.max, this.near);
+    if (bond > 0) out.push({ id: 'bond', left: 0, power: bond });
+    return out;
+  }
+
+  /** 버프 목록과 바뀐 능력치를 내게 알린다 */
+  sendBuffs(): void {
+    this.send({ t: 'buffs', list: this.buffViews() });
+    const e = this.eff;
+    this.send({ t: 'me', s: { atk: e.atk, def: e.def, crit: e.crit, speed: e.speed } });
+  }
+
   info(): PlayerInfo {
     return {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv,
@@ -83,7 +163,7 @@ export class PlayerSession {
     return {
       id: this.id, name: this.name, cls: this.cls, lv: this.lv, exp: this.data.exp, gold: this.data.gold,
       hp: this.data.hp, mhp: this.stats.mhp, mp: this.data.mp, mmp: this.stats.mmp, x: this.x, z: this.z,
-      atk: this.stats.atk, def: this.stats.def, crit: this.stats.crit, speed: this.stats.speed,
+      atk: this.eff.atk, def: this.eff.def, crit: this.eff.crit, speed: this.eff.speed,
       alloc: { ...this.data.alloc }, statPoints: this.data.statPoints, skillPoints: this.data.skillPoints, skills: { ...this.data.skills },
       pvp: { ...this.data.pvp },
     };
@@ -98,6 +178,7 @@ export class PlayerSession {
 
   snap(): number[] {
     const r = (v: number) => Math.round(v * 100) / 100;
-    return [this.id, r(this.x), r(this.z), r(this.y), r(this.f), this.st, Math.round(this.data.hp)];
+    // 쓰러져 있으면 다른 사람 화면에서도 누워 있게(쓰러진 파티원을 찾아 살릴 수 있도록)
+    return [this.id, r(this.x), r(this.z), r(this.y), r(this.f), this.dead ? MoveState.Dead : this.st, Math.round(this.data.hp)];
   }
 }

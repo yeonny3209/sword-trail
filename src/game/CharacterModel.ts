@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import type { WeaponKind } from '../../shared/types';
 import { bladeGeo, DEG, defaultLook, GEO, guardGeo, outlineOf, OUTLINE_MAT, toon, type Look } from './CharacterParts';
 
 export interface ModelStyle {
   body: string;
   hair?: string;
   skin?: string;
-  weapon?: { kind: 'sword' | 'greatsword' | 'dual' | 'runeblade'; length: number; width: number; color: string } | null;
+  weapon?: { kind: WeaponKind; length: number; width: number; color: string } | null;
   scale?: number;
   look?: Look;
   /** 적(병사형 몬스터): 기본 모습에 투구 */
@@ -171,8 +172,9 @@ export class CharacterModel {
 
   private buildWeaponArm(shoulder: THREE.Group, side: number, w: NonNullable<ModelStyle['weapon']>, cloth: THREE.Material, skin: THREE.Material): void {
     shoulder.add(this.part(GEO.upperArm, cloth, 0, 0, 0.15), this.part(GEO.foreArm, cloth, 0, 0, 0.36), this.part(GEO.hand, skin, 0, 0, HAND_Z));
-    const rune = w.kind === 'runeblade';
-    const bladeMat = toon(w.color, { emissive: rune ? '#8a60ff' : w.color, emissiveIntensity: rune ? 0.55 : 0.12 });
+    const rune = w.kind === 'runeblade' || w.kind === 'staff' || w.kind === 'scythe';
+    const glow = w.kind === 'staff' ? '#ffe070' : w.kind === 'scythe' ? '#b060ff' : '#8a60ff';
+    const bladeMat = toon(w.color, { emissive: rune ? glow : w.color, emissiveIntensity: w.kind === 'staff' ? 0.9 : rune ? 0.55 : 0.12 });
     bladeMat.userData.e = bladeMat.emissive.clone();
     bladeMat.userData.ei = bladeMat.emissiveIntensity;
     this.bladeMats.push(bladeMat);
@@ -183,13 +185,32 @@ export class CharacterModel {
       x.userData.ei = 0;
       this.mats.push(x);
     }
-    shoulder.add(this.part(GEO.grip, grip, 0, 0, HAND_Z), this.part(GEO.pommel, metal, 0, 0, HAND_Z - 0.12, false));
-    shoulder.add(this.part(guardGeo(w.width), metal, 0, 0, BLADE_Z - 0.03));
-    shoulder.add(this.part(bladeGeo(w.length, w.width, w.kind === 'dual'), bladeMat, 0, 0, BLADE_Z));
     const base = new THREE.Object3D();
-    base.position.z = BLADE_Z + 0.05;
     const tip = new THREE.Object3D();
-    tip.position.z = BLADE_Z + w.length;
+    if (w.kind === 'staff') {
+      // 지팡이: 긴 막대 + 끝에 빛나는 구슬과 고리
+      const L = 0.9 + w.length * 0.9, top = HAND_Z + L * 0.35 + L / 2;
+      shoulder.add(this.part(new THREE.CylinderGeometry(0.036, 0.04, L, 8).rotateX(Math.PI / 2), grip, 0, 0, HAND_Z + L * 0.35));
+      shoulder.add(this.part(new THREE.TorusGeometry(0.1, 0.022, 6, 14), metal, 0, 0, top - 0.06));
+      shoulder.add(this.part(new THREE.SphereGeometry(0.1, 12, 10), bladeMat, 0, 0, top + 0.02, false));
+      base.position.z = top - 0.25;
+      tip.position.z = top + 0.1;
+    } else if (w.kind === 'scythe') {
+      // 낫: 긴 자루 + 끝에서 옆으로 휘어진 큰 날
+      const L = 1.5, top = HAND_Z - 0.25 + L;
+      shoulder.add(this.part(new THREE.CylinderGeometry(0.034, 0.038, L, 8).rotateX(Math.PI / 2), grip, 0, 0, HAND_Z - 0.25 + L / 2));
+      const blade = this.part(bladeGeo(0.7 + w.length * 0.5, w.width, true), bladeMat, 0, 0, top - 0.05);
+      blade.rotation.y = Math.PI / 2;
+      shoulder.add(blade, this.part(new THREE.SphereGeometry(0.06, 8, 6), metal, 0, 0, top, false));
+      base.position.set(0.1, 0, top - 0.05);
+      tip.position.set(0.7 + w.length * 0.5, 0, top - 0.05);
+    } else {
+      shoulder.add(this.part(GEO.grip, grip, 0, 0, HAND_Z), this.part(GEO.pommel, metal, 0, 0, HAND_Z - 0.12, false));
+      shoulder.add(this.part(guardGeo(w.width), metal, 0, 0, BLADE_Z - 0.03));
+      shoulder.add(this.part(bladeGeo(w.length, w.width, w.kind === 'dual'), bladeMat, 0, 0, BLADE_Z));
+      base.position.z = BLADE_Z + 0.05;
+      tip.position.z = BLADE_Z + w.length;
+    }
     shoulder.add(base, tip);
     shoulder.userData.side = side;
     shoulder.userData.bladeMat = bladeMat;

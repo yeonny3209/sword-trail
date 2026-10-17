@@ -126,6 +126,23 @@ export function rollLoot(p: PlayerSession, mon: MonsterDef): void {
   }
 }
 
+/** 정예 처치 보상: 일반 드랍을 한 번 더 + 반드시 장비 하나(등급 보너스) + 강화석 */
+export function eliteLoot(p: PlayerSession, mon: MonsterDef): void {
+  rollLoot(p, mon);
+  const pool = Object.values(ITEMS).filter((d) => d.kind === 'equip' && d.lv <= mon.lv + 3 && d.lv >= mon.lv - 8 && (!d.cls || d.cls === p.cls || Math.random() < 0.25));
+  const d = pool[Math.floor(Math.random() * pool.length)];
+  const got: { id: string; n: number; rar?: number }[] = [];
+  if (d) {
+    const rar = rollRarity(Math.random(), 1.2);
+    const it = makeItem(d.id, 1, newUid(), rar);
+    if (addItem(p, it) === 0) got.push({ id: it.id, n: 1, rar });
+  }
+  const stones = makeItem('enh_stone', 2 + Math.floor(Math.random() * 3), newUid());
+  if (addItem(p, stones) < stones.n) got.push({ id: stones.id, n: stones.n });
+  if (got.length) p.send({ t: 'loot', items: got });
+  syncInv(p);
+}
+
 export function nearNpc(p: PlayerSession, zone: ZoneDef, role: NpcDef['role'], id?: string): NpcDef | null {
   return zone.npcs.find((n) => n.role === role && (!id || n.id === id) && dist2(p.x, p.z, n.x, n.z) <= NPC_RANGE * NPC_RANGE) ?? null;
 }

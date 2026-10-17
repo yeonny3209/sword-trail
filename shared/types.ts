@@ -1,6 +1,9 @@
 /** 게임 데이터(JSON) 타입. 클라이언트·서버 공용 */
 
-export type ClassId = 'swordsman' | 'berserker' | 'blademaster' | 'spellblade';
+export type ClassId = 'swordsman' | 'berserker' | 'blademaster' | 'spellblade' | 'buffer' | 'debuffer';
+
+/** 무기 종류(손에 쥔 모양) */
+export type WeaponKind = 'sword' | 'greatsword' | 'dual' | 'runeblade' | 'staff' | 'scythe';
 
 /** 중심 좌표 + 크기의 사각형(XZ 평면) */
 export interface Rect {
@@ -107,7 +110,7 @@ export interface ClassDef {
   desc: string;
   role: string;
   color: string;
-  weapon: { kind: 'sword' | 'greatsword' | 'dual' | 'runeblade'; length: number; width: number; color: string };
+  weapon: { kind: WeaponKind; length: number; width: number; color: string };
   base: { hp: number; mp: number; atk: number; def: number; crit: number; speed: number };
   growth: { hp: number; mp: number; atk: number; def: number };
   /** 레벨업마다 주는 주 스탯 비중 */
@@ -140,6 +143,27 @@ export interface HitDef {
   fx?: 'slash' | 'heavy' | 'pierce' | 'x' | 'magic';
   /** 대상을 끌어당김(+) 또는 밀어냄 */
   pull?: boolean;
+}
+
+/** 스킬 효과: 정해진 프레임에 서버가 적용한다. 효과 크기는 스킬 레벨(castScale)에 따라 커진다 */
+export interface Cast {
+  /** 이 프레임에 적용 */
+  at: number;
+  /** 아군: 가까운 파티원(나 포함) */
+  ally?: {
+    range: number;
+    /** 나만 */
+    selfOnly?: boolean;
+    /** 최대 체력의 비율만큼 회복 */
+    heal?: number;
+    buffs?: import('./status').StatusApply[];
+    /** 쓰러진 파티원 한 명을 이 체력 비율로 살림 */
+    revive?: number;
+  };
+  /** 적: 판정 모양 안의 적에게 */
+  foe?: { shape: import('./geom').HitShape; debuffs: import('./status').StatusApply[] };
+  /** 연출 색 */
+  color?: string;
 }
 
 /** 행동(기본공격·대시공격·점프공격·백스텝·스킬) — 프레임 단위 */
@@ -179,6 +203,8 @@ export interface ActionDef {
   max?: number;
   /** 이 프레임들에서 마우스 방향으로 다시 돈다 */
   aim?: number[];
+  /** 아군·적에게 거는 효과(치유·버프·디버프·소생) */
+  cast?: Cast;
   icon?: string;
   desc?: string;
 }
@@ -236,6 +262,8 @@ export interface MonsterDef {
   /** 레이드 보스: 부하 소환·체력 단계·격노 */
   raid?: { adds: string; phases: number[]; addsPerPlayer: number; enrageSec: number };
   attacks: MonsterAttackDef[];
-  model: { shape: 'slime' | 'beast' | 'humanoid' | 'golem'; color: string; scale: number; weapon?: { kind: 'sword' | 'greatsword' | 'dual' | 'runeblade'; length: number; width: number; color: string } };
+  model: { shape: 'slime' | 'beast' | 'humanoid' | 'golem'; color: string; scale: number; weapon?: { kind: WeaponKind; length: number; width: number; color: string } };
+  /** 정예 몬스터: 원래 몬스터 id */
+  elite?: string;
   hitMat?: 'flesh' | 'metal' | 'slime' | 'stone';
 }

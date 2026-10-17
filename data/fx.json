@@ -104,6 +104,30 @@
       "life": 0.7,
       "size": 0.42,
       "gravity": -1.5
+    },
+    "healSpark": {
+      "count": 26,
+      "color": "#8fffb0",
+      "speed": 3.5,
+      "life": 0.8,
+      "size": 0.3,
+      "gravity": -3
+    },
+    "buffSpark": {
+      "count": 22,
+      "color": "#ffe080",
+      "speed": 3.2,
+      "life": 0.8,
+      "size": 0.28,
+      "gravity": -3
+    },
+    "curseSpark": {
+      "count": 26,
+      "color": "#b060e0",
+      "speed": 3.8,
+      "life": 0.7,
+      "size": 0.3,
+      "gravity": -1.5
     }
   },
   "parryFlash": {

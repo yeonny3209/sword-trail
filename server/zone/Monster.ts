@@ -2,6 +2,7 @@ import { disabled, newBody, stepBody, type Body } from '../../shared/combat';
 import { dist2, resolveCircle, wrapAngle, yawTo } from '../../shared/geom';
 import { MonState, type MonsterInfo, type S2C } from '../../shared/protocol';
 import type { MonsterDef, Rect, ZoneDef } from '../../shared/types';
+import type { StatusId } from '../../shared/status';
 import type { PlayerSession } from './PlayerSession';
 
 let nextId = 1;
@@ -35,6 +36,12 @@ export class Monster {
   cdMul = 1;
   /** 보스가 소환한 부하: 보상 없이 쓰러지면 사라짐 */
   summoned = false;
+  /** 이벤트로 나온 몬스터: 쓰러지면 다시 나오지 않고 사라짐(보상은 정상) */
+  temporary = false;
+  /** 걸려 있는 디버프(효과 id → 세기·끝나는 시각·건 사람·독 초당 피해) */
+  readonly status = new Map<StatusId, { power: number; until: number; by: number; val: number }>();
+  /** 둔화·속박을 반영한 이동 배율 */
+  private moveF = 1;
   /** 최근 입힌 피해(시간이 지나면 줄어듦) — 레이드 보스가 누굴 노릴지 */
   readonly threat = new Map<number, number>();
   /** 지금까지 입힌 피해 합계 — 레이드 보상을 받을 자격 */
@@ -84,6 +91,37 @@ export class Monster {
   private set(s: MonState): void {
     this.state = s;
     this.stateT = 0;
+  }
+
+  /** 이 디버프의 세기(없으면 0) */
+  power(id: StatusId): number {
+    const s = this.status.get(id);
+    return s && s.until > Date.now() ? s.power : 0;
+  }
+
+  /** 디버프를 건다(같은 효과는 센 쪽·긴 쪽). 바뀌었으면 true */
+  addStatus(id: StatusId, power: number, durSec: number, by: number, val = 0): boolean {
+    const until = Date.now() + durSec * 1000;
+    const cur = this.status.get(id);
+    if (cur && cur.until > Date.now()) {
+      const stronger = power > cur.power || val > cur.val;
+      this.status.set(id, { power: Math.max(cur.power, power), until: Math.max(cur.until, until), by: stronger ? by : cur.by, val: Math.max(cur.val, val) });
+      return stronger || until > cur.until;
+    }
+    this.status.set(id, { power, until, by, val });
+    return true;
+  }
+
+  /** 끝난 디버프를 지운다. 지웠으면 true */
+  pruneStatus(now: number): boolean {
+    let changed = false;
+    for (const [id, s] of this.status) {
+      if (s.until <= now) {
+        this.status.delete(id);
+        changed = true;
+      }
+    }
+    return changed;
   }
 
   addDamage(id: number, n: number): void {
@@ -140,6 +178,7 @@ export class Monster {
     this.dead = false;
     this.target = null;
     this.window = null;
+    this.status.clear();
     this.set(MonState.Idle);
   }
 
@@ -155,6 +194,7 @@ export class Monster {
     }
     if (this.state === MonState.Hit || this.state === MonState.Air || this.state === MonState.Down) this.set(MonState.Idle);
     this.cd -= dt;
+    this.moveF = this.status.size ? (this.power('bind') > 0 ? 0 : Math.max(0, 1 - this.power('slow'))) : 1;
     if (d.raid) for (let i = 0; i < this.acd.length; i++) this.acd[i] -= dt;
 
     // 대상 고르기: 가까운 살아 있는 플레이어. 집에서 너무 멀어지면 포기
@@ -185,7 +225,7 @@ export class Monster {
           this.turn(want, 8, dt);
           const k = d.raid ? this.pickRaidAttack(dist) : d.attacks.findIndex((a) => dist <= a.range && this.cd <= 0);
           if (k >= 0 && Math.abs(wrapAngle(want - this.f)) < 0.6) return this.startAttack(k, emit);
-          if (dist > Math.min(...d.attacks.map((a) => a.range)) * 0.8) this.walk(want, d.speed * this.speedMul, dt, zone);
+          if (dist > Math.min(...d.attacks.map((a) => a.range)) * 0.8) this.walk(want, d.speed * this.speedMul * this.moveF, dt, zone);
           else this.state = MonState.Idle;
           return;
         }
@@ -198,7 +238,7 @@ export class Monster {
         if (dist2(b.x, b.z, this.wanderX, this.wanderZ) > 0.6) {
           const want = yawTo(b.x, b.z, this.wanderX, this.wanderZ);
           this.turn(want, 5, dt);
-          this.walk(want, d.speed * this.speedMul * (leashed ? 1.2 : 0.45), dt, zone);
+          this.walk(want, d.speed * this.speedMul * this.moveF * (leashed ? 1.2 : 0.45), dt, zone);
         } else this.state = MonState.Idle;
         return;
       }
@@ -210,7 +250,7 @@ export class Monster {
       }
       case MonState.Attack: {
         const a = d.attacks[this.attack];
-        if (a.lunge) this.walk(this.f, a.lunge, dt, zone);
+        if (a.lunge && this.moveF > 0) this.walk(this.f, a.lunge * this.moveF, dt, zone);
         if (this.stateT >= a.active) this.set(MonState.Recover);
         return;
       }

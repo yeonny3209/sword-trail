@@ -2,7 +2,7 @@ import { ACTIONS } from '../../shared/data';
 import { skillMp } from '../../shared/rules';
 import type { LocalPlayer } from '../game/LocalPlayer';
 
-const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R'];
+const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R', '1', '2', '3', '4'];
 
 /** 화면 아래 스킬 단축키 칸: 이름, MP, 쿨타임, 배우는 레벨 */
 export class SkillBar {

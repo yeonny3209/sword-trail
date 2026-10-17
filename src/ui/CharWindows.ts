@@ -3,7 +3,7 @@ import type { C2S, SelfState } from '../../shared/protocol';
 import { expToNext, skillMax, skillMp, skillMul, STAT_DESC, STAT_KEYS, STAT_NAMES } from '../../shared/rules';
 import { Window } from './Window';
 
-const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R'];
+const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R', '1', '2', '3', '4'];
 
 /** 캐릭터 정보(U): 능력치와 스탯 포인트 분배 */
 export class CharacterWindow extends Window {

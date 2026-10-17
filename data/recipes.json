@@ -1235,6 +1235,226 @@
    "gold": 5000,
    "lv": 30,
    "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_1",
+   "out": "w_buffer_1",
+   "n": 1,
+   "need": [
+    [
+     "ore_1",
+     7
+    ],
+    [
+     "mat_pelt",
+     7
+    ],
+    [
+     "wood_1",
+     3
+    ]
+   ],
+   "gold": 200,
+   "lv": 5,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_2",
+   "out": "w_buffer_2",
+   "n": 1,
+   "need": [
+    [
+     "ore_2",
+     9
+    ],
+    [
+     "mat_spear",
+     9
+    ],
+    [
+     "mat_feather",
+     4
+    ]
+   ],
+   "gold": 800,
+   "lv": 10,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_3",
+   "out": "w_buffer_3",
+   "n": 1,
+   "need": [
+    [
+     "ore_2",
+     11
+    ],
+    [
+     "mat_cloth",
+     11
+    ],
+    [
+     "mat_shield",
+     5
+    ]
+   ],
+   "gold": 1800,
+   "lv": 15,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_4",
+   "out": "w_buffer_4",
+   "n": 1,
+   "need": [
+    [
+     "ore_3",
+     13
+    ],
+    [
+     "mat_ecto",
+     13
+    ],
+    [
+     "mat_crest2",
+     6
+    ]
+   ],
+   "gold": 3200,
+   "lv": 20,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_buffer_5",
+   "out": "w_buffer_5",
+   "n": 1,
+   "need": [
+    [
+     "ore_3",
+     15
+    ],
+    [
+     "mat_core",
+     15
+    ],
+    [
+     "mat_rune",
+     7
+    ]
+   ],
+   "gold": 5000,
+   "lv": 30,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_1",
+   "out": "w_debuffer_1",
+   "n": 1,
+   "need": [
+    [
+     "ore_1",
+     7
+    ],
+    [
+     "mat_pelt",
+     7
+    ],
+    [
+     "wood_1",
+     3
+    ]
+   ],
+   "gold": 200,
+   "lv": 5,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_2",
+   "out": "w_debuffer_2",
+   "n": 1,
+   "need": [
+    [
+     "ore_2",
+     9
+    ],
+    [
+     "mat_spear",
+     9
+    ],
+    [
+     "mat_feather",
+     4
+    ]
+   ],
+   "gold": 800,
+   "lv": 10,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_3",
+   "out": "w_debuffer_3",
+   "n": 1,
+   "need": [
+    [
+     "ore_2",
+     11
+    ],
+    [
+     "mat_cloth",
+     11
+    ],
+    [
+     "mat_shield",
+     5
+    ]
+   ],
+   "gold": 1800,
+   "lv": 15,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_4",
+   "out": "w_debuffer_4",
+   "n": 1,
+   "need": [
+    [
+     "ore_3",
+     13
+    ],
+    [
+     "mat_ecto",
+     13
+    ],
+    [
+     "mat_crest2",
+     6
+    ]
+   ],
+   "gold": 3200,
+   "lv": 20,
+   "minRar": 1
+  },
+  {
+   "id": "r_w_debuffer_5",
+   "out": "w_debuffer_5",
+   "n": 1,
+   "need": [
+    [
+     "ore_3",
+     15
+    ],
+    [
+     "mat_core",
+     15
+    ],
+    [
+     "mat_rune",
+     7
+    ]
+   ],
+   "gold": 5000,
+   "lv": 30,
+   "minRar": 1
   }
  ]
 }

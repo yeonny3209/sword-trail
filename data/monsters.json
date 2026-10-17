@@ -1167,6 +1167,212 @@
     "addsPerPlayer": 2,
     "enrageSec": 480
    }
+  },
+  {
+   "id": "ember_cultist",
+   "name": "불꽃 신도",
+   "lv": 36,
+   "hp": 5200,
+   "atk": 112,
+   "def": 46,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "speed": 3.8,
+   "radius": 0.42,
+   "height": 1.8,
+   "weight": 0.9,
+   "aggro": 70,
+   "leash": 140,
+   "respawn": 3,
+   "attacks": [
+    {
+     "name": "부적 날리기",
+     "windup": 1.0,
+     "active": 0.2,
+     "recover": 0.8,
+     "range": 9,
+     "shape": {
+      "type": "box",
+      "range": 10,
+      "width": 1.4
+     },
+     "dmg": 1.3,
+     "kx": 4,
+     "stun": 22,
+     "cd": 2.6,
+     "fx": "wave"
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#b8452a",
+    "scale": 1,
+    "weapon": {
+     "kind": "runeblade",
+     "length": 1.0,
+     "width": 0.8,
+     "color": "#ffe090"
+    }
+   },
+   "hitMat": "flesh"
+  },
+  {
+   "id": "ignis",
+   "name": "화염의 대사제 이그니스",
+   "lv": 40,
+   "hp": 140000,
+   "atk": 150,
+   "def": 70,
+   "exp": 9500,
+   "gold": [
+    800,
+    1400
+   ],
+   "speed": 3.3,
+   "radius": 1.2,
+   "height": 3.8,
+   "weight": 7,
+   "aggro": 80,
+   "leash": 140,
+   "respawn": 999999,
+   "attacks": [
+    {
+     "name": "화염 일격",
+     "windup": 0.8,
+     "active": 0.3,
+     "recover": 0.9,
+     "range": 4.6,
+     "shape": {
+      "type": "arc",
+      "range": 4.8,
+      "width": 150
+     },
+     "dmg": 1.7,
+     "kx": 9,
+     "stun": 30,
+     "cd": 2.0
+    },
+    {
+     "name": "불꽃 파도",
+     "windup": 1.1,
+     "active": 0.25,
+     "recover": 1.0,
+     "range": 14,
+     "shape": {
+      "type": "box",
+      "range": 15,
+      "width": 3.0
+     },
+     "dmg": 1.6,
+     "kx": 6,
+     "stun": 28,
+     "cd": 3.5,
+     "fx": "wave"
+    },
+    {
+     "name": "화염 폭풍",
+     "windup": 1.9,
+     "active": 0.45,
+     "recover": 1.5,
+     "range": 9.5,
+     "shape": {
+      "type": "circle",
+      "range": 9.5,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.9,
+     "kx": 13,
+     "stun": 40,
+     "cd": 10,
+     "heavy": true,
+     "kz": 12
+    },
+    {
+     "name": "불기둥",
+     "windup": 1.2,
+     "active": 0.4,
+     "recover": 1.2,
+     "range": 9,
+     "shape": {
+      "type": "circle",
+      "range": 3.8,
+      "width": 0,
+      "offset": 6
+     },
+     "dmg": 2.4,
+     "kx": 10,
+     "stun": 36,
+     "cd": 7,
+     "heavy": true,
+     "kz": 11
+    },
+    {
+     "name": "화염 돌진",
+     "windup": 1.0,
+     "active": 0.4,
+     "recover": 1.3,
+     "range": 12,
+     "shape": {
+      "type": "box",
+      "range": 12.5,
+      "width": 3.0
+     },
+     "dmg": 2.6,
+     "kx": 11,
+     "stun": 36,
+     "cd": 9,
+     "lunge": 22,
+     "heavy": true,
+     "kz": 10
+    },
+    {
+     "name": "업화 회전",
+     "windup": 1.1,
+     "active": 0.45,
+     "recover": 1.3,
+     "range": 6.2,
+     "shape": {
+      "type": "circle",
+      "range": 6.3,
+      "width": 0,
+      "offset": 0
+     },
+     "dmg": 2.2,
+     "kx": 11,
+     "stun": 36,
+     "cd": 7,
+     "heavy": true,
+     "kz": 10
+    }
+   ],
+   "model": {
+    "shape": "humanoid",
+    "color": "#b04a2a",
+    "scale": 2.3,
+    "weapon": {
+     "kind": "greatsword",
+     "length": 2.8,
+     "width": 2.6,
+     "color": "#ff8a40"
+    }
+   },
+   "hitMat": "metal",
+   "boss": true,
+   "superArmor": true,
+   "raid": {
+    "adds": "ember_cultist",
+    "phases": [
+     0.75,
+     0.5,
+     0.25
+    ],
+    "addsPerPlayer": 2,
+    "enrageSec": 540
+   }
   }
  ]
 }

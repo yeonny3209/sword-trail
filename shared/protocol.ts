@@ -4,6 +4,7 @@ import type { Equip, Item, Slot } from './items';
 import type { QuestState } from './quests';
 import type { AhCategory, AuctionRow, MailRow, TradeSide } from './market';
 import type { PvpRankRow, PvpRecord } from './pvp';
+import type { BuffView, StatusId } from './status';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -140,6 +141,8 @@ export type C2S =
   /** 결투장: 서버가 알린 공격 k에 내가 맞았다 */
   | { t: 'phurt'; k: number }
   | { t: 'pvprank' }
+  /** 쓰러진 파티원 곁에서 살려 준다 */
+  | { t: 'raise'; id: number }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }
   | { t: 'portal'; id: string }
   | { t: 'ping'; c: number };
@@ -152,7 +155,7 @@ export type S2C =
   | { t: 'leave'; id: number }
   | { t: 'act'; id: number; a: string; f: number }
   /** 피해 숫자. tk: 'm' 몬스터 / 'p' 플레이어 */
-  | { t: 'dmg'; tk: 'm' | 'p'; id: number; n: number; crit?: boolean; back?: boolean; counter?: boolean; by: number; pvp?: boolean }
+  | { t: 'dmg'; tk: 'm' | 'p'; id: number; n: number; crit?: boolean; back?: boolean; counter?: boolean; by: number; pvp?: boolean; dot?: boolean }
   /** 내 상태 일부 갱신 */
   | { t: 'me'; s: Partial<SelfState> }
   | { t: 'mspawn'; m: MonsterInfo }
@@ -188,6 +191,14 @@ export type S2C =
   /** 거래 창 상태 */
   | { t: 'trade'; name: string; mine: TradeSide; theirs: TradeSide }
   | { t: 'tend'; ok: boolean; text: string }
+  /** 내게 걸린 버프·디버프 전체(바뀔 때마다) */
+  | { t: 'buffs'; list: BuffView[] }
+  /** 몬스터에게 걸린 디버프 id들 */
+  | { t: 'mstatus'; id: number; s: StatusId[] }
+  /** 치유 숫자 */
+  | { t: 'heal'; id: number; n: number; by: number }
+  /** 스킬 효과 연출: by가 쓴 효과가 아군(ids)·적(mids)에게 닿음 */
+  | { t: 'cast'; by: number; kind: 'heal' | 'buff' | 'debuff' | 'revive'; ids: number[]; mids: number[]; color?: string }
   /** 화면 가운데 큰 알림(레이드 단계·격노·클리어) */
   | { t: 'banner'; text: string; kind?: 'warn' | 'good' }
   /** 결투장: 플레이어 by가 나를 행동 a의 h번째 판정으로 맞혔다(x, z: 공격자 위치). 맞았으면 phurt k로 확인 */

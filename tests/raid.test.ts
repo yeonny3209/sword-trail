@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { baseZone, MONSTERS, ZONES } from '../shared/data';
-import { RAID, raidHp, raidKey } from '../shared/raid';
+import { RAID, raidHp, raidKey, raidOf } from '../shared/raid';
 
 describe('레이드 규칙', () => {
   it('보스 체력은 한 명 늘 때마다 +75%', () => {
@@ -27,10 +27,16 @@ describe('레이드 규칙', () => {
     expect(boss.raid).toBeTruthy();
     expect(MONSTERS[boss.raid!.adds]).toBeTruthy();
     expect(boss.raid!.phases.every((p) => p > 0 && p < 1)).toBe(true);
-    const raid = ZONES[RAID.zone];
-    expect(raid.spawns.some((s) => s.monster === 'gargon')).toBe(true);
-    const gate = ZONES.town.portals.find((p) => p.to === RAID.zone)!;
-    expect(raid.portals.find((p) => p.id === gate.toPortal)).toBeTruthy();
-    expect(ZONES.town.portals.find((p) => p.id === raid.portals[0].toPortal)).toBeTruthy();
+    for (const d of RAID.dungeons) {
+      const raid = ZONES[d.zone];
+      expect(raid.type).toBe('raid');
+      const bossId = raid.spawns.map((s) => s.monster).find((id) => MONSTERS[id]?.raid);
+      expect(bossId).toBeTruthy();
+      expect(MONSTERS[MONSTERS[bossId!].raid!.adds]).toBeTruthy();
+      const gate = ZONES.town.portals.find((p) => p.to === d.zone)!;
+      expect(raid.portals.find((p) => p.id === gate.toPortal)).toBeTruthy();
+      expect(ZONES.town.portals.find((p) => p.id === raid.portals[0].toPortal)).toBeTruthy();
+      expect(raidOf(d.zone)).toBe(d);
+    }
   });
 });

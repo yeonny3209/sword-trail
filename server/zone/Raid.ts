@@ -1,7 +1,7 @@
 import { MONSTERS } from '../../shared/data';
 import { ITEMS, makeItem, rollRarity, type Item } from '../../shared/items';
 import type { S2C } from '../../shared/protocol';
-import { RAID, raidHp } from '../../shared/raid';
+import { RAID, raidHp, raidOf } from '../../shared/raid';
 import { expBoost, PROGRESSION } from '../../shared/rules';
 import type { MonsterDef, ZoneDef } from '../../shared/types';
 import { newUid } from '../db';
@@ -77,7 +77,7 @@ export class RaidSystem {
     const def = MONSTERS[cfg.adds];
     b.speedMul += 0.08;
     b.cdMul *= 0.92;
-    this.h.broadcast({ t: 'banner', text: `${this.phase}단계! 성채 수호병이 몰려온다!`, kind: 'warn' });
+    this.h.broadcast({ t: 'banner', text: `${this.phase}단계! ${def?.name ?? '부하'}이(가) 몰려온다!`, kind: 'warn' });
     if (!def) return;
     const alive = [...this.h.players.values()].filter((p) => !p.dead && !p.leaving).length;
     const n = Math.max(2, Math.min(8, alive * cfg.addsPerPlayer));
@@ -119,7 +119,7 @@ export class RaidSystem {
     const out: Item[] = [];
     const pool = Object.values(ITEMS).filter((d) => d.kind === 'equip' && d.lv <= def.lv + 2 && d.lv >= def.lv - 14 && (!d.cls || d.cls === p.cls || Math.random() < 0.3));
     const d = pool[Math.floor(Math.random() * pool.length)];
-    if (d) out.push(makeItem(d.id, 1, newUid(), Math.max(RAID.minRarity, rollRarity(Math.random(), RAID.rewardRarityBonus))));
+    if (d) out.push(makeItem(d.id, 1, newUid(), Math.max(RAID.minRarity, rollRarity(Math.random(), raidOf(this.h.zone.id)?.rarityBonus ?? 2.5))));
     for (const m of RAID.mats) {
       const n = m.n[0] + Math.floor(Math.random() * (m.n[1] - m.n[0] + 1));
       if (ITEMS[m.item] && n > 0) out.push(makeItem(m.item, n, newUid()));

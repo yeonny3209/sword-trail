@@ -4,6 +4,7 @@ import { getData } from '../core/config';
 export type Action =
   | 'up' | 'down' | 'left' | 'right' | 'attack' | 'jump' | 'back' | 'dash'
   | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 'pot1' | 'pot2'
+  | 's7' | 's8' | 's9' | 's10'
   | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'camreset' | 'debug';
 
 interface InputData {

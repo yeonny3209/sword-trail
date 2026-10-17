@@ -1,18 +1,29 @@
 import raidJson from '../data/raid.json';
 
-/** 레이드(파티 전용 던전) 규칙. 수치는 data/raid.json */
-export interface RaidConfig {
+/** 레이드 던전 하나 */
+export interface RaidDungeon {
   zone: string;
   minLevel: number;
   maxPlayers: number;
+  /** 보상 장비 등급이 높게 나오는 정도 */
+  rarityBonus: number;
+}
+
+/** 레이드(파티 전용 던전) 규칙. 수치는 data/raid.json */
+export interface RaidConfig {
+  dungeons: RaidDungeon[];
   /** 한 명 늘 때마다 보스 체력이 이만큼 늘어난다(0.75 = +75%) */
   hpPerExtraPlayer: number;
-  rewardRarityBonus: number;
   minRarity: number;
   mats: { item: string; n: [number, number] }[];
 }
 
 export const RAID = raidJson as RaidConfig;
+
+/** 이 존이 레이드 던전이면 그 규칙 */
+export function raidOf(zoneId: string): RaidDungeon | null {
+  return RAID.dungeons.find((d) => d.zone === zoneId) ?? null;
+}
 
 /** 인원수에 맞춘 보스 최대 체력 */
 export function raidHp(base: number, players: number): number {

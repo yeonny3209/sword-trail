@@ -6,7 +6,7 @@ import { actionTravel, expBoost, expToNext, PROGRESSION, MAX_LEVEL, SKILL_POINTS
 import type { ZoneDef } from '../../shared/types';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
-import { rollLoot } from './Inventory';
+import { eliteLoot, rollLoot } from './Inventory';
 import { PARTY_SHARE_RANGE, partyExp } from '../../shared/social';
 import { PVP } from '../../shared/pvp';
 
@@ -20,6 +20,8 @@ export interface CombatHost {
   players: Map<number, PlayerSession>;
   /** 레이드 보스를 쓰러뜨렸다(참여한 모두에게 보상) */
   onRaidClear?(mon: Monster): void;
+  /** 스킬을 썼다(치유·버프·디버프를 시전 프레임에 적용) */
+  onCast?(p: PlayerSession, a: import('../../shared/types').ActionDef, slv: number): void;
 }
 
 const SLACK_RANGE = 3;
@@ -52,6 +54,7 @@ export class Combat {
     p.acts.set(m.i | 0, { a: a.id, start: now, hits: new Map() });
     if (p.acts.size > 24) p.acts.delete(p.acts.keys().next().value!);
     this.host.broadcast({ t: 'act', id: p.id, a: a.id, f: Number(m.f) || 0 }, p);
+    if (a.cast) this.host.onCast?.(p, a, p.data.skills[a.id] ?? 1);
   }
 
   onHit(p: PlayerSession, m: Extract<C2S, { t: 'hit' }>): void {
@@ -75,11 +78,13 @@ export class Combat {
     const reach = hit.shape.range + (hit.shape.offset ?? 0) + mon.def.radius + SLACK_RANGE;
     if (dist2(p.x, p.z, mon.body.x, mon.body.z) > reach * reach) return;
 
-    const crit = Math.random() < p.stats.crit;
+    const crit = Math.random() < p.eff.crit;
     const back = !mon.def.boss && isBackAttack(mon.f, p.x, p.z, mon.body.x, mon.body.z);
     const counter = mon.state === MonState.Windup || mon.state === MonState.Attack;
     const mult = hit.dmg * (isSkill(p.cls, a.id) ? skillMul(p.data.skills[a.id] ?? 1) : 1);
-    const n = rollDamage(p.stats.atk, mult, mon.def.def, Math.random(), { crit, critMul: 1.5, back, counter });
+    // 방어력 약화·약점 노출 같은 디버프를 반영
+    const monDef = mon.def.def * (1 - mon.power('defDown'));
+    const n = Math.max(1, Math.round(rollDamage(p.eff.atk, mult, monDef, Math.random(), { crit, critMul: 1.5, back, counter }) * (1 + mon.power('vuln'))));
     mon.hp -= n;
     mon.lastAttacker = p.id;
     mon.addDamage(p.id, n);
@@ -114,11 +119,12 @@ export class Combat {
     for (const q of mates) {
       const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
       q.data.gold += gold;
-      rollLoot(q, mon.def);
+      if (mon.def.elite) eliteLoot(q, mon.def);
+      else rollLoot(q, mon.def);
       const exp = partyExp(Math.max(1, Math.round(mon.def.exp * PROGRESSION.monsterExpRate * expBoost(q.lv) * expFactor(q.lv, mon.def.lv))), mates.length);
       q.send({ t: 'reward', exp, gold, name: mon.def.name });
       this.gainExp(q, exp);
-      this.host.onKill(q, mon.def.id);
+      this.host.onKill(q, mon.def.elite ?? mon.def.id);
     }
   }
 
@@ -156,7 +162,7 @@ export class Combat {
     const reach = a.range + (a.lunge ?? 0) * a.active + mon.def.radius + SLACK_RANGE;
     if (dist2(p.x, p.z, mon.body.x, mon.body.z) > reach * reach) return;
     w.hurt.add(p.id);
-    const n = rollDamage(mon.def.atk * mon.atkMul, a.dmg, p.stats.def, Math.random(), { crit: false, critMul: 1, back: false, counter: false });
+    const n = rollDamage(mon.def.atk * mon.atkMul * (1 - mon.power('atkDown')), a.dmg, p.eff.def, Math.random(), { crit: false, critMul: 1, back: false, counter: false });
     this.damagePlayer(p, n, mon.id);
   }
 
@@ -167,6 +173,11 @@ export class Combat {
   /** 플레이어 피해(몬스터 by 또는 결투장에서 플레이어 by) */
   damagePlayer(p: PlayerSession, n: number, by: number, o: { crit?: boolean; pvp?: boolean } = {}): void {
     p.gathering = null;
+    // 수호(받는 피해 감소)와 보호막이 먼저 받는다
+    n = Math.round(n * p.damageTaken);
+    const hadShield = (p.buffs.get('shield')?.val ?? 0) > 0;
+    n = p.absorb(n);
+    if (hadShield) p.sendBuffs();
     p.data.hp = Math.max(0, p.data.hp - n);
     p.lastHurtAt = Date.now();
     p.dirty = true;
@@ -178,6 +189,19 @@ export class Combat {
       p.send({ t: 'died', wait: this.reviveWait() });
       // 결투장은 처치 알림을 따로 띄운다
       if (!o.pvp) this.host.broadcast({ t: 'sys', text: `${p.name}님이 쓰러졌습니다.` });
+    }
+  }
+
+  /** 독 같은 지속 피해(맞는 효과 없음). 쓰러뜨리면 건 사람이 처치한 것으로 */
+  dot(mon: Monster, n: number, by: number): void {
+    if (mon.dead) return;
+    const killer = this.host.players.get(by);
+    mon.hp -= n;
+    mon.addDamage(by, n);
+    this.host.broadcast({ t: 'dmg', tk: 'm', id: mon.id, n, by, dot: true });
+    if (mon.hp <= 0) {
+      if (killer) this.kill(mon, killer);
+      else mon.hp = 1;
     }
   }
 

@@ -76,15 +76,16 @@ export class CombatClient {
     for (const key of run.sfxNow()) bus.emit('sfx', { key });
     const fwd = (d: number) => [me.pos.x + Math.sin(me.yaw) * d, me.pos.z + Math.cos(me.yaw) * d] as const;
     for (const [kind, arg] of run.fxNow()) {
-      const color = FX_COLOR[run.def.hits[0]?.fx ?? 'slash'] ?? '#cfe6ff';
+      const color = run.def.cast?.color ?? FX_COLOR[run.def.hits[0]?.fx ?? 'slash'] ?? '#cfe6ff';
       if (kind === 'crescent') {
         const [x, z] = fwd(0.8);
         this.c.fx.crescent(x, me.pos.y + 1.2, z, me.yaw, arg ?? 1, color, -0.9);
       } else if (kind === 'ring') {
-        const off = run.def.hits[0]?.shape.offset ?? 1.2;
+        // 아군 대상 스킬은 내 발밑에서 퍼진다
+        const off = run.def.cast?.ally ? 0 : (run.def.hits[0]?.shape.offset ?? 1.2);
         const [x, z] = fwd(off);
         this.c.fx.ring(x, z, arg ?? 1, color);
-        this.c.cam.addShake(0.12);
+        if (!run.def.cast) this.c.cam.addShake(0.12);
       } else if (kind === 'wave') this.c.fx.wave(me.pos.x, me.pos.z, me.yaw, arg ?? 6, color);
       else if (kind === 'flash') this.c.fx.flash(me.pos.x, me.pos.y + 1, me.pos.z, 2.2, color);
     }
@@ -170,6 +171,13 @@ export class CombatClient {
     switch (m.t) {
       case 'dmg': {
         const pos = this.posOf(m.tk, m.id);
+        if (m.dot) {
+          // 독 같은 지속 피해: 맞는 연출 없이 작은 숫자만
+          const v = this.c.monsters.list.get(m.id);
+          if (v) this.c.monsters.setHp(m.id, v.hp - m.n);
+          if (pos) this.c.numbers.add(pos, String(m.n), 'dot');
+          return;
+        }
         if (m.tk === 'm') {
           const v = this.c.monsters.list.get(m.id);
           if (v) this.c.monsters.setHp(m.id, v.hp - m.n);
@@ -232,7 +240,38 @@ export class CombatClient {
       case 'phit':
         this.onPvpHit(m);
         break;
+      case 'heal': {
+        const pos = this.posOf('p', m.id);
+        if (pos) this.c.numbers.add(pos, `+${m.n}`, 'heal');
+        break;
+      }
+      case 'cast':
+        this.onCast(m);
+        break;
     }
+  }
+
+  /** 치유·버프·디버프·소생이 닿았다: 대상 발밑에 빛과 입자, 소리 */
+  private onCast(m: Extract<S2C, { t: 'cast' }>): void {
+    const spark = m.kind === 'debuff' ? 'curseSpark' : m.kind === 'buff' ? 'buffSpark' : 'healSpark';
+    const color = m.color ?? (m.kind === 'debuff' ? '#b060e0' : m.kind === 'buff' ? '#ffe080' : '#8fffb0');
+    const one = (x: number, y: number, z: number, big = 1) => {
+      this.c.fx.ring(x, z, 0.9 * big, color);
+      this.c.fx.flash(x, y + 0.6, z, 0.9 * big, color);
+      this.c.particles.burst(this.a.set(x, y + 0.2, z), this.c.bursts[spark]);
+    };
+    for (const id of m.ids) {
+      const p = this.posOf('p', id);
+      if (p) one(p.x, 0, p.z);
+    }
+    for (const id of m.mids) {
+      const v = this.c.monsters.list.get(id);
+      if (v) one(v.pos.x, v.pos.y, v.pos.z, 1.1);
+    }
+    const me = this.c.me();
+    const mine = m.by === me?.self.id || m.ids.includes(me?.self.id ?? -1);
+    bus.emit('sfx', { key: m.kind === 'debuff' ? 'curse' : m.kind === 'buff' ? 'buff' : 'heal', volume: mine ? 1 : 0.5 });
+    if (m.kind === 'revive') bus.emit('sfx', { key: 'gate', volume: 0.7 });
   }
 
   /** 렌더 프레임: 검 궤적, 연출, 파티클, 숫자 */

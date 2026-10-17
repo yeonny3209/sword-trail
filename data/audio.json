@@ -338,11 +338,33 @@
           "type": "tone",
           "wave": "sine",
           "freq": [
-            440,
-            880
+            520,
+            1040
           ],
-          "dur": 0.4,
-          "gain": 0.2
+          "dur": 0.35,
+          "gain": 0.35
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            780,
+            1560
+          ],
+          "dur": 0.45,
+          "gain": 0.22,
+          "delay": 0.08
+        },
+        {
+          "type": "metal",
+          "freqs": [
+            1560,
+            2340,
+            3120
+          ],
+          "dur": 0.5,
+          "gain": 0.12,
+          "delay": 0.1
         }
       ]
     },
@@ -670,6 +692,79 @@
           "dur": 0.5,
           "gain": 0.2,
           "delay": 0.03
+        }
+      ]
+    },
+    "buff": {
+      "path": "sfx/buff.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "triangle",
+          "freq": [
+            330,
+            660
+          ],
+          "dur": 0.25,
+          "gain": 0.35
+        },
+        {
+          "type": "tone",
+          "wave": "triangle",
+          "freq": [
+            495,
+            990
+          ],
+          "dur": 0.3,
+          "gain": 0.28,
+          "delay": 0.1
+        },
+        {
+          "type": "noise",
+          "filter": "highpass",
+          "freq": [
+            4000,
+            6000
+          ],
+          "q": 0.7,
+          "dur": 0.2,
+          "gain": 0.12
+        }
+      ]
+    },
+    "curse": {
+      "path": "sfx/curse.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sawtooth",
+          "freq": [
+            220,
+            70
+          ],
+          "dur": 0.5,
+          "gain": 0.3
+        },
+        {
+          "type": "tone",
+          "wave": "square",
+          "freq": [
+            233,
+            74
+          ],
+          "dur": 0.5,
+          "gain": 0.12
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            1800,
+            200
+          ],
+          "q": 0.8,
+          "dur": 0.45,
+          "gain": 0.35
         }
       ]
     }

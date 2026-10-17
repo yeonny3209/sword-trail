@@ -1,9 +1,19 @@
 {
-  "zone": "raid1",
-  "minLevel": 10,
-  "maxPlayers": 4,
+  "dungeons": [
+    {
+      "zone": "raid1",
+      "minLevel": 10,
+      "maxPlayers": 4,
+      "rarityBonus": 2.5
+    },
+    {
+      "zone": "raid2",
+      "minLevel": 25,
+      "maxPlayers": 4,
+      "rarityBonus": 3.5
+    }
+  ],
   "hpPerExtraPlayer": 0.75,
-  "rewardRarityBonus": 2.5,
   "minRarity": 2,
   "mats": [
     {

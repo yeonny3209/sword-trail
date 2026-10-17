@@ -19,6 +19,7 @@ import { UiHub } from './UiHub';
 import { SocialHub } from './SocialHub';
 import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
 import { ScreenFx } from '../ui/ScreenFx';
+import { BuffBar } from '../ui/BuffBar';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
 import { Monsters } from './Monsters';
@@ -102,6 +103,7 @@ export class GameClient {
     this.minimap = new Minimap(ui);
     this.bossBar = new BossBar(ui);
     new ScreenFx(ui);
+    new BuffBar(ui);
     bus.on('slowmo', ({ scale, ms }) => {
       if (scale < this.loop.timeScale || this.slowT <= 0) this.loop.timeScale = scale;
       this.slowT = Math.max(this.slowT, ms / 1000);
@@ -203,6 +205,9 @@ export class GameClient {
         break;
       case 'lvup':
         if (m.id !== this.me?.self.id) this.remotes.setLevel(m.id, m.lv);
+        break;
+      case 'mstatus':
+        this.monsters.setStatus(m.id, m.s);
         break;
       case 'died':
         this.me?.die();
@@ -330,7 +335,7 @@ export class GameClient {
     let boss: { name: string; lv: number; hp: number; mhp: number; d: number } | null = null;
     for (const v of this.monsters.list.values()) {
       if (v.dying) continue;
-      dots.push({ x: v.pos.x, z: v.pos.z, kind: v.def.boss ? 'boss' : 'monster' });
+      dots.push({ x: v.pos.x, z: v.pos.z, kind: v.def.boss || v.def.elite ? 'boss' : 'monster' });
       if (v.def.boss) {
         const d = Math.hypot(v.pos.x - me.pos.x, v.pos.z - me.pos.z);
         if (d < (v.def.raid ? 90 : 30) && (!boss || d < boss.d)) boss = { name: v.def.name, lv: v.def.lv, hp: v.hp, mhp: v.mhp, d };

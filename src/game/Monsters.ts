@@ -7,6 +7,7 @@ import type { HitDef, MonsterAttackDef, MonsterDef, ZoneDef } from '../../shared
 import { InterpBuffer, type Sample } from '../net/Interp';
 import type { Nameplates } from '../ui/Nameplates';
 import { Telegraphs } from '../fx/Telegraph';
+import { STATUS, type StatusId } from '../../shared/status';
 import { MonsterModel } from './MonsterModel';
 
 export interface MonView {
@@ -27,6 +28,9 @@ export interface MonView {
   speed: number;
   atk: { k: number; t0: number; a: MonsterAttackDef; reported: boolean; fxDone?: boolean } | null;
   dying: number;
+  /** 이름표 글자와 걸려 있는 디버프 */
+  label: string;
+  status: StatusId[];
 }
 
 /** 같은 존의 몬스터들. 서버 상태를 보간하고, 내가 때린 몬스터는 반응을 먼저 계산해서 즉시 보여 준다 */
@@ -53,10 +57,10 @@ export class Monsters {
     const v: MonView = {
       id: info.id, def, model, buf, hp: info.hp, mhp: info.mhp, st: MonState.Idle,
       body: newBody(info.x, info.z), predict: 0, blend: 1, pos: new THREE.Vector3(info.x, 0, info.z),
-      yaw: info.f, speed: 0, atk: null, dying: 0,
+      yaw: info.f, speed: 0, atk: null, dying: 0, label: `<span class="lv">Lv${def.lv}</span> ${def.name}`, status: [],
     };
     this.list.set(info.id, v);
-    this.plates.add(`m${info.id}`, model.root, def.height * def.model.scale + 0.45, `<span class="lv">Lv${def.lv}</span> ${def.name}`, 'monster', true, 30);
+    this.plates.add(`m${info.id}`, model.root, def.height * def.model.scale + 0.45, v.label, 'monster', true, 30);
     this.plates.setHp(`m${info.id}`, info.hp / info.mhp);
   }
 
@@ -81,6 +85,15 @@ export class Monsters {
     v.buf.push({ t: time, x: row[1], z: row[2], y: row[3], f: row[4], st: row[5] });
     v.hp = row[6];
     this.plates.setHp(`m${v.id}`, v.hp / v.mhp);
+  }
+
+  /** 디버프가 바뀌었다: 이름표에 아이콘을 붙인다 */
+  setStatus(id: number, s: StatusId[]): void {
+    const v = this.list.get(id);
+    if (!v) return;
+    v.status = s;
+    const icons = s.map((x) => STATUS[x]?.icon ?? '').join('');
+    this.plates.setHtml(`m${id}`, icons ? `${v.label}<br><span class="debuffs">${icons}</span>` : v.label);
   }
 
   setHp(id: number, hp: number): void {

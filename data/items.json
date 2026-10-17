@@ -1007,6 +1007,150 @@
    "price": 260,
    "stack": 99,
    "desc": "최대 MP의 70%를 회복한다."
+  },
+  {
+   "id": "w_buffer_0",
+   "name": "수련 지팡이",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 1,
+   "stats": {
+    "atk": 8
+   },
+   "price": 138
+  },
+  {
+   "id": "w_buffer_1",
+   "name": "성수 지팡이",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 5,
+   "stats": {
+    "atk": 18
+   },
+   "price": 570
+  },
+  {
+   "id": "w_buffer_2",
+   "name": "수호의 홀",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 10,
+   "stats": {
+    "atk": 30
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_buffer_3",
+   "name": "빛의 홀",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 15,
+   "stats": {
+    "atk": 44
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_buffer_4",
+   "name": "대천사의 지팡이",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 20,
+   "stats": {
+    "atk": 60
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_buffer_5",
+   "name": "세계수의 성장",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "buffer",
+   "lv": 30,
+   "stats": {
+    "atk": 90
+   },
+   "price": 16320
+  },
+  {
+   "id": "w_debuffer_0",
+   "name": "낡은 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 1,
+   "stats": {
+    "atk": 8
+   },
+   "price": 138
+  },
+  {
+   "id": "w_debuffer_1",
+   "name": "그림자 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 5,
+   "stats": {
+    "atk": 18
+   },
+   "price": 570
+  },
+  {
+   "id": "w_debuffer_2",
+   "name": "저주받은 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 10,
+   "stats": {
+    "atk": 30
+   },
+   "price": 1920
+  },
+  {
+   "id": "w_debuffer_3",
+   "name": "사신의 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 15,
+   "stats": {
+    "atk": 44
+   },
+   "price": 4170
+  },
+  {
+   "id": "w_debuffer_4",
+   "name": "망령의 대낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 20,
+   "stats": {
+    "atk": 60
+   },
+   "price": 7320
+  },
+  {
+   "id": "w_debuffer_5",
+   "name": "종말의 낫",
+   "kind": "equip",
+   "slot": "weapon",
+   "cls": "debuffer",
+   "lv": 30,
+   "stats": {
+    "atk": 90
+   },
+   "price": 16320
   }
  ]
 }
