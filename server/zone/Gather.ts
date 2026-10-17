@@ -30,20 +30,28 @@ export class GatherSystem {
     }
   }
 
-  private usable(p: PlayerSession, i: number): boolean {
+  /** 채집할 수 없으면 이유, 되면 null */
+  private blocked(p: PlayerSession, i: number): string | null {
     const n = this.zone.nodes[i];
-    return !!n && !this.down.has(i) && !p.dead && dist2(p.x, p.z, n.x, n.z) <= this.g.range * this.g.range;
+    if (!n || p.dead) return '채집할 수 없습니다.';
+    if (this.down.has(i)) return '이미 누군가 캐 갔습니다.';
+    if (dist2(p.x, p.z, n.x, n.z) > (this.g.range + 0.6) ** 2) return '너무 멉니다.';
+    return null;
   }
 
   onStart(p: PlayerSession, i: number): void {
-    if (!this.usable(p, i)) return;
+    const why = this.blocked(p, i);
+    if (why) return p.send({ t: 'err', text: why });
     p.gathering = { i, start: Date.now() };
   }
 
   onDone(p: PlayerSession, i: number): void {
     const g = p.gathering;
     p.gathering = null;
-    if (!g || g.i !== i || Date.now() - g.start < this.g.seconds * 1000 - 200 || !this.usable(p, i)) return;
+    if (!g || g.i !== i) return p.send({ t: 'err', text: '채집이 끊겼습니다.' });
+    if (Date.now() - g.start < this.g.seconds * 1000 - 400) return p.send({ t: 'err', text: '채집이 너무 빨랐습니다.' });
+    const why = this.blocked(p, i);
+    if (why) return p.send({ t: 'err', text: why });
     const node = this.zone.nodes[i];
     this.down.set(i, Date.now() + this.g.respawn * 1000);
     this.broadcast({ t: 'node', i, up: false });

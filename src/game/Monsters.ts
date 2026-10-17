@@ -24,7 +24,7 @@ export interface MonView {
   pos: THREE.Vector3;
   yaw: number;
   speed: number;
-  atk: { k: number; t0: number; a: MonsterAttackDef; reported: boolean } | null;
+  atk: { k: number; t0: number; a: MonsterAttackDef; reported: boolean; fxDone?: boolean } | null;
   dying: number;
 }
 
@@ -32,6 +32,8 @@ export interface MonView {
 export class Monsters {
   readonly list = new Map<number, MonView>();
   private readonly s: Sample = { t: 0, x: 0, z: 0, y: 0, f: 0, st: 0 };
+  /** 공격 판정이 시작될 때(화살·검기 연출) */
+  onAttackFx: (v: MonView, a: MonsterAttackDef) => void = () => {};
 
   constructor(private readonly scene: THREE.Scene, private readonly plates: Nameplates, private readonly delayMs: () => number) {}
 
@@ -176,7 +178,13 @@ export class Monsters {
       if (v.atk) {
         const t = (now - v.atk.t0) / 1000;
         if (t >= 0 && t < v.atk.a.windup) windup = t / v.atk.a.windup;
-        else if (t >= v.atk.a.windup && t < v.atk.a.windup + v.atk.a.active) attacking = true;
+        else if (t >= v.atk.a.windup && t < v.atk.a.windup + v.atk.a.active) {
+          attacking = true;
+          if (!v.atk.fxDone) {
+            v.atk.fxDone = true;
+            this.onAttackFx(v, v.atk.a);
+          }
+        }
       }
       const down = v.predict > 0 ? (v.body.down > 0 ? 1 : 0) : v.st === MonState.Down ? 1 : 0;
       const air = v.predict > 0 ? v.body.air : v.st === MonState.Air;

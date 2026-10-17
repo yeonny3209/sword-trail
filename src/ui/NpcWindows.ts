@@ -1,4 +1,5 @@
 import { bonusLines, enhanceCost, enhanceRate, ITEMS, itemBonus, itemName, LOOT, rarityColor, sellPrice, SHOPS, type Item } from '../../shared/items';
+import { RECIPE_LIST } from '../../shared/quests';
 import type { C2S } from '../../shared/protocol';
 import type { InventoryWindow } from './InventoryWindow';
 import { itemCell, itemTip, Tooltip } from './ItemView';
@@ -54,20 +55,24 @@ export class ShopWindow extends Window {
   }
 }
 
-/** 대장간: 장비 강화(+15까지). 가방이나 장비 칸에서 고른다 */
+/** 대장간: 강화(+15) 탭과 제작 탭 */
 export class SmithWindow extends Window {
   private pick: Item | null = null;
   private result = '';
+  private tab: 'enh' | 'craft' = 'enh';
+  private craftMsg = '';
+  /** 내 레벨(제작 가능 여부) */
+  lv: () => number = () => 1;
 
   constructor(ui: HTMLElement, private readonly send: (m: C2S) => void, private readonly inv: InventoryWindow) {
-    super(ui, '대장간 — 강화', '', 'smith-win');
+    super(ui, '대장간', '', 'smith-win');
   }
 
   openSmith(): void {
     this.open();
     this.inv.open();
     this.inv.picker = (it) => {
-      if (ITEMS[it.id]?.kind !== 'equip') return false;
+      if (this.tab !== 'enh' || ITEMS[it.id]?.kind !== 'equip') return false;
       this.pick = it;
       this.result = '';
       this.draw();
@@ -86,21 +91,39 @@ export class SmithWindow extends Window {
     this.draw();
   }
 
+  onCrafted(id: string, n: number, rar?: number): void {
+    const d = ITEMS[id];
+    this.craftMsg = `<span class="ok" style="color:${d?.kind === 'equip' ? rarityColor(rar) : ''}">제작 완료: ${d?.name ?? id}${n > 1 ? ` ${n}개` : ''}</span>`;
+    this.draw();
+  }
+
   draw(): void {
     if (!this.isOpen) return;
+    const tabs = `<div class="tabs"><button class="tab ${this.tab === 'enh' ? 'on' : ''}" data-t="enh">강화</button><button class="tab ${this.tab === 'craft' ? 'on' : ''}" data-t="craft">제작</button></div>`;
+    this.body.innerHTML = tabs + (this.tab === 'enh' ? this.enhHtml() : this.craftHtml());
+    this.body.querySelectorAll<HTMLButtonElement>('.tab').forEach((b) => b.addEventListener('click', () => {
+      this.tab = b.dataset.t as 'enh' | 'craft';
+      this.draw();
+    }));
+    if (this.tab === 'enh') this.bindEnh();
+    else this.body.querySelectorAll<HTMLButtonElement>('.mk').forEach((b) => b.addEventListener('click', () => this.send({ t: 'craft', id: b.dataset.id! })));
+  }
+
+  private current(): Item | null {
     // 서버 동기화 후 같은 uid의 최신 상태로
     const all = [...this.inv.inv, ...Object.values(this.inv.equip)].filter(Boolean) as Item[];
-    const it = this.pick ? all.find((x) => x.uid === this.pick!.uid) ?? null : null;
-    if (!it) {
-      this.body.innerHTML = '<div class="hint">강화할 장비를 가방이나 장비 칸에서 누르세요.</div>';
-      return;
-    }
+    return this.pick ? all.find((x) => x.uid === this.pick!.uid) ?? null : null;
+  }
+
+  private enhHtml(): string {
+    const it = this.current();
+    if (!it) return '<div class="hint">강화할 장비를 가방이나 장비 칸에서 누르세요.</div>';
     const e = it.enh ?? 0;
     const cost = enhanceCost(it);
     const stones = this.inv.count('enh_stone');
     const next = { ...it, enh: e + 1 };
     const maxed = e >= LOOT.enhance.max;
-    this.body.innerHTML = `
+    return `
       <div class="smith-item">${itemCell(it)}<div><div style="color:${rarityColor(it.rar)}">${itemName(it)}</div>
         <div class="desc">${bonusLines(itemBonus(it)).join(', ')}</div></div></div>
       ${maxed ? '<div class="hint">최고 단계입니다.</div>' : `
@@ -110,9 +133,34 @@ export class SmithWindow extends Window {
       ${e >= LOOT.enhance.failDropFrom ? '<div class="warn">실패하면 한 단계 내려갑니다.</div>' : ''}
       <div class="row end"><button class="btn primary go" ${this.inv.gold < cost.gold || stones < cost.stones ? 'disabled' : ''}>강화하기</button></div>`}
       <div class="result">${this.result}</div>`;
-    const cell = this.body.querySelector<HTMLDivElement>('.cell');
+  }
+
+  private bindEnh(): void {
+    const it = this.current();
+    if (!it) return;
+    const cell = this.body.querySelector<HTMLDivElement>('.smith-item .cell');
     cell?.addEventListener('mouseenter', (ev) => Tooltip.show(itemTip(it), ev.clientX, ev.clientY));
     cell?.addEventListener('mouseleave', () => Tooltip.hide());
     this.body.querySelector('.go')?.addEventListener('click', () => this.send({ t: 'enhance', uid: it.uid }));
+  }
+
+  /** 제작법 목록: 내 레벨 +5까지 보여 주고, 재료가 모자라면 흐리게 */
+  private craftHtml(): string {
+    const lv = this.lv();
+    const rows = RECIPE_LIST.filter((r) => r.lv <= lv + 5).map((r) => {
+      const d = ITEMS[r.out];
+      if (!d) return '';
+      const mats = r.need.map(([id, n]) => {
+        const have = this.inv.count(id);
+        return `<span class="${have >= n ? 'ok' : 'lack'}">${ITEMS[id]?.name ?? id} ${have}/${n}</span>`;
+      }).join(' · ');
+      const can = lv >= r.lv && this.inv.gold >= r.gold && r.need.every(([id, n]) => this.inv.count(id) >= n);
+      const stats = d.stats ? bonusLines(d.stats).join(', ') : d.desc ?? '';
+      return `<div class="craft-row ${can ? '' : 'dim'}"><div class="nm">${d.name}${r.n > 1 ? ` ×${r.n}` : ''} <small>Lv${r.lv}${r.minRar ? ' · 고급 이상' : ''}</small>
+        <div class="desc">${stats}</div><div class="mats">${mats} · <span class="${this.inv.gold >= r.gold ? 'ok' : 'lack'}">${r.gold.toLocaleString()} G</span></div></div>
+        <button class="btn small mk" data-id="${r.id}" ${can ? '' : 'disabled'}>제작</button></div>`;
+    }).join('');
+    return `<div class="hint">재료는 몬스터와 채집(스페이스)으로 모읍니다. 장비는 고급 이상 등급으로 만들어집니다.</div>
+      <div class="result">${this.craftMsg}</div>${rows}`;
   }
 }

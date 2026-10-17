@@ -63,6 +63,19 @@ export class Effects {
     });
   }
 
+  /** 날아가는 화살(가늘고 빠름) */
+  arrow(x: number, z: number, yaw: number, length: number, color = '#ffe8b0'): void {
+    const m = new THREE.Mesh(this.waveGeo, this.mat(color));
+    m.rotation.y = yaw;
+    m.scale.set(0.06, 0.06, 1.6);
+    const dx = Math.sin(yaw), dz = Math.cos(yaw);
+    this.add(m, 0.18, (k, f) => {
+      const d = 0.6 + k * length;
+      f.obj.position.set(x + dx * d, 1.3, z + dz * d);
+      f.mat.opacity = 1 - k * 0.5;
+    });
+  }
+
   /** 섬광 구 */
   flash(x: number, y: number, z: number, scale = 1, color = '#ffffff'): void {
     const m = new THREE.Mesh(this.flashGeo, this.mat(color, 0.35));

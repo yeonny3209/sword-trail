@@ -16,6 +16,7 @@ import { Hud } from '../ui/Hud';
 import { Nameplates } from '../ui/Nameplates';
 import { DeathOverlay, SkillBar } from '../ui/SkillBar';
 import { UiHub } from './UiHub';
+import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
 import { Monsters } from './Monsters';
@@ -37,6 +38,9 @@ export class GameClient {
   readonly hud: Hud;
   readonly remotes: RemotePlayers;
   readonly monsters: Monsters;
+  private readonly fx: Effects;
+  private readonly minimap: Minimap;
+  private readonly bossBar: BossBar;
   readonly combat: CombatClient;
   private readonly skillbar: SkillBar;
   private readonly death: DeathOverlay;
@@ -77,16 +81,26 @@ export class GameClient {
     const bursts = getData<{ particles: Record<string, BurstSpec> }>('fx').particles;
     this.combat = new CombatClient({
       scene: this.scene, net: this.net, monsters: this.monsters, remotes: this.remotes, cam: this.cam,
-      fx: new Effects(this.scene), particles: new Particles(this.scene), numbers: new DamageNumbers(ui, this.camera),
+      fx: (this.fx = new Effects(this.scene)), particles: new Particles(this.scene), numbers: new DamageNumbers(ui, this.camera),
       bursts, me: () => this.me, zone: () => this.zone?.def ?? null,
     });
     this.remotes.onRemove = (r) => this.combat.forget(r.model);
     this.skillbar = new SkillBar(ui);
     this.death = new DeathOverlay(ui, () => this.net.send({ t: 'revive' }));
     this.chat = new ChatBox(ui, (ch, text, to) => this.net.send({ t: 'chat', ch, text, to }));
-    this.ui = new UiHub(ui, (m) => this.net.send(m), (text) => this.chat.addHtml(text));
+    this.ui = new UiHub(ui, (m) => this.net.send(m), (text) => this.chat.addHtml(text), () => this.zone);
+    this.ui.quests.onChange = () => this.refreshNpcPlates();
+    this.minimap = new Minimap(ui);
+    this.bossBar = new BossBar(ui);
+    this.monsters.onAttackFx = (v, a) => {
+      if (a.fx === 'arrow') this.fx.arrow(v.pos.x, v.pos.z, v.yaw, a.range);
+      else if (a.fx === 'wave') this.fx.wave(v.pos.x, v.pos.z, v.yaw, a.range, '#ffcf70');
+      else if (a.heavy) this.fx.ring(v.pos.x, v.pos.z, 1.2, '#ff5040');
+    };
     this.renderer.domElement.addEventListener('mousedown', (e) => {
-      if (e.button === 0 && this.zone && this.ui.clickNpc(this.input.mouseNdc(), this.camera, this.zone.npcs)) this.input.cancel('attack');
+      if (e.button !== 0 || !this.zone || !this.me) return;
+      const ndc = this.input.mouseNdc();
+      if (this.ui.clickNpc(ndc, this.camera, this.zone.npcs) || this.ui.gathering.click(ndc, this.camera, this.me)) this.input.cancel('attack');
     });
     new Audio();
     this.overlay = document.createElement('div');
@@ -197,12 +211,21 @@ export class GameClient {
     }
     for (const p of this.zone.portals) this.plates.add(`portal${p.def.id}`, p.ring, 3.4, p.def.label, 'portal', false, 80);
     this.hud.setZone(id);
+    this.minimap.setZone(def);
+    this.refreshNpcPlates();
+  }
+
+  /** NPC 이름표: 퀘스트 받을 것 !, 보고할 것 ? */
+  private refreshNpcPlates(): void {
+    for (const n of this.zone?.npcs ?? []) {
+      this.plates.setHtml(`npc${n.def.id}`, `${this.ui.quests.markerFor(n.def.id)}<span class="title">${n.def.title}</span>${n.def.name}`);
+    }
   }
 
   private update = (dt: number, frame: number): void => {
     this.input.beginTick();
     bus.emit('tick', { frame, dt });
-    if (this.zone) this.ui.update(this.input, this.zone.npcs, this.zone.def.type === 'town');
+    if (this.zone) this.ui.update(this.input, this.zone.npcs, this.zone.def.type === 'town', dt);
     const me = this.me, zone = this.zone;
     if (!me || !zone) return;
     // 마우스가 가리키는 땅 쪽이 공격 방향
@@ -258,11 +281,34 @@ export class GameClient {
     this.remotes.render(renderTime, dt);
     this.monsters.render(renderTime, dt);
     this.combat.render(dt);
+    this.renderMap(dt);
     this.plates.render();
     this.skillbar.render();
     this.hud.setNet(this.net.rtt, this.remotes.list.size + 1);
     this.renderer.render(this.scene, this.camera);
   };
+
+  /** 미니맵 점과 가까운 보스 체력 바 */
+  private renderMap(dt: number): void {
+    const me = this.me, z = this.zone;
+    if (!me || !z) return;
+    const dots: MapDot[] = [];
+    let boss: { name: string; lv: number; hp: number; mhp: number; d: number } | null = null;
+    for (const v of this.monsters.list.values()) {
+      if (v.dying) continue;
+      dots.push({ x: v.pos.x, z: v.pos.z, kind: v.def.boss ? 'boss' : 'monster' });
+      if (v.def.boss) {
+        const d = Math.hypot(v.pos.x - me.pos.x, v.pos.z - me.pos.z);
+        if (d < 30 && (!boss || d < boss.d)) boss = { name: v.def.name, lv: v.def.lv, hp: v.hp, mhp: v.mhp, d };
+      }
+    }
+    for (const r of this.remotes.list.values()) dots.push({ x: r.model.root.position.x, z: r.model.root.position.z, kind: 'player' });
+    for (const n of z.npcs) dots.push({ x: n.def.x, z: n.def.z, kind: 'npc' });
+    for (const n of z.nodes) if (n.up) dots.push({ x: n.def.x, z: n.def.z, kind: 'node' });
+    this.minimap.render(dt, { x: me.pos.x, z: me.pos.z, yaw: me.yaw }, dots);
+    if (boss) this.bossBar.show(boss.name, boss.lv, boss.hp, boss.mhp);
+    else this.bossBar.hide();
+  }
 
   private resize = (): void => {
     const w = this.mount.clientWidth || window.innerWidth;

@@ -14,7 +14,7 @@ import { QuestSystem } from './Quests';
 import { GatherSystem, onCraft } from './Gather';
 
 const PLAYER_RADIUS = 0.4;
-const SAVE_EVERY_MS = 30_000;
+const SAVE_EVERY_MS = 10_000;
 const CHAT_MAX = 120;
 
 /**

@@ -46,7 +46,11 @@ export class QuestUi {
     this.refresh();
   }
 
+  /** 퀘스트 상태가 바뀌면(NPC 머리 위 표시 갱신 등) */
+  onChange: () => void = () => {};
+
   refresh(): void {
+    this.onChange();
     this.win.draw();
     this.dialog.draw();
     this.drawTracker();

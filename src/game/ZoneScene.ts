@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import type { NpcDef, PortalDef, PropDef, ZoneDef } from '../../shared/types';
+import type { NodeDef, NpcDef, PortalDef, PropDef, ZoneDef } from '../../shared/types';
+import { LOOT } from '../../shared/items';
 import { CharacterModel } from './CharacterModel';
 
 /** 땅에 얼룩을 뿌린 반복 텍스처 */
@@ -36,11 +37,26 @@ export interface NpcView {
   model: CharacterModel;
 }
 
+export interface NodeView {
+  i: number;
+  def: NodeDef;
+  /** 캘 수 있을 때 보이는 부분 */
+  res: THREE.Group;
+  up: boolean;
+}
+
+const NODE_TINT: Record<string, string[]> = {
+  ore: ['#c8b090', '#e8eef4', '#7fd8ff'],
+  herb: ['#7ccf5a', '#5ab0ff', '#f4f0ff'],
+  wood: ['#8a6440', '#4a3a30', '#b89a70'],
+};
+
 /** 존 정의(JSON)로 3D 장면을 만든다. 존을 옮기면 dispose하고 새로 만든다. */
 export class ZoneScene {
   readonly group = new THREE.Group();
   readonly portals: PortalView[] = [];
   readonly npcs: NpcView[] = [];
+  readonly nodes: NodeView[] = [];
   private readonly disposables: { dispose(): void }[] = [];
   private time = 0;
 
@@ -94,6 +110,8 @@ export class ZoneScene {
     }
     for (const p of def.props) this.prop(p);
     for (const p of def.portals) this.portal(p);
+    const tier = (LOOT as unknown as { gather: { tiers: Record<string, number> } }).gather.tiers[def.id] ?? 1;
+    def.nodes.forEach((n, i) => this.node(n, i, tier));
     for (const n of def.npcs) {
       const model = new CharacterModel({ body: n.color, weapon: null });
       model.root.position.set(n.x, 0, n.z);
@@ -105,6 +123,53 @@ export class ZoneScene {
 
   private track(...items: { dispose(): void }[]): void {
     this.disposables.push(...items);
+  }
+
+  /** 채집 노드: 광석(바위+결정), 약초(덤불+꽃), 나무(그루터기+통나무) */
+  private node(n: NodeDef, i: number, tier: number): void {
+    const tint = NODE_TINT[n.kind][Math.min(2, tier - 1)];
+    const base = new THREE.Group();
+    base.position.set(n.x, 0, n.z);
+    const res = new THREE.Group();
+    const m = (color: string, extra: THREE.MeshStandardMaterialParameters = {}) => {
+      const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...extra });
+      this.track(mat);
+      return mat;
+    };
+    const add = (parent: THREE.Group, geo: THREE.BufferGeometry, mat: THREE.Material, x: number, y: number, z: number) => {
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = true;
+      parent.add(mesh);
+      this.track(geo);
+      return mesh;
+    };
+    if (n.kind === 'ore') {
+      add(base, new THREE.DodecahedronGeometry(0.6, 0), m('#6a6660'), 0, 0.3, 0).scale.y = 0.7;
+      for (const [x, z, s] of [[0.2, 0.1, 1], [-0.25, 0.15, 0.8], [0.05, -0.25, 0.7]]) {
+        const c = add(res, new THREE.ConeGeometry(0.12 * s, 0.6 * s, 5), m(tint, { emissive: tint, emissiveIntensity: 0.35, metalness: 0.5 }), x, 0.55, z);
+        c.rotation.set(x, 0, z);
+      }
+    } else if (n.kind === 'herb') {
+      add(res, new THREE.SphereGeometry(0.35, 8, 6), m('#3f7a34'), 0, 0.25, 0).scale.y = 0.7;
+      for (const [x, z] of [[0.15, 0.1], [-0.18, 0.05], [0, -0.2], [0.1, -0.05]]) add(res, new THREE.SphereGeometry(0.08, 6, 5), m(tint, { emissive: tint, emissiveIntensity: 0.5 }), x, 0.5, z);
+      add(base, new THREE.CircleGeometry(0.45, 10), m('#4a3a28'), 0, 0.03, 0).rotation.x = -Math.PI / 2;
+    } else {
+      add(base, new THREE.CylinderGeometry(0.35, 0.42, 0.45, 8), m('#5a4030'), 0, 0.22, 0);
+      const log = add(res, new THREE.CylinderGeometry(0.16, 0.16, 1.2, 7), m(tint), 0.5, 0.18, 0.2);
+      log.rotation.set(0, 0.6, Math.PI / 2);
+      add(res, new THREE.SphereGeometry(0.1, 6, 5), m('#5f8a42'), 0, 0.5, 0);
+    }
+    base.add(res);
+    this.group.add(base);
+    this.nodes.push({ i, def: n, res, up: true });
+  }
+
+  setNode(i: number, up: boolean): void {
+    const n = this.nodes[i];
+    if (!n) return;
+    n.up = up;
+    n.res.visible = up;
   }
 
   private prop(p: PropDef): void {

@@ -10,7 +10,8 @@ import { ShopWindow, SmithWindow } from '../ui/NpcWindows';
 import { QuestUi } from '../ui/QuestUi';
 import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
-import type { NpcView } from './ZoneScene';
+import type { NpcView, ZoneScene } from './ZoneScene';
+import { Gathering } from './Gathering';
 
 const TALK_RANGE = 3.2;
 
@@ -29,9 +30,15 @@ export class UiHub {
   readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
   private readonly ray = new THREE.Raycaster();
   private readonly potBar: HTMLDivElement;
+  private readonly prompt: HTMLDivElement;
+  readonly gathering: Gathering;
   private me: LocalPlayer | null = null;
 
-  constructor(ui: HTMLElement, private readonly send: (m: C2S) => void, private readonly say: (text: string) => void) {
+  constructor(ui: HTMLElement, private readonly send: (m: C2S) => void, private readonly say: (text: string) => void, zone: () => ZoneScene | null) {
+    this.gathering = new Gathering(ui, send, say, zone);
+    this.prompt = document.createElement('div');
+    this.prompt.className = 'act-prompt';
+    ui.appendChild(this.prompt);
     this.charWin = new CharacterWindow(ui, send);
     this.skillWin = new SkillWindow(ui, send);
     this.invWin = new InventoryWindow(ui, send);
@@ -39,6 +46,7 @@ export class UiHub {
     this.smithWin = new SmithWindow(ui, send, this.invWin);
     this.npcHandlers.shop = (n) => this.shopWin.openShop(n.id, n.ref ?? 'general');
     this.npcHandlers.smith = () => this.smithWin.openSmith();
+    this.smithWin.lv = () => this.me?.self.lv ?? 1;
     this.quests = new QuestUi(ui, send);
     this.quests.count = (id) => this.invWin.count(id);
     this.npcHandlers.quest = (n) => this.quests.openGiver(n.id, n.name);
@@ -62,6 +70,11 @@ export class UiHub {
     switch (m.t) {
       case 'quests':
         this.quests.set(m.q);
+        break;
+      case 'crafted':
+        this.smithWin.onCrafted(m.id, m.n, m.rar);
+        this.say(`제작 완료: ${ITEMS[m.id]?.name ?? m.id}${m.n > 1 ? ` ${m.n}개` : ''}`);
+        bus.emit('sfx', { key: 'gate' });
         break;
       case 'qdone':
         this.say(`<b>퀘스트 완료: ${QUESTS[m.id]?.name ?? m.id}</b>`);
@@ -109,8 +122,8 @@ export class UiHub {
     this.potBar.innerHTML = `<div class="pot"><span class="k">C</span>🧪<b>${hp}</b></div><div class="pot"><span class="k">V</span>💧<b>${mp}</b></div>`;
   }
 
-  /** 고정 단계마다: 단축키 창 열기, 물약, 마을에서 스페이스로 NPC 대화 */
-  update(input: Input, npcs: NpcView[], town: boolean): void {
+  /** 고정 단계마다: 단축키 창 열기, 물약, 스페이스로 NPC 대화(마을)·채집 */
+  update(input: Input, npcs: NpcView[], town: boolean, dt = 1 / 60): void {
     if (input.pressed.has('character')) this.charWin.toggle();
     if (input.pressed.has('skills')) this.skillWin.toggle();
     if (input.pressed.has('inventory')) this.invWin.toggle();
@@ -118,11 +131,20 @@ export class UiHub {
     if (input.pressed.has('pot1')) this.send({ t: 'pot', k: 1 });
     if (input.pressed.has('pot2')) this.send({ t: 'pot', k: 2 });
     const me = this.me;
-    if (!me || !town || !input.pressed.has('jump')) return;
-    const n = this.nearest(npcs, me.pos.x, me.pos.z);
-    if (n) {
+    if (!me) return;
+    this.gathering.update(dt, me);
+    const npc = town ? this.nearest(npcs, me.pos.x, me.pos.z) : null;
+    const node = npc ? null : this.gathering.nearest(me.pos.x, me.pos.z);
+    const text = npc ? `대화: ${npc.name}` : node && !this.gathering.busy ? `채집: ${this.gathering.nodeName(node)}` : '';
+    this.prompt.innerHTML = text ? `<b>Space</b> ${text}` : '';
+    this.prompt.style.display = text ? '' : 'none';
+    if (!input.pressed.has('jump')) return;
+    if (npc) {
       input.pressed.delete('jump');
-      this.talk(n);
+      this.talk(npc);
+    } else if (node) {
+      input.pressed.delete('jump');
+      this.gathering.start(node, me);
     }
   }
 
