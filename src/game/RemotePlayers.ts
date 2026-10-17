@@ -4,6 +4,7 @@ import { MoveState, type PlayerInfo } from '../../shared/protocol';
 import { InterpBuffer, type Sample } from '../net/Interp';
 import type { Nameplates } from '../ui/Nameplates';
 import { ACTIONS } from '../../shared/data';
+import type { HitDef } from '../../shared/types';
 import { CharacterModel } from './CharacterModel';
 import { ActionRunner } from './combat/ActionRunner';
 
@@ -55,6 +56,8 @@ export class RemotePlayers {
 
   delayFrames = 8;
   onRemove: (r: Remote) => void = () => {};
+  /** 다른 플레이어의 타격 판정이 시작되는 프레임(베기 자국) */
+  onSlash: (r: Remote, hit: HitDef, index: number) => void = () => {};
 
   remove(id: number): void {
     const r = this.list.get(id);
@@ -111,7 +114,11 @@ export class RemotePlayers {
       r.last.set(s.x, 0, s.z);
       const run = r.action;
       if (run) {
+        const before = run.frame;
         run.frame += dt * 60;
+        run.def.hits.forEach((h, i) => {
+          if (before < h.f[0] && run.frame >= h.f[0]) this.onSlash(r, h, i);
+        });
         if (run.done()) r.action = null;
       }
       r.model.pose = run && run.frame >= 0 ? run.pose(run.frame) : [-30, -50];

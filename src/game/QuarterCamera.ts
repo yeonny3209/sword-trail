@@ -17,6 +17,9 @@ export class QuarterCamera {
   theta = 0;
   private shake = 0;
   private shakeT = 0;
+  /** 맞은 방향으로 밀렸다 돌아오는 반동(세계 좌표)과 줌 펀치(확 당겨졌다 돌아옴) */
+  private readonly kick = new THREE.Vector3();
+  private punch = 0;
   enabledShake = true;
 
   constructor(readonly camera: THREE.PerspectiveCamera) {
@@ -45,21 +48,35 @@ export class QuarterCamera {
     if (this.enabledShake) this.shake = Math.min(1, this.shake + amount);
   }
 
+  /** 타격 반동: (dx, dz) 방향으로 amount(m)만큼 밀리고 zoom만큼 당겨졌다가 돌아온다 */
+  addKick(dx: number, dz: number, amount: number, zoom = 0): void {
+    if (!this.enabledShake) return;
+    const l = Math.hypot(dx, dz) || 1;
+    this.kick.x += (dx / l) * amount;
+    this.kick.z += (dz / l) * amount;
+    this.punch = Math.min(0.14, this.punch + zoom);
+  }
+
   update(target: THREE.Vector3, dt: number): void {
     this.zoom += (this.targetZoom - this.zoom) * damp(10, dt);
     this.focus.x += (target.x - this.focus.x) * damp(this.d.follow, dt);
     this.focus.z += (target.z - this.focus.z) * damp(this.d.follow, dt);
     this.focus.y = target.y * 0.35;
     const c = this.camera;
-    const back = this.d.back * this.zoom;
-    c.position.set(this.focus.x + Math.sin(this.theta) * back, this.focus.y + this.d.height * this.zoom, this.focus.z + Math.cos(this.theta) * back);
+    const zk = this.zoom * (1 - this.punch);
+    const back = this.d.back * zk;
+    c.position.set(this.focus.x + Math.sin(this.theta) * back + this.kick.x, this.focus.y + this.d.height * zk, this.focus.z + Math.cos(this.theta) * back + this.kick.z);
+    const decay = Math.exp(-14 * dt);
+    this.kick.multiplyScalar(decay);
+    this.punch *= Math.exp(-12 * dt);
     c.lookAt(this.focus.x, this.focus.y + 0.8, this.focus.z);
     if (this.shake > 0) {
       this.shakeT += dt * 40;
-      const s = this.shake * this.shake * 0.45;
+      const s = this.shake * 0.55;
       c.position.x += Math.sin(this.shakeT * 1.3) * s;
       c.position.y += Math.sin(this.shakeT * 1.7 + 1) * s;
-      this.shake = Math.max(0, this.shake - dt * 2.8);
+      c.position.z += Math.sin(this.shakeT * 1.1 + 2) * s * 0.6;
+      this.shake = Math.max(0, this.shake - dt * 3.4);
     }
   }
 

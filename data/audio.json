@@ -1,5 +1,5 @@
 {
-  "master": 0.6,
+  "master": 0.8,
   "pitchJitter": 0.05,
   "useFiles": false,
   "sounds": {
@@ -15,7 +15,17 @@
           ],
           "q": 1.4,
           "dur": 0.13,
-          "gain": 0.28
+          "gain": 0.5
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            420,
+            140
+          ],
+          "dur": 0.1,
+          "gain": 0.18
         }
       ]
     },
@@ -31,7 +41,17 @@
           ],
           "q": 1.1,
           "dur": 0.22,
-          "gain": 0.4
+          "gain": 0.75
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            260,
+            70
+          ],
+          "dur": 0.22,
+          "gain": 0.3
         }
       ]
     },
@@ -392,7 +412,7 @@
           ],
           "q": 2.5,
           "dur": 0.14,
-          "gain": 0.5
+          "gain": 0.8
         },
         {
           "type": "tone",
@@ -402,7 +422,7 @@
             90
           ],
           "dur": 0.16,
-          "gain": 0.5
+          "gain": 0.9
         }
       ]
     },
@@ -455,6 +475,201 @@
           ],
           "dur": 0.4,
           "gain": 0.12
+        }
+      ]
+    },
+    "hitFlesh": {
+      "path": "sfx/hitFlesh.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            240,
+            50
+          ],
+          "dur": 0.14,
+          "gain": 1.1
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            4200,
+            380
+          ],
+          "q": 0.9,
+          "dur": 0.11,
+          "gain": 0.95
+        },
+        {
+          "type": "noise",
+          "filter": "bandpass",
+          "freq": [
+            3000,
+            1600
+          ],
+          "q": 1.2,
+          "dur": 0.05,
+          "gain": 0.7
+        }
+      ]
+    },
+    "hitHeavy": {
+      "path": "sfx/hitHeavy.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            150,
+            32
+          ],
+          "dur": 0.3,
+          "gain": 1.5
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            5000,
+            300
+          ],
+          "q": 0.8,
+          "dur": 0.24,
+          "gain": 1.0
+        },
+        {
+          "type": "tone",
+          "wave": "sawtooth",
+          "freq": [
+            320,
+            70
+          ],
+          "dur": 0.1,
+          "gain": 0.35
+        },
+        {
+          "type": "noise",
+          "filter": "bandpass",
+          "freq": [
+            2600,
+            1200
+          ],
+          "q": 1.0,
+          "dur": 0.07,
+          "gain": 0.8
+        }
+      ]
+    },
+    "hitMetal": {
+      "path": "sfx/hitMetal.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            900,
+            1340,
+            1960,
+            2800,
+            3600
+          ],
+          "dur": 0.3,
+          "gain": 0.45
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            200,
+            60
+          ],
+          "dur": 0.1,
+          "gain": 0.8
+        },
+        {
+          "type": "noise",
+          "filter": "highpass",
+          "freq": [
+            3500,
+            3500
+          ],
+          "q": 0.7,
+          "dur": 0.06,
+          "gain": 0.6
+        }
+      ]
+    },
+    "crit": {
+      "path": "sfx/crit.ogg",
+      "layers": [
+        {
+          "type": "metal",
+          "freqs": [
+            1500,
+            2250,
+            3300,
+            4100
+          ],
+          "dur": 0.4,
+          "gain": 0.5
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            700,
+            1900
+          ],
+          "dur": 0.14,
+          "gain": 0.3
+        },
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            110,
+            35
+          ],
+          "dur": 0.28,
+          "gain": 1.1
+        }
+      ]
+    },
+    "kill": {
+      "path": "sfx/kill.ogg",
+      "layers": [
+        {
+          "type": "tone",
+          "wave": "sine",
+          "freq": [
+            100,
+            28
+          ],
+          "dur": 0.5,
+          "gain": 1.5
+        },
+        {
+          "type": "noise",
+          "filter": "lowpass",
+          "freq": [
+            3500,
+            200
+          ],
+          "q": 0.7,
+          "dur": 0.42,
+          "gain": 1.0
+        },
+        {
+          "type": "metal",
+          "freqs": [
+            660,
+            990,
+            1480
+          ],
+          "dur": 0.5,
+          "gain": 0.2,
+          "delay": 0.03
         }
       ]
     }

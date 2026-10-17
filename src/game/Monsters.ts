@@ -112,7 +112,8 @@ export class Monsters {
     v.predict = 0.35;
     v.blend = 0;
     if (!v.def.superArmor) v.atk = null;
-    v.model.flash();
+    // 가벼운 몬스터일수록, 센 공격일수록 크게 움찔
+    v.model.kick(dirX, dirZ, Math.min(2.2, (0.7 + hit.stop * 0.1) / Math.sqrt(Math.max(0.6, v.def.weight))));
   }
 
   /** 고정 단계: 예측 중인 몬스터의 반응 물리(히트스톱 중에는 멈춤) */
@@ -189,6 +190,7 @@ export class Monsters {
       const down = v.predict > 0 ? (v.body.down > 0 ? 1 : 0) : v.st === MonState.Down ? 1 : 0;
       const air = v.predict > 0 ? v.body.air : v.st === MonState.Air;
       v.model.animate(dt, v.predict > 0 ? 0 : v.speed, air, down, windup, attacking);
+      root.position.add(v.model.recoil);
       v.model.telegraph(windup > 0 ? (v.atk!.a.heavy ? '#ff3020' : '#fff4d0') : null, windup);
     }
   }

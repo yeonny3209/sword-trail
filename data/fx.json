@@ -1,17 +1,120 @@
 {
-  "hitstop": { "parry": 4, "finisher": 10, "postureBreak": 6, "blocked": 2, "useAttackHitstop": true },
-  "shake": {
-    "parry": 0.28, "finisher": 0.5, "guardBreak": 0.35, "playerHit": 0.12,
-    "decay": 2.6, "frequency": 26, "maxOffset": 0.32, "maxRoll": 0.035
+  "hitstop": {
+    "parry": 4,
+    "finisher": 10,
+    "postureBreak": 6,
+    "blocked": 2,
+    "useAttackHitstop": true
   },
-  "trail": { "seconds": 0.14, "maxSamples": 40, "color": "#dfe9ff", "enemyColor": "#ffb070", "intensity": 0.85, "from": 0.3 },
+  "shake": {
+    "parry": 0.28,
+    "finisher": 0.5,
+    "guardBreak": 0.35,
+    "playerHit": 0.12,
+    "decay": 2.6,
+    "frequency": 26,
+    "maxOffset": 0.32,
+    "maxRoll": 0.035
+  },
+  "trail": {
+    "seconds": 0.14,
+    "maxSamples": 40,
+    "color": "#dfe9ff",
+    "enemyColor": "#ffb070",
+    "intensity": 0.85,
+    "from": 0.3
+  },
   "particles": {
     "max": 600,
-    "hit": { "count": 14, "color": "#ffb347", "speed": 5.5, "life": 0.32, "size": 0.09, "gravity": 9 },
-    "heavyHit": { "count": 24, "color": "#ff9a3c", "speed": 7.5, "life": 0.4, "size": 0.11, "gravity": 9 },
-    "block": { "count": 12, "color": "#8fd3ff", "speed": 5, "life": 0.25, "size": 0.08, "gravity": 6 },
-    "parry": { "count": 40, "color": "#fff3b0", "speed": 10, "life": 0.45, "size": 0.13, "gravity": 4 },
-    "finisher": { "count": 50, "color": "#ff4d6d", "speed": 9, "life": 0.6, "size": 0.14, "gravity": 7 }
+    "hit": {
+      "count": 26,
+      "color": "#ffb347",
+      "speed": 9,
+      "life": 0.4,
+      "size": 0.28,
+      "gravity": 14,
+      "bounce": 0.35
+    },
+    "heavyHit": {
+      "count": 46,
+      "color": "#ff9a3c",
+      "speed": 12,
+      "life": 0.5,
+      "size": 0.38,
+      "gravity": 14,
+      "bounce": 0.35
+    },
+    "block": {
+      "count": 30,
+      "color": "#bfe6ff",
+      "speed": 11,
+      "life": 0.35,
+      "size": 0.24,
+      "gravity": 12,
+      "bounce": 0.5
+    },
+    "parry": {
+      "count": 50,
+      "color": "#d8c4ff",
+      "speed": 12,
+      "life": 0.5,
+      "size": 0.34,
+      "gravity": 6
+    },
+    "finisher": {
+      "count": 90,
+      "color": "#ff4d6d",
+      "speed": 13,
+      "life": 0.7,
+      "size": 0.45,
+      "gravity": 10,
+      "bounce": 0.3
+    },
+    "crit": {
+      "count": 60,
+      "color": "#ffd24a",
+      "speed": 14,
+      "life": 0.55,
+      "size": 0.4,
+      "gravity": 9,
+      "bounce": 0.3
+    },
+    "goo": {
+      "count": 34,
+      "color": "#7fe08a",
+      "speed": 8,
+      "life": 0.55,
+      "size": 0.3,
+      "gravity": 12,
+      "bounce": 0.1
+    },
+    "blood": {
+      "count": 28,
+      "color": "#d8404a",
+      "speed": 9,
+      "life": 0.45,
+      "size": 0.26,
+      "gravity": 16,
+      "bounce": 0.15
+    }
   },
-  "parryFlash": { "lightColor": "#fff4cc", "lightIntensity": 40, "lightDistance": 9, "seconds": 0.18, "screenFlash": 0.35 }
+  "parryFlash": {
+    "lightColor": "#fff4cc",
+    "lightIntensity": 40,
+    "lightDistance": 9,
+    "seconds": 0.18,
+    "screenFlash": 0.35
+  },
+  "juice": {
+    "hitstopMul": 1.7,
+    "hitstopMin": 4,
+    "critStop": 4,
+    "killStop": 8,
+    "bossKillStop": 16,
+    "shakeBase": 0.09,
+    "shakePerStop": 0.028,
+    "kickBase": 0.1,
+    "kickPerStop": 0.03,
+    "zoomPerStop": 0.006
+  }
 }

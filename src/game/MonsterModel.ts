@@ -16,6 +16,13 @@ export class MonsterModel {
   private flashT = 0;
   private walk = 0;
   private glow: THREE.Mesh | null = null;
+  /** 맞은 반응: 남은 시간·방향·세기 */
+  private hitT = 0;
+  private hitDur = 0.2;
+  private hitDir = new THREE.Vector2();
+  private hitPower = 1;
+  /** 맞아서 순간적으로 밀린 만큼(세계 좌표) — 위치에 더해서 그린다 */
+  readonly recoil = new THREE.Vector3();
 
   constructor(readonly def: MonsterDef) {
     const m = def.model;
@@ -91,9 +98,17 @@ export class MonsterModel {
     }
   }
 
-  flash(): void {
-    this.flashT = 0.1;
-    this.human?.flash();
+  flash(power = 1): void {
+    this.flashT = 0.1 + power * 0.06;
+    this.human?.flash(0.1 + power * 0.06);
+  }
+
+  /** 맞았다: 반대쪽으로 움찔 밀리고, 찌그러졌다 펴지고, 부르르 떤다. power 1 = 보통, 클수록 크게 */
+  kick(dx: number, dz: number, power = 1): void {
+    this.hitT = this.hitDur = 0.16 + power * 0.06;
+    this.hitDir.set(dx, dz).normalize();
+    this.hitPower = power;
+    this.flash(power);
   }
 
   /** windup: 0~1 예비 동작 진행(뒤로 젖힘), lunge: 공격 중 앞으로 숙임 */
@@ -112,11 +127,28 @@ export class MonsterModel {
         this.inner.scale.set(this.def.model.scale * (1 / Math.sqrt(sq)), this.def.model.scale * (1 / sq) * (attacking ? 1.25 : 1), this.def.model.scale * (1 / Math.sqrt(sq)));
       }
     }
+    if (this.hitT > 0) {
+      this.hitT = Math.max(0, this.hitT - dt);
+      const k = this.hitT / this.hitDur;
+      const p = this.hitPower;
+      const back = Math.sin(k * Math.PI) * 0.34 * p;
+      const jitter = k * 0.07 * p;
+      this.recoil.set(this.hitDir.x * back + (Math.random() - 0.5) * jitter, 0, this.hitDir.y * back + (Math.random() - 0.5) * jitter);
+      // 맞는 순간 눌렸다가(납작) 펴지며 되돌아옴
+      const s = this.def.model.scale;
+      const sq = 1 - Math.sin(k * Math.PI) * 0.2 * Math.min(1.6, p);
+      this.inner.scale.set(s * (2 - sq) ** 0.5, s * sq, s * (2 - sq) ** 0.5);
+      this.inner.rotation.z = (this.hitDir.x * Math.cos(this.root.rotation.y) - this.hitDir.y * Math.sin(this.root.rotation.y)) * -0.35 * k * Math.min(1.5, p);
+    } else {
+      this.recoil.set(0, 0, 0);
+      this.inner.rotation.z = 0;
+      if (this.def.model.shape !== 'slime') this.inner.scale.setScalar(this.def.model.scale);
+    }
     if (this.flashT > 0) {
       this.flashT -= dt;
       for (const m of this.mats) {
         m.emissive.set('#ffffff');
-        m.emissiveIntensity = this.flashT > 0 ? 0.9 : 0;
+        m.emissiveIntensity = this.flashT > 0 ? 1.6 : 0;
       }
     }
   }

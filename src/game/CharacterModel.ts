@@ -35,6 +35,9 @@ export class CharacterModel {
   private walk = 0;
   /** 무기 자세 [수평각, 수직각](도) — 오른손 기준, 왼손은 좌우 반전 */
   pose: [number, number] = [-20, -60];
+  /** 최근 무기 휘두르는 속도(몸통을 비틀고 숙이는 데 씀) */
+  private swingV = 0;
+  private prevPose: [number, number] = [-20, -60];
 
   constructor(style: ModelStyle) {
     const mat = (color: string, extra: THREE.MeshStandardMaterialParameters = {}) => {
@@ -99,6 +102,9 @@ export class CharacterModel {
   }
 
   applyPose(): void {
+    const dh = this.pose[0] - this.prevPose[0], dv = this.pose[1] - this.prevPose[1];
+    this.swingV = Math.max(this.swingV * 0.82, Math.min(120, Math.hypot(dh, dv)));
+    this.prevPose = [this.pose[0], this.pose[1]];
     for (const p of this.weaponPivots) {
       const side = p.userData.side as number;
       p.rotation.set(0, 0, 0, 'YXZ');
@@ -133,14 +139,17 @@ export class CharacterModel {
     this.arms[0].rotation.x = -swing * 0.6;
     this.arms[1].rotation.x = swing * 0.6;
     this.body.position.y = moving ? Math.abs(Math.cos(this.walk)) * 0.06 : 0;
-    this.body.rotation.x = down > 0 ? -down * 1.45 : moving ? 0.12 : 0;
+    // 휘두를 때 상체가 검을 따라 비틀리고 앞으로 숙여짐(휘두르는 속도에 비례)
+    const lean = down > 0 || air ? 0 : Math.min(0.34, this.swingV * 0.006);
+    this.body.rotation.y = down > 0 ? 0 : (this.weaponPivots.length ? this.pose[0] * DEG * 0.22 * Math.min(1, this.swingV / 12) : 0);
+    this.body.rotation.x = down > 0 ? -down * 1.45 : (moving ? 0.12 : 0) + lean;
     this.body.position.z = down > 0 ? -down * 0.6 : 0;
     if (this.flashT > 0) {
       this.flashT -= dt;
       const on = this.flashT > 0;
       for (const m of this.mats) {
         m.emissive.setRGB(1, 1, 1);
-        m.emissiveIntensity = on ? 0.8 : 0;
+        m.emissiveIntensity = on ? 1.4 : 0;
       }
     }
   }

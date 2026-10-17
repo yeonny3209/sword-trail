@@ -119,18 +119,20 @@ input:focus { border-color: var(--gold); }
 
 /* 데미지 숫자·콤보 */
 .dmg-layer { position: absolute; inset: 0; overflow: hidden; }
-.dmg { position: absolute; left: 0; top: 0; font-family: var(--title); font-size: 22px; color: #fff; text-shadow: 0 0 3px #000, 0 2px 0 #000; white-space: nowrap; text-align: center; }
+.dmg { position: absolute; left: 0; top: 0; font-family: var(--title); font-size: 30px; font-weight: 900; color: #fff; -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 0 0 10px rgba(255,200,120,.75), 0 3px 0 #000; white-space: nowrap; text-align: center; will-change: transform; }
 .dmg small { display: block; font-family: var(--font); font-size: 10px; color: #8fd8ff; font-weight: 700; }
-.dmg.c { color: #ffb030; font-size: 30px; }
-.dmg.p { color: #ff5a4a; font-size: 20px; }
-.dmg.o { color: #c8c8c8; font-size: 15px; }
+.dmg.c { color: #ffd24a; font-size: 44px; text-shadow: 0 0 16px rgba(255,170,30,.95), 0 0 4px #ff8a00, 0 4px 0 #000; }
+.dmg.c::after { content: 'CRITICAL'; display: block; font-size: 11px; letter-spacing: 3px; color: #fff; -webkit-text-stroke: 2px #a03000; margin-top: -4px; }
+.dmg.p { color: #ff5a4a; font-size: 26px; text-shadow: 0 0 12px rgba(255,40,30,.85), 0 3px 0 #000; }
+.dmg.o { color: #d8d8d8; font-size: 20px; -webkit-text-stroke: 2px #000; text-shadow: 0 2px 0 #000; }
 .dmg.exp { color: #b8f080; font-size: 15px; font-family: var(--font); font-weight: 700; }
 .dmg.gold { color: #ffd760; font-size: 15px; font-family: var(--font); font-weight: 700; }
 .dmg.lvup { color: #ffe080; font-size: 26px; }
-.combo { position: absolute; right: 8%; top: 32%; font-family: var(--title); font-size: 22px; color: #ffe8b0; text-shadow: 0 0 8px rgba(255,150,40,.8), 0 2px 0 #000; opacity: 0; transition: opacity .3s; }
-.combo b { font-size: 56px; color: #fff; margin-right: 4px; }
-.combo.pop { animation: comboPop .18s ease-out; }
-@keyframes comboPop { from { transform: scale(1.35); } to { transform: scale(1); } }
+.combo { position: absolute; right: 7%; top: 30%; font-family: var(--title); font-size: 30px; -webkit-text-stroke: 2px #000; paint-order: stroke fill; color: #ffe8b0; text-shadow: 0 0 8px rgba(255,150,40,.8), 0 2px 0 #000; opacity: 0; transition: opacity .3s; }
+.combo b { font-size: 84px; color: #fff; margin-right: 6px; }
+.combo.t2 b { color: #ffd24a; } .combo.t3 b { color: #ff7a30; text-shadow: 0 0 18px rgba(255,90,20,.9); } .combo.t4 b { color: #ff4a6a; text-shadow: 0 0 24px rgba(255,40,80,1); }
+.combo.pop { animation: comboPop .22s cubic-bezier(.2,1.4,.4,1); }
+@keyframes comboPop { from { transform: scale(1.8) rotate(-4deg); } to { transform: scale(1); } }
 
 /* 사망 */
 .death { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse, rgba(60,0,0,.35), rgba(0,0,0,.7)); pointer-events: auto; }

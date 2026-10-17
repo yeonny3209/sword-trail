@@ -7,6 +7,7 @@ import type { HitDef, MonsterAttackDef, ZoneDef } from '../../shared/types';
 import type { Effects } from '../fx/Effects';
 import type { Particles, BurstSpec } from '../fx/Particles';
 import { TrailRibbon } from '../fx/Trails';
+import { HitFx } from '../fx/HitFx';
 import type { Connection } from '../net/Connection';
 import type { DamageNumbers } from '../ui/DamageNumbers';
 import type { CharacterModel } from './CharacterModel';
@@ -41,12 +42,19 @@ const FX_COLOR: Record<string, string> = { slash: '#cfe6ff', heavy: '#ffd890', p
 export class CombatClient {
   /** 남은 히트스톱 프레임(내 캐릭터와 내가 때린 몬스터만 멈춘다) */
   hitstop = 0;
+  readonly hitfx: HitFx;
   private readonly trails = new Map<CharacterModel, TrailRibbon[]>();
   private readonly a = new THREE.Vector3();
   private readonly b = new THREE.Vector3();
 
   constructor(private readonly c: CombatCtx) {
+    this.hitfx = new HitFx(c.fx, c.particles, c.cam);
     bus.on('net', (m) => this.onNet(m));
+    // 다른 플레이어가 휘두를 때도 같은 베기 자국
+    c.remotes.onSlash = (r, hit, i) => {
+      const p = r.model.root.position;
+      this.hitfx.slash(p.x, p.y, p.z, r.model.root.rotation.y, hit, i === 0);
+    };
   }
 
   frozen(): boolean {
@@ -78,6 +86,9 @@ export class CombatClient {
       } else if (kind === 'wave') this.c.fx.wave(me.pos.x, me.pos.z, me.yaw, arg ?? 6, color);
       else if (kind === 'flash') this.c.fx.flash(me.pos.x, me.pos.y + 1, me.pos.z, 2.2, color);
     }
+    run.def.hits.forEach((h, i) => {
+      if (run.frame === h.f[0]) this.hitfx.slash(me.pos.x, me.pos.y, me.pos.z, me.yaw, h, i === 0);
+    });
     for (const hi of run.activeHits()) {
       const hit = run.def.hits[hi];
       for (const v of this.c.monsters.list.values()) {
@@ -98,13 +109,8 @@ export class CombatClient {
       if (!shapeHits(hit.shape, me.pos.x, me.pos.z, me.yaw, p.x, p.z, 0.45, p.y)) continue;
       run.markHit(hi, `p${r.info.id}`);
       this.c.net.send({ t: 'phit', i: run.instance, h: hi, p: r.info.id });
-      this.hitstop = Math.max(this.hitstop, hit.stop);
-      this.c.cam.addShake(hit.shake ?? 0.05);
-      const dir = new THREE.Vector3(p.x - me.pos.x, 0.3, p.z - me.pos.z).normalize();
-      const strong = hit.stop >= 8;
-      this.c.particles.burst(new THREE.Vector3(p.x, p.y + 1.1, p.z), strong ? this.c.bursts.heavyHit : this.c.bursts.hit, dir);
-      r.model.flash(0.12);
-      bus.emit('sfx', { key: strong ? 'slashHeavy' : 'slash' });
+      this.hitstop = Math.max(this.hitstop, this.hitfx.landed(new THREE.Vector3(p.x, p.y + 1.1, p.z), p.x - me.pos.x, p.z - me.pos.z, hit, 'flesh'));
+      r.model.flash(0.14);
       this.c.numbers.hit();
     }
   }
@@ -126,15 +132,8 @@ export class CombatClient {
     const dir = hit.shape.type === 'box' ? [Math.sin(me.yaw), Math.cos(me.yaw)] : [v.pos.x - me.pos.x, v.pos.z - me.pos.z];
     this.c.monsters.predictHit(v, hit, dir[0], dir[1]);
     this.c.net.send({ t: 'hit', i: run.instance, h: hi, m: v.id });
-    this.hitstop = Math.max(this.hitstop, hit.stop);
-    this.c.cam.addShake(hit.shake ?? 0.05);
     const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.6, v.pos.z);
-    const strong = hit.stop >= 8;
-    const burst = hit.fx === 'magic' ? this.c.bursts.parry : strong ? this.c.bursts.heavyHit : this.c.bursts.hit;
-    this.c.particles.burst(at, burst, new THREE.Vector3(dir[0], 0.3, dir[1]).normalize());
-    if (strong) this.c.fx.flash(at.x, at.y, at.z, 0.9, FX_COLOR[hit.fx ?? 'heavy']);
-    const mat = v.def.hitMat ?? 'flesh';
-    bus.emit('sfx', { key: mat === 'metal' ? (strong ? 'slashHeavy' : 'block') : mat === 'slime' ? 'hitSlime' : strong ? 'slashHeavy' : 'slash' });
+    this.hitstop = Math.max(this.hitstop, this.hitfx.landed(at, dir[0], dir[1], hit, v.def.hitMat ?? 'flesh'));
     this.c.numbers.hit();
   }
 
@@ -143,8 +142,9 @@ export class CombatClient {
     me.hurt(hit, v.pos.x, v.pos.z, zone);
     me.model.flash(0.15);
     this.c.net.send({ t: 'hurt', m: v.id, k: v.atk?.k ?? 0 });
-    this.c.cam.addShake(atk.heavy ? 0.35 : 0.18);
-    this.hitstop = Math.max(this.hitstop, 3);
+    this.c.cam.addShake(atk.heavy ? 0.6 : 0.3);
+    this.c.cam.addKick(me.pos.x - v.pos.x, me.pos.z - v.pos.z, atk.heavy ? 0.45 : 0.22, atk.heavy ? 0.05 : 0.02);
+    this.hitstop = Math.max(this.hitstop, atk.heavy ? 7 : 4);
     bus.emit('sfx', { key: 'hurt' });
   }
 
@@ -173,13 +173,29 @@ export class CombatClient {
         const mine = m.by === me?.self.id && (m.tk === 'm' || !!m.pvp);
         const kind = m.tk === 'p' && !mine ? 'p' : !mine ? 'o' : m.crit ? 'c' : 'n';
         const tag = mine && m.tk === 'm' ? [m.counter ? 'COUNTER' : '', m.back ? 'BACK' : ''].filter(Boolean).join(' ') : '';
-        this.c.numbers.add(pos, String(m.n), kind, tag);
+        this.c.numbers.add(pos, String(m.n), kind, tag, m.n);
+        if (mine && m.tk === 'm' && (m.crit || m.back || m.counter)) {
+          const v = this.c.monsters.list.get(m.id);
+          if (v) {
+            const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.6, v.pos.z);
+            const dx = me ? v.pos.x - me.pos.x : 0, dz = me ? v.pos.z - me.pos.z : 1;
+            if (m.crit) {
+              this.hitfx.crit(at, dx, dz);
+              this.hitstop = Math.max(this.hitstop, this.hitfx.juice.critStop);
+            } else this.c.fx.ring(at.x, at.z, m.counter ? 1.1 : 0.8, m.counter ? '#ff8a40' : '#8fd8ff');
+          }
+        }
         break;
       }
-      case 'mdie':
+      case 'mdie': {
+        const v = this.c.monsters.list.get(m.id);
+        if (v && !v.dying) {
+          const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.55, v.pos.z);
+          this.hitstop = Math.max(this.hitstop, this.hitfx.kill(at, !!v.def.boss, m.by === me?.self.id));
+        }
         this.c.monsters.die(m.id);
-        if (m.by === me?.self.id) bus.emit('sfx', { key: 'death', volume: 0.6 });
         break;
+      }
       case 'matk':
         this.c.monsters.attack(m.id, m.k);
         break;

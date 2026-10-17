@@ -40,6 +40,7 @@ export class GameClient {
   readonly remotes: RemotePlayers;
   readonly monsters: Monsters;
   private readonly fx: Effects;
+  private readonly particles: Particles;
   private readonly minimap: Minimap;
   private readonly bossBar: BossBar;
   readonly combat: CombatClient;
@@ -83,7 +84,7 @@ export class GameClient {
     const bursts = getData<{ particles: Record<string, BurstSpec> }>('fx').particles;
     this.combat = new CombatClient({
       scene: this.scene, net: this.net, monsters: this.monsters, remotes: this.remotes, cam: this.cam,
-      fx: (this.fx = new Effects(this.scene)), particles: new Particles(this.scene), numbers: new DamageNumbers(ui, this.camera),
+      fx: (this.fx = new Effects(this.scene)), particles: (this.particles = new Particles(this.scene)), numbers: new DamageNumbers(ui, this.camera),
       bursts, me: () => this.me, zone: () => this.zone?.def ?? null,
       ally: (id) => !!this.social.ui.party?.members.some((p) => p.id === id),
     });
@@ -333,5 +334,6 @@ export class GameClient {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.particles.resize(h, this.camera.fov, this.renderer.getPixelRatio());
   };
 }
