@@ -17,6 +17,7 @@ export class Minimap {
   private readonly title: HTMLDivElement;
   private zone: ZoneDef | null = null;
   private t = 0;
+  private lastRot = 0;
   private readonly size = 168;
 
   constructor(ui: HTMLElement) {
@@ -37,18 +38,23 @@ export class Minimap {
     this.title.textContent = z.name;
   }
 
-  /** 0.15초마다 다시 그린다 */
-  render(dt: number, me: { x: number; z: number; yaw: number } | null, dots: MapDot[]): void {
+  /** 0.15초마다(카메라가 돌 때는 바로) 다시 그린다. rot: 카메라 각도 — 지도를 화면 방향에 맞게 돌린다 */
+  render(dt: number, me: { x: number; z: number; yaw: number } | null, dots: MapDot[], rot = 0): void {
     this.t -= dt;
     const z = this.zone;
-    if (this.t > 0 || !z || !me) return;
+    if ((this.t > 0 && rot === this.lastRot) || !z || !me) return;
     this.t = 0.15;
+    this.lastRot = rot;
     const c = this.ctx, S = this.size * 2;
     const scale = (S - 16) / Math.max(z.size[0], z.size[1]);
     const px = (x: number) => S / 2 + x * scale, pz = (v: number) => S / 2 + v * scale;
     c.clearRect(0, 0, S, S);
     c.fillStyle = 'rgba(10,12,16,.72)';
     c.fillRect(0, 0, S, S);
+    c.save();
+    c.translate(S / 2, S / 2);
+    c.rotate(rot);
+    c.translate(-S / 2, -S / 2);
     c.fillStyle = 'rgba(255,255,255,.06)';
     c.fillRect(px(-z.size[0] / 2), pz(-z.size[1] / 2), z.size[0] * scale, z.size[1] * scale);
     c.fillStyle = '#6a6a72';
@@ -78,6 +84,7 @@ export class Minimap {
     c.lineTo(-7, 7);
     c.closePath();
     c.fill();
+    c.restore();
     c.restore();
   }
 }

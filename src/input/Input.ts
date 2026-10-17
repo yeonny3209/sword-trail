@@ -4,7 +4,7 @@ import { getData } from '../core/config';
 export type Action =
   | 'up' | 'down' | 'left' | 'right' | 'attack' | 'jump' | 'back' | 'dash'
   | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 'pot1' | 'pot2'
-  | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'debug';
+  | 'inventory' | 'skills' | 'character' | 'quests' | 'party' | 'guild' | 'camreset' | 'debug';
 
 interface InputData {
   bindings: Record<string, string[]>;
@@ -30,6 +30,13 @@ export class Input {
   mouseY = 0;
   wheel = 0;
   enabled = true;
+  /** 카메라가 돌아간 각도(라디안). 이동 입력을 이만큼 돌려서 항상 '지금 화면 기준'으로 움직이게 한다 */
+  viewYaw = 0;
+  /** 오른쪽 버튼을 누른 채 끌지 않고 짧게 눌렀다 뗐을 때(플레이어 메뉴용), 화면 좌표 */
+  onRightTap: ((x: number, y: number) => void) | null = null;
+  private rightDown = false;
+  private rightMoved = 0;
+  private dragDx = 0;
 
   constructor(private readonly canvas: HTMLElement) {
     for (const [action, codes] of Object.entries(this.data.bindings)) {
@@ -49,18 +56,38 @@ export class Input {
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       this.press(`Mouse${e.button}`);
+      if (e.button === 2) {
+        this.rightDown = true;
+        this.rightMoved = 0;
+      }
     });
-    window.addEventListener('mouseup', (e) => this.codes.delete(`Mouse${e.button}`));
+    window.addEventListener('mouseup', (e) => {
+      this.codes.delete(`Mouse${e.button}`);
+      if (e.button !== 2 || !this.rightDown) return;
+      this.rightDown = false;
+      canvas.style.cursor = '';
+      if (this.rightMoved < 5) this.onRightTap?.(e.clientX, e.clientY);
+    });
     window.addEventListener('mousemove', (e) => {
       this.mouseX = e.clientX;
       this.mouseY = e.clientY;
+      if (!this.rightDown) return;
+      this.rightMoved += Math.abs(e.movementX) + Math.abs(e.movementY);
+      // 짧게 흔들린 것은 클릭으로 보고, 5px 넘게 끌었을 때부터 회전
+      if (this.rightMoved >= 5) {
+        this.dragDx += e.movementX;
+        canvas.style.cursor = 'grabbing';
+      }
     });
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       this.wheel += Math.sign(e.deltaY);
     }, { passive: false });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    window.addEventListener('blur', () => this.codes.clear());
+    window.addEventListener('blur', () => {
+      this.codes.clear();
+      this.rightDown = false;
+    });
     bus.on('typing', ({ active }) => {
       this.enabled = !active;
       if (active) this.codes.clear();
@@ -105,12 +132,20 @@ export class Input {
     return false;
   }
 
-  /** 화면 기준 이동 입력. x: 오른쪽 +, y: 위쪽 + (길이 1로 정규화) */
+  /** 이동 입력(카메라가 돌아간 만큼 돌린 값). x: 세계 +X(동), y: 세계 북쪽(-Z) + (길이 1로 정규화) */
   moveAxis(): { x: number; y: number } {
     const x = (this.isDown('right') ? 1 : 0) - (this.isDown('left') ? 1 : 0);
     const y = (this.isDown('up') ? 1 : 0) - (this.isDown('down') ? 1 : 0);
     const len = Math.hypot(x, y) || 1;
-    return { x: x / len, y: y / len };
+    const c = Math.cos(this.viewYaw), s = Math.sin(this.viewYaw);
+    return { x: (x * c - y * s) / len, y: (x * s + y * c) / len };
+  }
+
+  /** 오른쪽 드래그로 움직인 가로 거리(px)를 한 번 꺼낸다 */
+  consumeDrag(): number {
+    const d = this.dragDx;
+    this.dragDx = 0;
+    return d;
   }
 
   consumeWheel(): number {

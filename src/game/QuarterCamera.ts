@@ -5,14 +5,16 @@ import { damp } from '../core/math';
 interface CamData { fov: number; height: number; back: number; zoomMin: number; zoomMax: number; zoomStep: number; follow: number }
 
 /**
- * 쿼터뷰 고정 카메라: 플레이어 남쪽 위에서 비스듬히 내려다본다(화면 위 = 북쪽 = -Z).
- * 마우스 휠로 확대·축소, 흔들림은 마지막에 더한다.
+ * 쿼터뷰 카메라: 처음엔 플레이어 남쪽 위에서 비스듬히 내려다본다(화면 위 = 북쪽 = -Z).
+ * 마우스 휠로 확대·축소, 오른쪽 드래그로 캐릭터 주위를 돌린다(theta, Home으로 되돌림). 흔들림은 마지막에 더한다.
  */
 export class QuarterCamera {
   readonly d = getData<{ camera: CamData }>('client').camera;
   private zoom = 1;
   private targetZoom = 1;
   private readonly focus = new THREE.Vector3();
+  /** 카메라가 캐릭터 둘레를 돈 각도: 0 = 남쪽에서 북쪽을 봄 */
+  theta = 0;
   private shake = 0;
   private shakeT = 0;
   enabledShake = true;
@@ -24,6 +26,15 @@ export class QuarterCamera {
 
   zoomBy(steps: number): void {
     this.targetZoom = Math.min(this.d.zoomMax, Math.max(this.d.zoomMin, this.targetZoom + steps * this.d.zoomStep));
+  }
+
+  /** 드래그 거리(px)만큼 돌린다. 오른쪽으로 끌면 장면이 오른쪽으로 돈다 */
+  rotateBy(dx: number): void {
+    if (dx) this.theta = (this.theta + dx * 0.007) % (Math.PI * 2);
+  }
+
+  resetAngle(): void {
+    this.theta = 0;
   }
 
   snap(x: number, z: number): void {
@@ -40,7 +51,8 @@ export class QuarterCamera {
     this.focus.z += (target.z - this.focus.z) * damp(this.d.follow, dt);
     this.focus.y = target.y * 0.35;
     const c = this.camera;
-    c.position.set(this.focus.x, this.focus.y + this.d.height * this.zoom, this.focus.z + this.d.back * this.zoom);
+    const back = this.d.back * this.zoom;
+    c.position.set(this.focus.x + Math.sin(this.theta) * back, this.focus.y + this.d.height * this.zoom, this.focus.z + Math.cos(this.theta) * back);
     c.lookAt(this.focus.x, this.focus.y + 0.8, this.focus.z);
     if (this.shake > 0) {
       this.shakeT += dt * 40;

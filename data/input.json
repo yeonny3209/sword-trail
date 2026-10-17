@@ -21,6 +21,7 @@
     "quests": ["KeyL"],
     "party": ["KeyP"],
     "guild": ["KeyN"],
+    "camreset": ["Home"],
     "debug": ["F2"]
   },
   "doubleTapMs": 240

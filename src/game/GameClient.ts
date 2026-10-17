@@ -105,10 +105,13 @@ export class GameClient {
     this.renderer.domElement.addEventListener('mousedown', (e) => {
       if (!this.zone || !this.me) return;
       const ndc = this.input.mouseNdc();
-      if (e.button === 2) return void this.social.rightClick(ndc, this.camera, e.clientX, e.clientY);
       if (e.button !== 0) return;
       if (this.ui.clickNpc(ndc, this.camera, this.zone.npcs) || this.ui.gathering.click(ndc, this.camera, this.me)) this.input.cancel('attack');
     });
+    // 오른쪽 버튼은 끌면 카메라 회전, 짧게 누르면 플레이어 메뉴
+    this.input.onRightTap = (x, y) => {
+      if (this.zone && this.me) this.social.rightClick(this.input.mouseNdc(), this.camera, x, y);
+    };
     new Audio();
     this.overlay = document.createElement('div');
     this.overlay.className = 'conn-overlay';
@@ -234,6 +237,7 @@ export class GameClient {
 
   private update = (dt: number, frame: number): void => {
     this.input.beginTick();
+    if (this.input.pressed.has('camreset')) this.cam.resetAngle();
     bus.emit('tick', { frame, dt });
     if (this.zone) this.ui.update(this.input, this.zone.npcs, this.zone.def.type === 'town', dt);
     this.social.update(this.input, dt);
@@ -280,6 +284,8 @@ export class GameClient {
   private render = (alpha: number, dt: number): void => {
     const me = this.me;
     this.cam.zoomBy(this.input.consumeWheel());
+    this.cam.rotateBy(this.input.consumeDrag());
+    this.input.viewYaw = this.cam.theta;
     if (me) {
       me.render(this.combat.frozen() ? 1 : alpha, dt);
       this.cam.update(me.model.root.position, dt);
@@ -316,7 +322,7 @@ export class GameClient {
     for (const r of this.remotes.list.values()) dots.push({ x: r.model.root.position.x, z: r.model.root.position.z, kind: 'player' });
     for (const n of z.npcs) dots.push({ x: n.def.x, z: n.def.z, kind: 'npc' });
     for (const n of z.nodes) if (n.up) dots.push({ x: n.def.x, z: n.def.z, kind: 'node' });
-    this.minimap.render(dt, { x: me.pos.x, z: me.pos.z, yaw: me.yaw }, dots);
+    this.minimap.render(dt, { x: me.pos.x, z: me.pos.z, yaw: me.yaw }, dots, this.cam.theta);
     if (boss) this.bossBar.show(boss.name, boss.lv, boss.hp, boss.mhp);
     else this.bossBar.hide();
   }
