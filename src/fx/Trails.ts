@@ -3,7 +3,7 @@ import * as THREE from 'three';
 interface S { a: THREE.Vector3; b: THREE.Vector3; t: number }
 
 const MAX = 48;
-const LIFE = 0.13;
+const LIFE = 0.2;
 
 /** 검 끝을 따라가는 띠 모양 잔상(가산 혼합). 휘두르는 동안 샘플을 쌓고 시간이 지나면 사라진다 */
 export class TrailRibbon {

@@ -1,0 +1,5 @@
+{
+  "expCurve": { "a": 22, "p": 1.55, "b": 18 },
+  "monsterExpRate": 1.5,
+  "questExpRate": 1.5
+}

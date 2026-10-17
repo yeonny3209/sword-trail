@@ -1,4 +1,8 @@
 import { CLASS_BY_ID } from './data';
+import progJson from '../data/progression.json';
+
+/** 성장 속도(data/progression.json): 경험치 곡선과 몬스터·퀘스트 경험치 배율 */
+export const PROGRESSION = progJson as { expCurve: { a: number; p: number; b: number }; monsterExpRate: number; questExpRate: number };
 import type { ActionDef, ClassId } from './types';
 
 /** 레벨·직업·스탯으로 정해지는 능력치 */
@@ -75,7 +79,13 @@ export function finalStats(cls: ClassId, lv: number, a: Alloc, bonus: Bonus = {}
 
 /** 다음 레벨까지 필요한 경험치 */
 export function expToNext(lv: number): number {
-  return Math.round(60 * Math.pow(lv, 1.75) + 40 * lv);
+  const c = PROGRESSION.expCurve;
+  return Math.round(c.a * Math.pow(lv, c.p) + c.b * lv);
+}
+
+/** 퀘스트 보상 경험치(배율 적용) */
+export function questExp(base: number): number {
+  return Math.round(base * PROGRESSION.questExpRate);
 }
 
 export function skillMax(def: ActionDef): number {

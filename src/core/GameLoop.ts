@@ -5,6 +5,8 @@
 export class GameLoop {
   readonly step: number;
   frame = 0;
+  /** 1 = 보통, 0.3 = 느리게(슬로모션) */
+  timeScale = 1;
   private acc = 0;
   private last = 0;
   private running = false;
@@ -27,7 +29,7 @@ export class GameLoop {
     if (!this.running) return;
     const realDt = Math.min((now - this.last) / 1000, 0.25);
     this.last = now;
-    this.acc += realDt;
+    this.acc += realDt * this.timeScale;
     while (this.acc >= this.step) {
       this.update(this.step, this.frame);
       this.frame++;

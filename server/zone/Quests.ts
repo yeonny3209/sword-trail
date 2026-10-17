@@ -2,6 +2,7 @@ import { dist2 } from '../../shared/geom';
 import { ITEMS, makeItem } from '../../shared/items';
 import { availableQuests, isComplete, MAX_ACTIVE_QUESTS, QUESTS, type QuestDef } from '../../shared/quests';
 import type { ZoneDef } from '../../shared/types';
+import { questExp } from '../../shared/rules';
 import { newUid } from '../db';
 import { addItem, countItem, removeById, syncInv } from './Inventory';
 import type { PlayerSession } from './PlayerSession';
@@ -86,6 +87,6 @@ export class QuestSystem {
     p.send({ t: 'qdone', id });
     syncInv(p);
     p.send({ t: 'me', s: { gold: p.data.gold } });
-    if (r.exp) this.gainExp(p, r.exp);
+    if (r.exp) this.gainExp(p, questExp(r.exp));
   }
 }

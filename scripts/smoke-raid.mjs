@@ -1,6 +1,9 @@
 // 레이드 연기 테스트(로컬 서버 실행 중): node scripts/smoke-raid.mjs
 // 파티 둘이 레이드에 입장 → 같은 방·인원별 보스 체력 → 단계별 부하 소환 → 처치 보상 → 모두 나가면 방 초기화
 import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+const RATE = JSON.parse(readFileSync(new URL('../data/progression.json', import.meta.url), 'utf8')).monsterExpRate;
 
 const BASE = process.argv[2] ?? 'http://127.0.0.1:8787';
 const WS = BASE.replace(/^http/, 'ws');
@@ -142,7 +145,7 @@ check('레이드 클리어 알림', banners.some((t) => t.includes('클리어'))
 for (const p of [a, b]) {
   const rw = p.last('reward');
   const loot = p.last('loot');
-  check(`${p.name === a.name ? 'A' : 'B'} 보상: 경험치·골드`, rw?.exp === 6500 && rw.gold >= 400, JSON.stringify(rw));
+  check(`${p.name === a.name ? 'A' : 'B'} 보상: 경험치·골드`, rw?.exp === Math.round(6500 * RATE) && rw.gold >= 400, JSON.stringify(rw));
   const hasEquip = loot?.items.some((i) => (i.rar ?? 0) >= 2);
   check(`${p.name === a.name ? 'A' : 'B'} 보상: 희귀 이상 장비 + 재료`, !!hasEquip && loot.items.length >= 3, JSON.stringify(loot?.items.map((i) => `${i.id}${i.rar ?? ''}`)));
 }

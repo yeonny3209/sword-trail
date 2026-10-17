@@ -1,5 +1,6 @@
 import { MONSTERS, ZONES } from '../../shared/data';
 import { ITEMS } from '../../shared/items';
+import { questExp } from '../../shared/rules';
 import { availableQuests, isComplete, progressOf, QUESTS, type QuestDef, type QuestState } from '../../shared/quests';
 import type { C2S } from '../../shared/protocol';
 import { Window } from './Window';
@@ -16,7 +17,7 @@ function objText(q: QuestDef, p: number[]): string {
 
 function rewardText(q: QuestDef): string {
   const r = q.reward;
-  const parts = [r.exp ? `경험치 ${r.exp.toLocaleString()}` : '', r.gold ? `${r.gold.toLocaleString()} G` : '',
+  const parts = [r.exp ? `경험치 ${questExp(r.exp).toLocaleString()}` : '', r.gold ? `${r.gold.toLocaleString()} G` : '',
     ...(r.items ?? []).map(([id, n]) => `${ITEMS[id]?.name ?? id} ${n}개`), r.equip ? `Lv${r.equip.lv} 장비(등급 보장)` : ''];
   return parts.filter(Boolean).join(' · ');
 }

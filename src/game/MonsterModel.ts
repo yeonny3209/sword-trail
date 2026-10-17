@@ -72,7 +72,7 @@ export class MonsterModel {
         add(new THREE.BoxGeometry(0.35, 1.0, 0.35), mat(m.color, { roughness: 1 }), 0.78 * s, 1.4, 0.1);
       }
     } else {
-      this.human = new CharacterModel({ body: m.color, weapon: m.weapon ?? null, skin: '#c9a080' });
+      this.human = new CharacterModel({ body: m.color, weapon: m.weapon ?? null, skin: '#c9a080', enemy: true });
       this.inner.add(this.human.root);
     }
     // 예비 동작 빛(발밑 원)

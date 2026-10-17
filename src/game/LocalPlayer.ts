@@ -50,7 +50,7 @@ export class LocalPlayer {
   constructor(public self: SelfState) {
     const c = CLASS_BY_ID[self.cls];
     this.kit = KITS[self.cls];
-    this.model = new CharacterModel({ body: c.color, weapon: c.weapon });
+    this.model = new CharacterModel({ body: c.color, weapon: c.weapon, look: c.look });
     this.place(self.x, self.z);
   }
 

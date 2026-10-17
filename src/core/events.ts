@@ -26,4 +26,8 @@ export interface GameEvents {
   social: Social2C;
   /** 채팅 입력창을 이 내용으로 연다(귓속말 등) */
   chatPrefill: { text: string };
+  /** 화면 전체 번쩍임(flash) 또는 붉은 테두리(hurt) */
+  screen: { kind: 'flash' | 'hurt'; alpha: number; ms: number };
+  /** 잠깐 느리게(처치 순간 등). scale 0~1 */
+  slowmo: { scale: number; ms: number };
 }

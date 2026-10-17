@@ -163,6 +163,23 @@ export class Effects {
     }
   }
 
+  /** 강타 자리 바닥 균열: 가운데서 뻗는 어두운 금(천천히 사라짐) */
+  crack(x: number, z: number, size = 1): void {
+    const n = 6 + Math.round(size * 2);
+    for (let i = 0; i < n; i++) {
+      const yaw = (i / n) * Math.PI * 2 + Math.random() * 0.5;
+      const len = size * (0.6 + Math.random() * 0.8);
+      const mat = new THREE.MeshBasicMaterial({ color: '#1a120c', transparent: true, opacity: 0.75, depthWrite: false });
+      const m = new THREE.Mesh(this.streakGeo, mat);
+      m.rotation.y = yaw;
+      m.scale.set(0.05 + Math.random() * 0.04, 0.01, len);
+      m.position.set(x + Math.sin(yaw) * len * 0.5, 0.04, z + Math.cos(yaw) * len * 0.5);
+      this.add(m, 0.9, (k, f) => {
+        f.mat.opacity = 0.75 * (1 - k * k);
+      });
+    }
+  }
+
   update(dt: number): void {
     for (let i = this.list.length - 1; i >= 0; i--) {
       const f = this.list[i];

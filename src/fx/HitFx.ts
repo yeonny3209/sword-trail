@@ -63,7 +63,11 @@ export class HitFx {
     const spec = mat === 'slime' ? this.bursts.goo : hard ? this.bursts.block : strong ? this.bursts.heavyHit : this.bursts.hit;
     this.particles.burst(at, spec, dir);
     if (mat === 'flesh' || mat === undefined) this.particles.burst(at, { ...this.bursts.blood, count: Math.round(this.bursts.blood.count * (strong ? 1 : 0.5)) }, dir);
-    if (strong) this.fx.ring(at.x, at.z, 0.9, color);
+    if (strong) {
+      this.fx.ring(at.x, at.z, 0.9, color);
+      this.fx.crack(at.x, at.z, 0.8 + hit.stop * 0.06);
+      this.particles.burst(new THREE.Vector3(at.x, 0.1, at.z), this.bursts.dust);
+    }
     const stop = this.stopFrames(hit);
     const shake = Math.max(this.juice.shakeBase + hit.stop * this.juice.shakePerStop, (hit.shake ?? 0) * 1.6);
     this.cam.addShake(shake);
@@ -81,6 +85,7 @@ export class HitFx {
     this.cam.addShake(0.3);
     this.cam.addKick(dx, dz, 0.28, 0.05);
     bus.emit('sfx', { key: 'crit' });
+    bus.emit('screen', { kind: 'flash', alpha: 0.22, ms: 160 });
   }
 
   /** 쓰러뜨렸다: 커다란 폭발과 묵직한 소리. 돌려주는 값: 멈출 프레임 */
@@ -90,9 +95,14 @@ export class HitFx {
     this.fx.flash(at.x, at.y, at.z, size * 1.2, '#ffd0c0');
     this.fx.ring(at.x, at.z, boss ? 2.4 : 1.3, '#ffb090');
     this.particles.burst(at, { ...this.bursts.finisher, count: boss ? 160 : this.bursts.finisher.count });
+    this.fx.crack(at.x, at.z, boss ? 2.6 : 1.3);
+    this.particles.burst(new THREE.Vector3(at.x, 0.1, at.z), { ...this.bursts.dust, count: boss ? 80 : 30 });
     if (mine) {
       this.cam.addShake(boss ? 0.6 : 0.3);
       this.cam.addKick(0, 1, boss ? 0.5 : 0.25, boss ? 0.08 : 0.04);
+      // 처치 순간 잠깐 느리게(보스는 길게) + 보스는 화면 번쩍
+      bus.emit('slowmo', { scale: boss ? 0.2 : 0.35, ms: boss ? 900 : 220 });
+      if (boss) bus.emit('screen', { kind: 'flash', alpha: 0.45, ms: 600 });
     }
     bus.emit('sfx', { key: 'kill', volume: mine ? 1 : 0.5 });
     return mine ? (boss ? this.juice.bossKillStop : this.juice.killStop) : 0;

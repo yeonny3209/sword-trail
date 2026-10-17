@@ -18,6 +18,7 @@ import { DeathOverlay, SkillBar } from '../ui/SkillBar';
 import { UiHub } from './UiHub';
 import { SocialHub } from './SocialHub';
 import { BossBar, Minimap, type MapDot } from '../ui/Minimap';
+import { ScreenFx } from '../ui/ScreenFx';
 import { CombatClient } from './CombatClient';
 import { LocalPlayer } from './LocalPlayer';
 import { Monsters } from './Monsters';
@@ -59,6 +60,8 @@ export class GameClient {
   private interpDelay = getData<{ net: { interpDelayMs: number } }>('client').net.interpDelayMs;
   private readonly overlay: HTMLDivElement;
   private readonly aim = new THREE.Vector3();
+  /** 슬로모션 남은 시간(실제 초) */
+  private slowT = 0;
 
   constructor(private readonly mount: HTMLElement, ui: HTMLElement, private readonly onExit: () => void) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -98,6 +101,11 @@ export class GameClient {
     this.ui.quests.onChange = () => this.refreshNpcPlates();
     this.minimap = new Minimap(ui);
     this.bossBar = new BossBar(ui);
+    new ScreenFx(ui);
+    bus.on('slowmo', ({ scale, ms }) => {
+      if (scale < this.loop.timeScale || this.slowT <= 0) this.loop.timeScale = scale;
+      this.slowT = Math.max(this.slowT, ms / 1000);
+    });
     this.monsters.onAttackFx = (v, a) => {
       if (a.fx === 'arrow') this.fx.arrow(v.pos.x, v.pos.z, v.yaw, a.range);
       else if (a.fx === 'wave') this.fx.wave(v.pos.x, v.pos.z, v.yaw, a.range, '#ffcf70');
@@ -297,8 +305,14 @@ export class GameClient {
     this.zone?.update(dt);
     const renderTime = this.net.serverNow() - this.interpDelay;
     this.remotes.render(renderTime, dt);
-    this.monsters.render(renderTime, dt);
-    this.combat.render(dt);
+    // 슬로모션 중에는 연출·몬스터 동작도 느리게(위치는 서버 시간 그대로)
+    if (this.slowT > 0) {
+      this.slowT -= dt;
+      if (this.slowT <= 0) this.loop.timeScale = 1;
+    }
+    const sdt = dt * this.loop.timeScale;
+    this.monsters.render(renderTime, sdt);
+    this.combat.render(sdt);
     this.renderMap(dt);
     this.plates.render();
     this.skillbar.render();

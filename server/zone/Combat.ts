@@ -2,7 +2,7 @@ import { applyReaction, expFactor, isBackAttack, rollDamage } from '../../shared
 import { actionOf, isSkill } from '../../shared/data';
 import { dist2 } from '../../shared/geom';
 import { MonState, type C2S, type S2C } from '../../shared/protocol';
-import { actionTravel, expToNext, MAX_LEVEL, SKILL_POINTS_PER_LEVEL, skillMp, skillMul, STAT_POINTS_PER_LEVEL } from '../../shared/rules';
+import { actionTravel, expToNext, PROGRESSION, MAX_LEVEL, SKILL_POINTS_PER_LEVEL, skillMp, skillMul, STAT_POINTS_PER_LEVEL } from '../../shared/rules';
 import type { ZoneDef } from '../../shared/types';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
@@ -115,7 +115,7 @@ export class Combat {
       const gold = g0 + Math.floor(Math.random() * (g1 - g0 + 1));
       q.data.gold += gold;
       rollLoot(q, mon.def);
-      const exp = partyExp(Math.max(1, Math.round(mon.def.exp * expFactor(q.lv, mon.def.lv))), mates.length);
+      const exp = partyExp(Math.max(1, Math.round(mon.def.exp * PROGRESSION.monsterExpRate * expFactor(q.lv, mon.def.lv))), mates.length);
       q.send({ t: 'reward', exp, gold, name: mon.def.name });
       this.gainExp(q, exp);
       this.host.onKill(q, mon.def.id);

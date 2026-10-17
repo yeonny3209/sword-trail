@@ -29,7 +29,7 @@ export class RemotePlayers {
   add(info: PlayerInfo, time: number): void {
     this.remove(info.id);
     const c = CLASS_BY_ID[info.cls];
-    const model = new CharacterModel({ body: c.color, weapon: c.weapon });
+    const model = new CharacterModel({ body: c.color, weapon: c.weapon, look: c.look });
     model.root.position.set(info.x, 0, info.z);
     model.root.rotation.y = info.f;
     this.scene.add(model.root);

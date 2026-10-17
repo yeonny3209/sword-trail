@@ -85,6 +85,22 @@ export interface ZoneDef {
   boss?: { monster: string; x: number; z: number; respawn: number };
 }
 
+/** 캐릭터 겉모습(머리 모양·갑옷·망토 등) */
+export interface CharacterLook {
+  hairStyle: 'spiky' | 'short' | 'long' | 'pony' | 'wild' | 'none';
+  hairColor: string;
+  /** 가슴 갑옷 */
+  armor: string;
+  /** 허리띠·테두리 */
+  accent: string;
+  boots: string;
+  /** 망토 색(없으면 망토 없음) */
+  cape?: string;
+  pauldron: 'none' | 'small' | 'big';
+  /** 투구(병사형 몬스터) */
+  helm?: boolean;
+}
+
 export interface ClassDef {
   id: ClassId;
   name: string;
@@ -96,6 +112,7 @@ export interface ClassDef {
   growth: { hp: number; mp: number; atk: number; def: number };
   /** 레벨업마다 주는 주 스탯 비중 */
   mainStat: 'str' | 'dex' | 'int';
+  look?: CharacterLook;
 }
 
 /** 타격 한 번(행동 안의 판정 구간) */

@@ -96,6 +96,14 @@
       "size": 0.26,
       "gravity": 16,
       "bounce": 0.15
+    },
+    "dust": {
+      "count": 36,
+      "color": "#8a7a62",
+      "speed": 4.5,
+      "life": 0.7,
+      "size": 0.42,
+      "gravity": -1.5
     }
   },
   "parryFlash": {

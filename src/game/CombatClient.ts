@@ -42,6 +42,8 @@ const FX_COLOR: Record<string, string> = { slash: '#cfe6ff', heavy: '#ffd890', p
 export class CombatClient {
   /** 남은 히트스톱 프레임(내 캐릭터와 내가 때린 몬스터만 멈춘다) */
   hitstop = 0;
+  /** 때린 순간 칼날이 번쩍이는 남은 시간 */
+  private glowT = 0;
   readonly hitfx: HitFx;
   private readonly trails = new Map<CharacterModel, TrailRibbon[]>();
   private readonly a = new THREE.Vector3();
@@ -123,6 +125,7 @@ export class CombatClient {
     me.hurt(hit, m.x, m.z, zone);
     me.model.flash(0.15);
     this.c.net.send({ t: 'phurt', k: m.k });
+    bus.emit('screen', { kind: 'hurt', alpha: 0.6, ms: 450 });
     this.c.cam.addShake(Math.min(0.35, 0.12 + hit.stop * 0.02));
     this.hitstop = Math.max(this.hitstop, 3);
     bus.emit('sfx', { key: 'hurt' });
@@ -134,6 +137,8 @@ export class CombatClient {
     this.c.net.send({ t: 'hit', i: run.instance, h: hi, m: v.id });
     const at = new THREE.Vector3(v.pos.x, v.pos.y + v.def.height * v.def.model.scale * 0.6, v.pos.z);
     this.hitstop = Math.max(this.hitstop, this.hitfx.landed(at, dir[0], dir[1], hit, v.def.hitMat ?? 'flesh'));
+    me.model.setGlow('#ffffff', 2.2);
+    this.glowT = 0.08;
     this.c.numbers.hit();
   }
 
@@ -143,6 +148,7 @@ export class CombatClient {
     me.model.flash(0.15);
     this.c.net.send({ t: 'hurt', m: v.id, k: v.atk?.k ?? 0 });
     this.c.cam.addShake(atk.heavy ? 0.6 : 0.3);
+    bus.emit('screen', { kind: 'hurt', alpha: atk.heavy ? 0.85 : 0.55, ms: 450 });
     this.c.cam.addKick(me.pos.x - v.pos.x, me.pos.z - v.pos.z, atk.heavy ? 0.45 : 0.22, atk.heavy ? 0.05 : 0.02);
     this.hitstop = Math.max(this.hitstop, atk.heavy ? 7 : 4);
     bus.emit('sfx', { key: 'hurt' });
@@ -232,6 +238,10 @@ export class CombatClient {
   /** 렌더 프레임: 검 궤적, 연출, 파티클, 숫자 */
   render(dt: number): void {
     const me = this.c.me();
+    if (this.glowT > 0) {
+      this.glowT -= dt;
+      if (this.glowT <= 0) me?.model.setGlow(null);
+    }
     if (me) this.trail(me.model, !!me.action?.trailOn(), dt, '#cfe6ff');
     for (const r of this.c.remotes.list.values()) this.trail(r.model, !!r.action?.trailOn(), dt, '#e0e8ff');
     this.c.fx.update(dt);
@@ -242,15 +252,14 @@ export class CombatClient {
   private trail(model: CharacterModel, on: boolean, dt: number, color: string): void {
     let list = this.trails.get(model);
     if (!list) {
-      list = model.weaponPivots.map(() => new TrailRibbon(color, 0.9));
+      list = model.weaponPivots.map(() => new TrailRibbon(color, 1.35));
       for (const t of list) this.c.scene.add(t.mesh);
       this.trails.set(model, list);
     }
     model.root.updateMatrixWorld(true);
-    model.weaponPivots.forEach((p, i) => {
+    model.weaponPivots.forEach((_p, i) => {
       model.bladeTips[i].getWorldPosition(this.b);
-      p.getWorldPosition(this.a);
-      this.a.lerp(this.b, 0.35);
+      model.bladeBases[i].getWorldPosition(this.a);
       list![i].update(dt, on, this.a, this.b);
     });
   }
