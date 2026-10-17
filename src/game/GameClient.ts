@@ -293,7 +293,9 @@ export class GameClient {
   private render = (alpha: number, dt: number): void => {
     const me = this.me;
     this.cam.zoomBy(this.input.consumeWheel());
-    this.cam.rotateBy(this.input.consumeDrag());
+    const drag = this.input.consumeDrag();
+    this.cam.rotateBy(drag.dx);
+    this.cam.tiltBy(drag.dy);
     this.input.viewYaw = this.cam.theta;
     if (me) {
       me.render(this.combat.frozen() ? 1 : alpha, dt);

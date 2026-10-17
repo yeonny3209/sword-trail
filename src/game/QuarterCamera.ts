@@ -15,6 +15,10 @@ export class QuarterCamera {
   private readonly focus = new THREE.Vector3();
   /** 카메라가 캐릭터 둘레를 돈 각도: 0 = 남쪽에서 북쪽을 봄 */
   theta = 0;
+  /** 내려다보는 각도(라디안): 클수록 위에서 곧장 내려다봄, 작을수록 옆에서 봄 */
+  pitch: number;
+  private readonly pitch0: number;
+  private readonly dist: number;
   private shake = 0;
   private shakeT = 0;
   /** 맞은 방향으로 밀렸다 돌아오는 반동(세계 좌표)과 줌 펀치(확 당겨졌다 돌아옴) */
@@ -23,6 +27,8 @@ export class QuarterCamera {
   enabledShake = true;
 
   constructor(readonly camera: THREE.PerspectiveCamera) {
+    this.pitch = this.pitch0 = Math.atan2(this.d.height, this.d.back);
+    this.dist = Math.hypot(this.d.height, this.d.back);
     camera.fov = this.d.fov;
     camera.updateProjectionMatrix();
   }
@@ -36,8 +42,14 @@ export class QuarterCamera {
     if (dx) this.theta = (this.theta + dx * 0.007) % (Math.PI * 2);
   }
 
+  /** 세로 드래그: 아래로 끌면 더 위에서(내려다봄), 위로 끌면 더 옆에서 본다 */
+  tiltBy(dy: number): void {
+    if (dy) this.pitch = Math.min(1.45, Math.max(0.35, this.pitch + dy * 0.005));
+  }
+
   resetAngle(): void {
     this.theta = 0;
+    this.pitch = this.pitch0;
   }
 
   snap(x: number, z: number): void {
@@ -64,8 +76,8 @@ export class QuarterCamera {
     this.focus.y = target.y * 0.35;
     const c = this.camera;
     const zk = this.zoom * (1 - this.punch);
-    const back = this.d.back * zk;
-    c.position.set(this.focus.x + Math.sin(this.theta) * back + this.kick.x, this.focus.y + this.d.height * zk, this.focus.z + Math.cos(this.theta) * back + this.kick.z);
+    const back = Math.cos(this.pitch) * this.dist * zk;
+    c.position.set(this.focus.x + Math.sin(this.theta) * back + this.kick.x, this.focus.y + Math.sin(this.pitch) * this.dist * zk, this.focus.z + Math.cos(this.theta) * back + this.kick.z);
     const decay = Math.exp(-14 * dt);
     this.kick.multiplyScalar(decay);
     this.punch *= Math.exp(-12 * dt);

@@ -37,6 +37,7 @@ export class Input {
   private rightDown = false;
   private rightMoved = 0;
   private dragDx = 0;
+  private dragDy = 0;
 
   constructor(private readonly canvas: HTMLElement) {
     for (const [action, codes] of Object.entries(this.data.bindings)) {
@@ -76,6 +77,7 @@ export class Input {
       // 짧게 흔들린 것은 클릭으로 보고, 5px 넘게 끌었을 때부터 회전
       if (this.rightMoved >= 5) {
         this.dragDx += e.movementX;
+        this.dragDy += e.movementY;
         canvas.style.cursor = 'grabbing';
       }
     });
@@ -141,10 +143,10 @@ export class Input {
     return { x: (x * c - y * s) / len, y: (x * s + y * c) / len };
   }
 
-  /** 오른쪽 드래그로 움직인 가로 거리(px)를 한 번 꺼낸다 */
-  consumeDrag(): number {
-    const d = this.dragDx;
-    this.dragDx = 0;
+  /** 오른쪽 드래그로 움직인 거리(px)를 한 번 꺼낸다: 가로는 카메라 돌리기, 세로는 내려다보는 각도 */
+  consumeDrag(): { dx: number; dy: number } {
+    const d = { dx: this.dragDx, dy: this.dragDy };
+    this.dragDx = this.dragDy = 0;
     return d;
   }
 
