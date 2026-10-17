@@ -8,10 +8,12 @@
     "dev:client": "vite",
     "dev:server": "wrangler dev --port 8787 --local",
     "db:migrate": "wrangler d1 migrations apply sword-trail-online --local",
+    "db:migrate:remote": "wrangler d1 migrations apply sword-trail-online --remote",
     "check": "tsc --noEmit -p . && tsc --noEmit -p server",
     "build": "npm run check && vite build",
     "test": "vitest run",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "cloud:setup": "node scripts/cloud-setup.mjs"
   },
   "dependencies": {
     "three": "^0.169.0"
