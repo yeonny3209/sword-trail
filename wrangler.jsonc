@@ -21,7 +21,7 @@
     {
       "binding": "DB",
       "database_name": "sword-trail-online",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "7518b826-9653-4b69-b011-b1dacadb430c",
       "migrations_dir": "server/migrations"
     }
   ],
