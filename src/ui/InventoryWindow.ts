@@ -49,8 +49,8 @@ export class InventoryWindow extends Window {
       const it = this.find(uid);
       if (!it) return;
       const d = ITEMS[it.id];
-      c.addEventListener('mouseenter', (e) => Tooltip.show(itemTip(it, d?.slot ? this.equip[d.slot] : undefined), e.clientX, e.clientY));
-      c.addEventListener('mousemove', (e) => Tooltip.show(itemTip(it, d?.slot ? this.equip[d.slot] : undefined), e.clientX, e.clientY));
+      c.addEventListener('mouseenter', (e) => Tooltip.show(itemTip(it, d?.slot ? this.equip[d.slot] : undefined, this.equip), e.clientX, e.clientY));
+      c.addEventListener('mousemove', (e) => Tooltip.show(itemTip(it, d?.slot ? this.equip[d.slot] : undefined, this.equip), e.clientX, e.clientY));
       c.addEventListener('mouseleave', () => Tooltip.hide());
       c.addEventListener('click', (e) => this.click(it, e));
       c.addEventListener('dblclick', () => this.quick(it));

@@ -1,9 +1,10 @@
 import { ACTIONS } from '../../shared/data';
 import { bus } from '../core/bus';
+import { cdMul } from '../../shared/skillEnh';
 import { skillMp } from '../../shared/rules';
 import type { LocalPlayer } from '../game/LocalPlayer';
 
-const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R', '1', '2', '3', '4'];
+const KEYS = ['Q', 'E', 'T', 'F', 'G', 'R', '1', '2', '3', '4', '5', '6'];
 
 /** 화면 아래 스킬 단축키 칸: 이름, MP, 쿨타임, 배우는 레벨 */
 export class SkillBar {
@@ -20,14 +21,18 @@ export class SkillBar {
     ui.appendChild(this.el);
   }
 
+  private shown = '';
+
   bind(me: LocalPlayer): void {
     this.bound = me;
+    const ids = me.skillIds();
+    this.shown = ids.join();
     this.el.innerHTML = '';
     this.slots = KEYS.map((k, i) => {
-      const id = me.kit.skills[i] ?? null;
+      const id = ids[i] ?? null;
       const def = id ? ACTIONS[id] : null;
       const el = document.createElement('div');
-      el.className = `slot ${def ? '' : 'empty'}`;
+      el.className = `slot ${def ? '' : 'empty'} ${i >= 10 ? 'branch' : ''}`;
       el.innerHTML = `<div class="key">${k}</div><div class="nm">${def?.name ?? ''}</div><div class="mp">${def?.mp ? `MP ${def.mp}` : ''}</div><div class="cd"></div>`;
       if (def) el.title = `${def.name} — ${def.desc ?? ''}\nMP ${def.mp ?? 0} · 쿨타임 ${def.cd ?? 0}초 · Lv ${def.lv ?? 1}`;
       this.el.appendChild(el);
@@ -38,16 +43,20 @@ export class SkillBar {
   render(): void {
     const me = this.bound;
     if (!me) return;
+    // 전직하면 5·6번 칸이 전직 스킬로 바뀐다
+    if (me.skillIds().join() !== this.shown) this.bind(me);
     const now = performance.now();
     for (const s of this.slots) {
       if (!s.id) continue;
       const def = ACTIONS[s.id];
       const left = Math.max(0, (me.cds.get(s.id) ?? 0) - now);
-      const total = (def.cd ?? 0) * 1000;
       const slv = me.skillLevel(s.id);
       const locked = slv < 1;
       s.el.classList.toggle('locked', locked);
-      s.el.classList.toggle('nomp', !locked && me.self.mp < skillMp(def, slv));
+      const enh = me.enhOf(s.id);
+      const total = (def.cd ?? 0) * 1000 * cdMul(enh, me.self.fx?.cdr);
+      s.el.classList.toggle('nomp', !locked && me.self.mp < skillMp(def, slv, enh));
+      s.el.classList.toggle('enh', !!enh);
       s.cd.style.background = left > 0 && total > 0 ? `conic-gradient(rgba(0,0,0,.7) ${(left / total) * 360}deg, transparent 0)` : 'none';
       // 쿨타임이 막 끝났다: 칸이 반짝이고 작은 소리
       if (left > 0) this.wasCd.add(s.id);
@@ -58,7 +67,7 @@ export class SkillBar {
         bus.emit('sfx', { key: 'ui', volume: 0.25 });
       }
       s.cd.textContent = locked ? ((def.lv ?? 1) > me.self.lv ? `Lv${def.lv}` : '미습득') : left > 0 ? (left / 1000).toFixed(1) : '';
-      s.mp.textContent = locked ? '' : `MP ${skillMp(def, slv)}`;
+      s.mp.textContent = locked ? '' : `MP ${skillMp(def, slv, enh)}`;
     }
   }
 }

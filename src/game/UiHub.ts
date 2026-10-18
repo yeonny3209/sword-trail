@@ -12,6 +12,7 @@ import { AuctionWindow, MailWindow } from '../ui/MarketWindows';
 import { TradeWindow } from '../ui/TradeWindow';
 import { ArenaUi } from '../ui/ArenaUi';
 import { Banner } from '../ui/Banner';
+import { BranchWindow } from '../ui/BranchWindow';
 import { QUESTS } from '../../shared/quests';
 import type { LocalPlayer } from './LocalPlayer';
 import type { NpcView, ZoneScene } from './ZoneScene';
@@ -34,6 +35,7 @@ export class UiHub {
   readonly mailWin: MailWindow;
   readonly tradeWin: TradeWindow;
   readonly arena: ArenaUi;
+  readonly branchWin: BranchWindow;
   /** NPC를 만났을 때 처리할 역할(이후 단계: 퀘스트·경매장·길드·우편 등) */
   readonly npcHandlers: Partial<Record<NpcDef['role'], (n: NpcDef) => void>> = {};
   private readonly ray = new THREE.Raycaster();
@@ -64,6 +66,8 @@ export class UiHub {
     this.npcHandlers.auction = () => this.auctionWin.openAuction();
     this.npcHandlers.mail = () => this.mailWin.openMail();
     this.arena = new ArenaUi(ui, send, say);
+    this.branchWin = new BranchWindow(ui, send);
+    this.npcHandlers.skill = () => this.branchWin.open();
     new Banner(ui);
     this.npcHandlers.arena = () => this.arena.openRank();
     this.quests = new QuestUi(ui, send);
@@ -83,6 +87,7 @@ export class UiHub {
     this.me = me;
     this.charWin.me = me.self;
     this.skillWin.me = me.self;
+    this.branchWin.me = me.self;
     this.quests.lv = me.self.lv;
   }
 
@@ -108,6 +113,7 @@ export class UiHub {
         this.quests.refresh();
         this.charWin.draw();
         this.skillWin.draw();
+        this.branchWin.draw();
         if (m.s.gold !== undefined) {
           this.invWin.gold = m.s.gold;
           this.invWin.draw();

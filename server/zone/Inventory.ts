@@ -108,6 +108,11 @@ export function rollLoot(p: PlayerSession, mon: MonsterDef): void {
       if (addItem(p, it) < it.n) got.push({ id: it.id, n: it.n });
     }
   }
+  // 룬: 일반 몬스터는 가끔, 보스는 반드시
+  if (mon.boss || Math.random() < 0.035) {
+    const rune = rollRune(mon.lv, mon.boss ? 0.3 : 0);
+    if (addItem(p, rune) === 0) got.push({ id: rune.id, n: 1 });
+  }
   const chance = mon.boss ? LOOT.equipChance.boss : LOOT.equipChance.default * (1 + mon.lv * 0.04);
   if (Math.random() < chance) {
     // 몬스터 레벨 + 2까지의 장비, 무기는 내 직업 것이 더 잘 나온다
@@ -139,8 +144,19 @@ export function eliteLoot(p: PlayerSession, mon: MonsterDef): void {
   }
   const stones = makeItem('enh_stone', 2 + Math.floor(Math.random() * 3), newUid());
   if (addItem(p, stones) < stones.n) got.push({ id: stones.id, n: stones.n });
+  const rune = rollRune(mon.lv, 0.25);
+  if (addItem(p, rune) === 0) got.push({ id: rune.id, n: 1 });
   if (got.length) p.send({ t: 'loot', items: got });
   syncInv(p);
+}
+
+/** 룬 한 개를 굴린다: 몬스터 레벨이 높을수록 높은 단계. boost가 크면 높은 단계가 잘 나온다 */
+export function rollRune(monLv: number, boost = 0): Item {
+  const types = [...new Set(Object.keys(ITEMS).filter((k) => k.startsWith('rune_')).map((k) => k.split('_')[1]))];
+  const r = Math.random();
+  const tier = monLv >= 34 && r < 0.2 + boost ? 3 : monLv >= 14 && r < 0.45 + boost ? 2 : 1;
+  const type = types[Math.floor(Math.random() * types.length)];
+  return makeItem(`rune_${type}_${tier}`, 1, newUid());
 }
 
 export function nearNpc(p: PlayerSession, zone: ZoneDef, role: NpcDef['role'], id?: string): NpcDef | null {
@@ -166,7 +182,7 @@ export function onInventory(p: PlayerSession, m: C2S, zone: ZoneDef): void {
   }
 }
 
-const KIND_ORDER: Record<string, number> = { equip: 0, potion: 1, material: 2 };
+const KIND_ORDER: Record<string, number> = { equip: 0, rune: 1, potion: 2, material: 3 };
 
 /** 가방 정리: 장비(부위·레벨 높은 순·등급) → 물약 → 재료, 같은 것끼리 합친다 */
 function sortBag(p: PlayerSession): void {

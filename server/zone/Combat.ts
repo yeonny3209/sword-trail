@@ -1,5 +1,7 @@
 import { applyReaction, expFactor, isBackAttack, rollDamage } from '../../shared/combat';
 import { actionOf, isSkill } from '../../shared/data';
+import { branchAllows } from '../../shared/branch';
+import { cdMul, enhancedAction, isEnh, powMul, type EnhKind } from '../../shared/skillEnh';
 import { dist2 } from '../../shared/geom';
 import { MonState, type C2S, type S2C } from '../../shared/protocol';
 import { actionTravel, expBoost, expToNext, PROGRESSION, MAX_LEVEL, SKILL_POINTS_PER_LEVEL, skillMp, skillMul, STAT_POINTS_PER_LEVEL } from '../../shared/rules';
@@ -38,25 +40,32 @@ export class Combat {
     const a = actionOf(p.cls, String(m.a));
     if (!a) return;
     const now = Date.now();
+    const enh = this.enhOf(p, a.id);
     if (isSkill(p.cls, a.id)) {
       const slv = p.data.skills[a.id] ?? 0;
-      const cost = skillMp(a, slv);
+      const cost = skillMp(a, slv, enh);
       const ready = p.cds.get(a.id) ?? 0;
-      if (slv < 1 || now < ready - 150 || p.data.mp + 0.5 < cost) {
+      if (slv < 1 || !branchAllows(p.cls, a.id, p.data.branch) || now < ready - 150 || p.data.mp + 0.5 < cost) {
         p.send({ t: 'cdfail', a: a.id });
         // 클라이언트가 미리 깎은 MP를 되돌린다
         p.send({ t: 'me', s: { mp: p.data.mp } });
         return;
       }
       p.data.mp -= cost;
-      p.cds.set(a.id, now + (a.cd ?? 0) * 1000);
+      p.cds.set(a.id, now + (a.cd ?? 0) * 1000 * cdMul(enh, p.fx.cdr));
       p.send({ t: 'me', s: { mp: p.data.mp } });
     }
     p.moveBudget = Math.min(30, p.moveBudget + actionTravel(a) * 1.3 + 1);
     p.acts.set(m.i | 0, { a: a.id, start: now, hits: new Map() });
     if (p.acts.size > 24) p.acts.delete(p.acts.keys().next().value!);
     this.host.broadcast({ t: 'act', id: p.id, a: a.id, f: Number(m.f) || 0 }, p);
-    if (a.cast) this.host.onCast?.(p, a, p.data.skills[a.id] ?? 1);
+    if (a.cast) this.host.onCast?.(p, enhancedAction(a, enh), p.data.skills[a.id] ?? 1);
+  }
+
+  /** 이 스킬에 붙인 강화(없으면 빈 문자열) */
+  private enhOf(p: PlayerSession, id: string): EnhKind | '' {
+    const k = p.data.senh[id];
+    return isEnh(k) ? k : '';
   }
 
   onHit(p: PlayerSession, m: Extract<C2S, { t: 'hit' }>): void {
@@ -65,7 +74,8 @@ export class Combat {
     const mon = this.host.monsters.get(m.m | 0);
     if (!act || !mon || mon.dead) return;
     const a = actionOf(p.cls, act.a);
-    const hit = a?.hits[m.h | 0];
+    const enh = a ? this.enhOf(p, a.id) : '';
+    const hit = a && enhancedAction(a, enh).hits[m.h | 0];
     if (!a || !hit) return;
     const now = Date.now();
     // 시간: 판정 끝 프레임 + 지연 여유
@@ -83,10 +93,13 @@ export class Combat {
     const crit = Math.random() < p.eff.crit;
     const back = !mon.def.boss && isBackAttack(mon.f, p.x, p.z, mon.body.x, mon.body.z);
     const counter = mon.state === MonState.Windup || mon.state === MonState.Attack;
-    const mult = hit.dmg * (isSkill(p.cls, a.id) ? skillMul(p.data.skills[a.id] ?? 1) : 1);
+    const mult = hit.dmg * (isSkill(p.cls, a.id) ? skillMul(p.data.skills[a.id] ?? 1) * powMul(enh) : 1);
     // 방어력 약화·약점 노출 같은 디버프를 반영
     const monDef = mon.def.def * (1 - mon.power('defDown'));
-    const n = Math.max(1, Math.round(rollDamage(p.eff.atk, mult, monDef, Math.random(), { crit, critMul: 1.5, back, counter }) * (1 + mon.power('vuln'))));
+    const boss = !!(mon.def.boss || mon.def.raid);
+    const fx = p.fx;
+    const n = Math.max(1, Math.round(rollDamage(p.eff.atk, mult, monDef, Math.random(), { crit, critMul: 1.5 + (fx.critDmg ?? 0), back, counter })
+      * (1 + mon.power('vuln')) * (1 + (fx.dmgMul ?? 0)) * (boss ? 1 + (fx.bossDmg ?? 0) : 1)));
     mon.hp -= n;
     mon.lastAttacker = p.id;
     mon.addDamage(p.id, n);
@@ -100,6 +113,11 @@ export class Combat {
       p.send({ t: 'me', s: { mp: Math.round(p.data.mp) } });
     }
     p.lastHitAt = now;
+    // 흡혈: 준 피해의 일부를 HP로
+    if (fx.leech && p.data.hp < p.stats.mhp) {
+      p.data.hp = Math.min(p.stats.mhp, p.data.hp + Math.max(1, Math.round(n * fx.leech)));
+      p.send({ t: 'me', s: { hp: Math.round(p.data.hp) } });
+    }
     this.host.broadcast({ t: 'dmg', tk: 'm', id: mon.id, n, crit, back, counter, by: p.id });
     if (mon.hp <= 0) this.kill(mon, p);
   }
@@ -126,7 +144,11 @@ export class Combat {
       q.data.gold += gold;
       if (mon.def.elite) eliteLoot(q, mon.def);
       else rollLoot(q, mon.def);
-      const exp = partyExp(Math.max(1, Math.round(mon.def.exp * PROGRESSION.monsterExpRate * expBoost(q.lv) * expFactor(q.lv, mon.def.lv))), mates.length);
+      const exp = partyExp(Math.max(1, Math.round(mon.def.exp * PROGRESSION.monsterExpRate * expBoost(q.lv) * expFactor(q.lv, mon.def.lv) * (1 + (q.fx.expUp ?? 0)))), mates.length);
+      // 처치 시 회복(세트·룬)
+      if (q.fx.hpOnKill && !q.dead) q.data.hp = Math.min(q.stats.mhp, q.data.hp + q.stats.mhp * q.fx.hpOnKill);
+      if (q.fx.mpOnKill) q.data.mp = Math.min(q.stats.mmp, q.data.mp + q.stats.mmp * q.fx.mpOnKill);
+      if (q.fx.hpOnKill || q.fx.mpOnKill) q.send({ t: 'me', s: { hp: Math.round(q.data.hp), mp: Math.round(q.data.mp) } });
       q.send({ t: 'reward', exp, gold, name: mon.def.name });
       this.gainExp(q, exp);
       this.host.onKill(q, mon.def.elite ?? mon.def.id, !!mon.def.elite);

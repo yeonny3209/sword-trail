@@ -192,7 +192,7 @@ input:focus { border-color: var(--gold); }
 .smith-win .warn { color: #ff9070; font-size: 12px; margin: 4px 0; }
 .smith-win .result { margin-top: 8px; font-size: 18px; text-align: center; font-family: var(--title); }
 .smith-win .result .ok { color: #8fe08f; } .smith-win .result .fail { color: #ff7060; }
-.potbar { position: absolute; left: calc(50% + 296px); bottom: 18px; display: flex; gap: 6px; }
+.potbar { position: absolute; left: calc(50% + 348px); bottom: 18px; display: flex; gap: 6px; }
 .potbar .pot { position: relative; width: 46px; height: 46px; background: rgba(10,10,14,.8); border: 1px solid #6a5a40; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .potbar .pot .k { position: absolute; left: 3px; top: 1px; font-size: 10px; color: var(--gold); font-weight: 700; }
 .potbar .pot b { position: absolute; right: 3px; bottom: 1px; font-size: 11px; text-shadow: 0 0 2px #000; }
@@ -386,3 +386,19 @@ input:focus { border-color: var(--gold); }
 .plates.nonames .plate.player .nm, .plates.nonames .plate.npc .nm { display: none; }
 .plate .ttl { color: #ffd870; font-size: 10px; }
 .death .box .btn + .btn { margin-left: 6px; }
+
+/* ---- 전직·스킬 강화·룬 ---- */
+.skillbar .slot.branch { border-color: #b890ff; }
+.skillbar .slot.enh::after { content: '★'; position: absolute; right: 3px; top: 1px; font-size: 10px; color: #ffd870; }
+.skill-row .enh-row { display: flex; gap: 4px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
+.skill-row .enh-row small { color: #999; }
+.enh-chip { background: #222; color: #ccc; border: 1px solid #555; border-radius: 10px; font-size: 11px; padding: 1px 8px; cursor: pointer; }
+.enh-chip:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); } .enh-chip.on { background: #4a3a20; border-color: var(--gold); color: var(--gold); } .enh-chip:disabled { opacity: .4; cursor: default; }
+.skill-row .branch-tag { color: #c8a8ff; font-size: 11px; margin-left: 4px; }
+.branch-win { width: 520px; } .branch-cards { display: flex; gap: 10px; } .branch-card { flex: 1; background: rgba(255,255,255,.04); border: 1px solid #555; border-radius: 6px; padding: 8px; }
+.branch-card.cur { border-color: var(--gold); box-shadow: 0 0 10px rgba(240,208,144,.25); } .branch-card h3 { margin: 0 0 4px; color: var(--gold); font-family: var(--title); letter-spacing: 2px; }
+.branch-card .perk { font-size: 12px; color: #b8e8a8; } .branch-card .sk { font-size: 12px; margin-top: 6px; color: #ddd; } .branch-card .sk small { color: #999; display: block; }
+.smith-win .sock-list { margin: 6px 0; } .smith-win .sock { display: flex; align-items: center; gap: 8px; padding: 4px; border: 1px solid #444; border-radius: 4px; margin-bottom: 4px; font-size: 12px; }
+.smith-win .sock.empty { border-style: dashed; color: #999; } .smith-win .sock b { flex: 1; font-weight: 500; }
+.tt-sock { font-size: 12px; color: #9fd8ff; } .tt-sock.empty { color: #888; } .tt-set { margin-top: 6px; font-size: 12px; } .tt-set .on { color: #ffd870; } .tt-set .off { color: #777; } .tt-set b { color: #ffd870; }
+.cell .so { position: absolute; left: 2px; bottom: 0; font-size: 8px; color: #6ac8ff; letter-spacing: -1px; text-shadow: 0 0 2px #000; }

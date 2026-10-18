@@ -2,6 +2,7 @@ import itemsJson from '../data/items.json';
 import shopsJson from '../data/shops.json';
 import lootJson from '../data/loot.json';
 import type { Bonus } from './rules';
+import type { Perk } from './perks';
 import type { ClassId } from './types';
 
 export type Slot = 'weapon' | 'helmet' | 'armor' | 'gloves' | 'boots' | 'ring' | 'necklace';
@@ -16,12 +17,14 @@ export const SLOT_ICONS: Record<Slot, string> = {
 export interface ItemDef {
   id: string;
   name: string;
-  kind: 'equip' | 'potion' | 'material';
+  kind: 'equip' | 'potion' | 'material' | 'rune';
   slot?: Slot;
   cls?: ClassId;
   lv: number;
   stats?: Bonus;
   heal?: { hp?: number; mp?: number };
+  /** 룬: 소켓에 끼우면 주는 능력치·효과 */
+  rune?: Perk;
   price: number;
   stack?: number;
   desc?: string;
@@ -38,6 +41,8 @@ export interface Item {
   opt?: Bonus;
   /** 강화 단계 */
   enh?: number;
+  /** 소켓에 끼운 룬 id(빈 칸은 빈 문자열). 소켓 수는 등급이 정한다 */
+  sock?: string[];
 }
 
 export type Equip = Partial<Record<Slot, Item>>;
@@ -56,6 +61,12 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries((itemsJson.list
 export const SHOPS = shopsJson as unknown as Record<string, { name: string; items: string[] }>;
 export const LOOT = lootJson as unknown as LootData;
 export const STAT_LABEL: Record<keyof Bonus, string> = { atk: '공격력', def: '방어력', mhp: '최대 HP', mmp: '최대 MP', crit: '치명타', speed: '이동 속도' };
+
+/** 장비 등급별 룬 소켓 수: 일반 0, 고급 1, 희귀 2, 영웅·전설 3 */
+export const SOCKETS_BY_RARITY = [0, 1, 2, 3, 3];
+export function socketCount(it: Item): number {
+  return ITEMS[it.id]?.kind === 'equip' ? SOCKETS_BY_RARITY[it.rar ?? 0] ?? 0 : 0;
+}
 
 export function rarityName(r = 0): string {
   return LOOT.rarity[r]?.name ?? '';

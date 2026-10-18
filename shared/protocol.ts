@@ -6,6 +6,7 @@ import type { AhCategory, AuctionRow, MailRow, TradeSide } from './market';
 import type { PvpRankRow, PvpRecord } from './pvp';
 import type { BuffView, StatusId } from './status';
 import type { BountyState } from './bounty';
+import type { Fx } from './perks';
 
 /** 서버 ↔ 클라이언트 메시지. 형식은 이 파일에만 정의한다. */
 
@@ -62,6 +63,12 @@ export interface SelfState {
   /** 스킬 id → 레벨(0 = 안 배움) */
   skills: Record<string, number>;
   pvp?: PvpRecord;
+  /** 전직 갈래 id */
+  branch?: string;
+  /** 스킬 강화: 스킬 id → 위력·쾌속·광역 */
+  senh?: Record<string, string>;
+  /** 장비·세트·룬·전직이 주는 추가 효과(재사용 시간 감소 등) */
+  fx?: Fx;
 }
 
 /** 이동 상태 코드(원격 애니메이션용) */
@@ -153,6 +160,13 @@ export type C2S =
   /** 결투장: 서버가 알린 공격 k에 내가 맞았다 */
   | { t: 'phurt'; k: number }
   | { t: 'pvprank' }
+  /** 대장간: 룬 끼우기(장비 uid, 소켓 번호, 가방의 룬 uid)·빼기 */
+  | { t: 'socket'; uid: string; i: number; rune: string }
+  | { t: 'unsocket'; uid: string; i: number }
+  /** 전직 교관 앞: 전직 갈래 고르기 */
+  | { t: 'branch'; id: string }
+  /** 스킬 강화 고르기(k가 빈 문자열이면 해제) */
+  | { t: 'senh'; a: string; k: string }
   /** 쓰러진 파티원 곁에서 살려 준다 */
   | { t: 'raise'; id: number }
   | { t: 'chat'; ch: ChatChannel; text: string; to?: string }

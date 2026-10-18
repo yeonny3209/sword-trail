@@ -71,7 +71,7 @@ export function baseStats(cls: ClassId, lv: number): Stats {
 export type Bonus = Partial<Stats>;
 
 /** 최종 능력치: 기본 + 스탯 분배 + 추가(장비) */
-export function finalStats(cls: ClassId, lv: number, a: Alloc, bonus: Bonus = {}): Stats {
+export function finalStats(cls: ClassId, lv: number, a: Alloc, bonus: Bonus = {}, pct: { atkPct?: number; defPct?: number; mhpPct?: number; mmpPct?: number } = {}): Stats {
   const s = baseStats(cls, lv);
   const main = CLASS_BY_ID[cls].mainStat;
   const atkPer = (k: StatKey) => (k === main ? 1.5 : k === 'str' ? 0.9 : 0.4);
@@ -86,6 +86,11 @@ export function finalStats(cls: ClassId, lv: number, a: Alloc, bonus: Bonus = {}
   s.def += bonus.def ?? 0;
   s.crit += bonus.crit ?? 0;
   s.speed += bonus.speed ?? 0;
+  // 세트·전직의 비율 증가
+  s.atk *= 1 + (pct.atkPct ?? 0);
+  s.def *= 1 + (pct.defPct ?? 0);
+  s.mhp = Math.round(s.mhp * (1 + (pct.mhpPct ?? 0)));
+  s.mmp = Math.round(s.mmp * (1 + (pct.mmpPct ?? 0)));
   s.atk = Math.round(s.atk);
   s.def = Math.round(s.def);
   s.crit = Math.min(0.75, s.crit);
@@ -113,8 +118,8 @@ export function skillMul(slv: number): number {
 }
 
 /** 스킬 레벨에 따른 MP 비용 */
-export function skillMp(def: ActionDef, slv: number): number {
-  return Math.round((def.mp ?? 0) * (1 + 0.06 * Math.max(0, slv - 1)));
+export function skillMp(def: ActionDef, slv: number, enh?: 'pow' | 'haste' | 'wide' | ''): number {
+  return Math.round((def.mp ?? 0) * (1 + 0.06 * Math.max(0, slv - 1)) * (enh === 'haste' ? 0.9 : 1));
 }
 
 /** 행동이 앞으로 움직이는 거리(서버 이동 검사의 여유분) */

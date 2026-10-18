@@ -104,6 +104,12 @@
     ],
     "settings": [
       "F10"
+    ],
+    "s11": [
+      "Digit5"
+    ],
+    "s12": [
+      "Digit6"
     ]
   },
   "doubleTapMs": 240

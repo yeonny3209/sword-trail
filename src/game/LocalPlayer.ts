@@ -6,6 +6,8 @@ import { resolveCircle } from '../../shared/geom';
 import { ACTIONS, CLASS_BY_ID, KITS } from '../../shared/data';
 import { MoveState, type SelfState } from '../../shared/protocol';
 import { skillMp } from '../../shared/rules';
+import { skillSlots } from '../../shared/branch';
+import { cdMul, enhancedAction, isEnh, type EnhKind } from '../../shared/skillEnh';
 import type { ActionDef, ClassKit, HitDef, ZoneDef } from '../../shared/types';
 import type { Action, Input } from '../input/Input';
 import { CharacterModel } from './CharacterModel';
@@ -15,7 +17,7 @@ interface PlayerTuning { radius: number; acceleration: number; dashMul: number; 
 
 export type PState = 'free' | 'action' | 'hurt' | 'dead';
 
-const SKILL_KEYS: Action[] = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
+const SKILL_KEYS: Action[] = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 's11', 's12'];
 const BUFFERED: Action[] = ['attack', 'back', 'jump', ...SKILL_KEYS];
 
 /**
@@ -74,9 +76,20 @@ export class LocalPlayer {
     return this.self.skills?.[id] ?? 0;
   }
 
+  /** 스킬바 12칸의 스킬 id(기본 10 + 전직 스킬 둘, 없는 칸은 null) */
+  skillIds(): (string | null)[] {
+    return skillSlots(this.kit.skills, this.self.branch);
+  }
+
+  /** 이 스킬에 붙인 강화 */
+  enhOf(id: string): EnhKind | '' {
+    const k = this.self.senh?.[id];
+    return isEnh(k) ? k : '';
+  }
+
   skillReady(def: ActionDef): boolean {
     const slv = this.skillLevel(def.id);
-    return slv >= 1 && this.self.mp >= skillMp(def, slv) && performance.now() >= (this.cds.get(def.id) ?? 0);
+    return slv >= 1 && this.self.mp >= skillMp(def, slv, this.enhOf(def.id)) && performance.now() >= (this.cds.get(def.id) ?? 0);
   }
 
   private take(...acts: Action[]): Action | null {
@@ -115,8 +128,9 @@ export class LocalPlayer {
   /** 자유 상태에서 입력으로 행동 시작 */
   private tryStart(input: Input): boolean {
     if (this.take('back')) return this.start(ACTIONS[this.kit.back]), true;
+    const ids = this.skillIds();
     for (let i = 0; i < SKILL_KEYS.length; i++) {
-      const id = this.kit.skills[i];
+      const id = ids[i];
       if (!id || !this.buffer.some((b) => b.a === SKILL_KEYS[i])) continue;
       const def = ACTIONS[id];
       if (!this.skillReady(def)) continue;
@@ -131,14 +145,17 @@ export class LocalPlayer {
     return false;
   }
 
-  start(def: ActionDef): void {
+  start(base: ActionDef): void {
+    // 광역 강화가 붙은 스킬은 판정이 커진 행동으로
+    const def = enhancedAction(base, this.enhOf(base.id));
     this.action = new ActionRunner(def);
     this.pstate = 'action';
     if (!def.back) this.yaw = this.aimYaw;
     if (!def.air) this.vel.set(0, 0);
-    if (this.kit.skills.includes(def.id)) {
-      this.cds.set(def.id, performance.now() + (def.cd ?? 0) * 1000);
-      this.self.mp -= skillMp(def, this.skillLevel(def.id));
+    if (this.skillIds().includes(def.id)) {
+      const enh = this.enhOf(def.id);
+      this.cds.set(def.id, performance.now() + (def.cd ?? 0) * 1000 * cdMul(enh, this.self.fx?.cdr));
+      this.self.mp -= skillMp(def, this.skillLevel(def.id), enh);
     }
     this.dashing = false;
     this.onAction(def, this.action.instance);
@@ -187,8 +204,9 @@ export class LocalPlayer {
     if (def.air && wasAir && !this.air) return this.end();
     if (a.canCancel()) {
       if (this.take('back')) return this.start(ACTIONS[this.kit.back]);
+      const ids = this.skillIds();
       for (let i = 0; i < SKILL_KEYS.length; i++) {
-        const id = this.kit.skills[i];
+        const id = ids[i];
         if (!id || id === def.id || !this.buffer.some((b) => b.a === SKILL_KEYS[i])) continue;
         const sd = ACTIONS[id];
         if (!this.skillReady(sd)) continue;

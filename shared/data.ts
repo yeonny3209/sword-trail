@@ -12,6 +12,7 @@ import field6 from '../data/zones/field6.json';
 import raid1 from '../data/zones/raid1.json';
 import raid2 from '../data/zones/raid2.json';
 import tower from '../data/zones/tower.json';
+import branchesJson from '../data/branches.json';
 import swordsman from '../data/kits/swordsman.json';
 import berserker from '../data/kits/berserker.json';
 import blademaster from '../data/kits/blademaster.json';
@@ -46,8 +47,15 @@ export const ACTIONS: Record<string, ActionDef> = Object.fromEntries(
 );
 
 /** 스킬(단축키로 쓰는 기술)인가 */
+/** 전직 스킬 id(직업별). 행동 정의는 kits에 같이 있고, 스킬바 12칸 중 5·6번째에 올라간다 */
+const BRANCH_SKILL_IDS = Object.fromEntries(
+  (['swordsman', 'berserker', 'blademaster', 'spellblade', 'buffer', 'debuffer'] as ClassId[]).map((c) => [
+    c, (branchesJson.list as { cls: string; skills: string[] }[]).filter((b) => b.cls === c).flatMap((b) => b.skills),
+  ]),
+) as Record<ClassId, string[]>;
+
 export function isSkill(cls: ClassId, id: string): boolean {
-  return KITS[cls].skills.includes(id);
+  return KITS[cls].skills.includes(id) || BRANCH_SKILL_IDS[cls].includes(id);
 }
 
 /** 행동이 그 직업의 것인가 */

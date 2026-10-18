@@ -2138,6 +2138,266 @@
    ],
    "gold": 150,
    "lv": 30
+  },
+  {
+   "id": "r_rune_ruby_2",
+   "out": "rune_ruby_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_ruby_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_ruby_3",
+   "out": "rune_ruby_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_ruby_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_sapphire_2",
+   "out": "rune_sapphire_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_sapphire_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_sapphire_3",
+   "out": "rune_sapphire_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_sapphire_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_emerald_2",
+   "out": "rune_emerald_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_emerald_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_emerald_3",
+   "out": "rune_emerald_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_emerald_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_amethyst_2",
+   "out": "rune_amethyst_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_amethyst_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_amethyst_3",
+   "out": "rune_amethyst_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_amethyst_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_topaz_2",
+   "out": "rune_topaz_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_topaz_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_topaz_3",
+   "out": "rune_topaz_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_topaz_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_moon_2",
+   "out": "rune_moon_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_moon_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_moon_3",
+   "out": "rune_moon_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_moon_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_blood_2",
+   "out": "rune_blood_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_blood_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_blood_3",
+   "out": "rune_blood_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_blood_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_fang_2",
+   "out": "rune_fang_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_fang_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_fang_3",
+   "out": "rune_fang_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_fang_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_sage_2",
+   "out": "rune_sage_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_sage_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_sage_3",
+   "out": "rune_sage_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_sage_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
+  },
+  {
+   "id": "r_rune_swift_2",
+   "out": "rune_swift_2",
+   "n": 1,
+   "need": [
+    [
+     "rune_swift_1",
+     3
+    ]
+   ],
+   "gold": 300,
+   "lv": 10
+  },
+  {
+   "id": "r_rune_swift_3",
+   "out": "rune_swift_3",
+   "n": 1,
+   "need": [
+    [
+     "rune_swift_2",
+     3
+    ]
+   ],
+   "gold": 1500,
+   "lv": 25
   }
  ]
 }

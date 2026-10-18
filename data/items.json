@@ -1683,6 +1683,366 @@
    "price": 320,
    "stack": 99,
    "desc": "HP와 MP를 50%씩 회복한다."
+  },
+  {
+   "id": "rune_ruby_1",
+   "name": "홍옥 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "atk": 6
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 공격력 +6"
+  },
+  {
+   "id": "rune_ruby_2",
+   "name": "홍옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "atk": 14
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 공격력 +14"
+  },
+  {
+   "id": "rune_ruby_3",
+   "name": "완전한 홍옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "atk": 28
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 공격력 +28"
+  },
+  {
+   "id": "rune_sapphire_1",
+   "name": "청옥 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "def": 5
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 방어력 +5"
+  },
+  {
+   "id": "rune_sapphire_2",
+   "name": "청옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "def": 12
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 방어력 +12"
+  },
+  {
+   "id": "rune_sapphire_3",
+   "name": "완전한 청옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "def": 24
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 방어력 +24"
+  },
+  {
+   "id": "rune_emerald_1",
+   "name": "녹옥 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "mhp": 40
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 HP +40"
+  },
+  {
+   "id": "rune_emerald_2",
+   "name": "녹옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "mhp": 110
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 HP +110"
+  },
+  {
+   "id": "rune_emerald_3",
+   "name": "완전한 녹옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "mhp": 230
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 HP +230"
+  },
+  {
+   "id": "rune_amethyst_1",
+   "name": "자수정 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "mmp": 30
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 MP +30"
+  },
+  {
+   "id": "rune_amethyst_2",
+   "name": "자수정 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "mmp": 70
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 MP +70"
+  },
+  {
+   "id": "rune_amethyst_3",
+   "name": "완전한 자수정 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "mmp": 140
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 최대 MP +140"
+  },
+  {
+   "id": "rune_topaz_1",
+   "name": "황옥 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "crit": 0.01
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 확률 +1%"
+  },
+  {
+   "id": "rune_topaz_2",
+   "name": "황옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "crit": 0.022
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 확률 +2.2%"
+  },
+  {
+   "id": "rune_topaz_3",
+   "name": "완전한 황옥 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "crit": 0.04
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 확률 +4%"
+  },
+  {
+   "id": "rune_moon_1",
+   "name": "월광석 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "speed": 0.06
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 이동 속도 +0.06"
+  },
+  {
+   "id": "rune_moon_2",
+   "name": "월광석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "speed": 0.12
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 이동 속도 +0.12"
+  },
+  {
+   "id": "rune_moon_3",
+   "name": "완전한 월광석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "speed": 0.2
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 이동 속도 +0.2"
+  },
+  {
+   "id": "rune_blood_1",
+   "name": "혈석 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "leech": 0.01
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 피해 흡수 +1%"
+  },
+  {
+   "id": "rune_blood_2",
+   "name": "혈석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "leech": 0.02
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 피해 흡수 +2%"
+  },
+  {
+   "id": "rune_blood_3",
+   "name": "완전한 혈석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "leech": 0.035
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 피해 흡수 +3.5%"
+  },
+  {
+   "id": "rune_fang_1",
+   "name": "쐐기석 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "critDmg": 0.08
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 피해 +8%"
+  },
+  {
+   "id": "rune_fang_2",
+   "name": "쐐기석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "critDmg": 0.18
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 피해 +18%"
+  },
+  {
+   "id": "rune_fang_3",
+   "name": "완전한 쐐기석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "critDmg": 0.35
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 치명타 피해 +35%"
+  },
+  {
+   "id": "rune_sage_1",
+   "name": "현자석 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "expUp": 0.03
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 경험치 획득 +3%"
+  },
+  {
+   "id": "rune_sage_2",
+   "name": "현자석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "expUp": 0.06
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 경험치 획득 +6%"
+  },
+  {
+   "id": "rune_sage_3",
+   "name": "완전한 현자석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "expUp": 0.1
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 경험치 획득 +10%"
+  },
+  {
+   "id": "rune_swift_1",
+   "name": "신속석 조각 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 60,
+   "stack": 99,
+   "rune": {
+    "cdr": 0.01
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 재사용 시간 감소 +1%"
+  },
+  {
+   "id": "rune_swift_2",
+   "name": "신속석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 240,
+   "stack": 99,
+   "rune": {
+    "cdr": 0.02
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 재사용 시간 감소 +2%"
+  },
+  {
+   "id": "rune_swift_3",
+   "name": "완전한 신속석 룬",
+   "kind": "rune",
+   "lv": 1,
+   "price": 900,
+   "stack": 99,
+   "rune": {
+    "cdr": 0.035
+   },
+   "desc": "장비의 룬 소켓에 끼운다. 재사용 시간 감소 +3.5%"
   }
  ]
 }

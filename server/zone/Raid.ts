@@ -5,7 +5,7 @@ import { RAID, raidHp, raidOf } from '../../shared/raid';
 import { expBoost, PROGRESSION } from '../../shared/rules';
 import type { MonsterDef, ZoneDef } from '../../shared/types';
 import { newUid } from '../db';
-import { addItem, syncInv } from './Inventory';
+import { addItem, rollRune, syncInv } from './Inventory';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
 
@@ -124,6 +124,8 @@ export class RaidSystem {
       const n = m.n[0] + Math.floor(Math.random() * (m.n[1] - m.n[0] + 1));
       if (ITEMS[m.item] && n > 0) out.push(makeItem(m.item, n, newUid()));
     }
+    // 룬 둘(높은 단계가 잘 나옴)
+    out.push(rollRune(def.lv, 0.35), rollRune(def.lv, 0.35));
     return out;
   }
 }

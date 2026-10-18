@@ -33,6 +33,11 @@ export interface CharData {
   tower: number;
   /** 오늘의 현상 수배 */
   bounty: BountyState;
+  /** 전직 갈래 id(없으면 아직 전직 안 함)와 전직 보너스 스킬 포인트를 받았는지 */
+  branch: string;
+  branchGrant: boolean;
+  /** 스킬 강화: 스킬 id → 위력·쾌속·광역 */
+  senh: Record<string, string>;
 }
 
 export function newUid(): string {
@@ -59,7 +64,7 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
   // v1 → v2: 스탯·스킬 포인트 도입. 이미 오른 레벨만큼 포인트를 돌려준다
   const fresh = !d.alloc;
   return {
-    v: 6,
+    v: 7,
     exp: d.exp ?? 0,
     gold: d.gold ?? 100,
     hp: d.hp ?? s.mhp,
@@ -81,6 +86,10 @@ export function migrateData(raw: unknown, cls: ClassId, lv: number): CharData {
     title: d.title ?? '',
     tower: d.tower ?? 0,
     bounty: { ...emptyBounty(), ...(d.bounty ?? {}) },
+    // v6 → v7: 전직·스킬 강화
+    branch: d.branch ?? '',
+    branchGrant: d.branchGrant ?? false,
+    senh: d.senh ?? {},
   };
 }
 

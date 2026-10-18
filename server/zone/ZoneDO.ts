@@ -23,6 +23,7 @@ import { TradeSystem, TRADE_MSGS, type TradeMsg } from './Trade';
 import { PvpSystem } from './Pvp';
 import { Achievements } from './Achieve';
 import { TowerSystem } from './Tower';
+import { ADVANCE_MSGS, onAdvance, type AdvanceMsg } from './Advance';
 import { EXTRA_MSGS, onExtra, recallTick, type ExtraHost, type ExtraMsg } from './Extras';
 
 
@@ -203,6 +204,7 @@ export class ZoneDO extends DurableObject<Env> {
       default:
         if (MARKET_MSGS.has(msg.t)) return this.market?.on(p, msg as MarketMsg);
         if (TRADE_MSGS.has(msg.t)) return this.trade?.on(p, msg as TradeMsg);
+        if (ADVANCE_MSGS.has(msg.t) && this.zone) return onAdvance(p, this.zone, msg as AdvanceMsg);
         if (EXTRA_MSGS.has(msg.t) && this.extra) return onExtra(this.extra, p, msg as ExtraMsg);
     }
   }

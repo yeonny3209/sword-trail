@@ -1,0 +1,184 @@
+{
+ "unlockLv": 30,
+ "cost": 20000,
+ "changeCost": 40000,
+ "grantPoints": 4,
+ "list": [
+  {
+   "cls": "swordsman",
+   "id": "sw_blade",
+   "name": "검성",
+   "desc": "검 한 자루로 극에 이른 검객. 공격력과 치명타 피해가 크게 오른다.",
+   "perks": {
+    "atkPct": 0.08,
+    "critDmg": 0.2,
+    "crit": 0.03
+   },
+   "skills": [
+    "sw_b1a",
+    "sw_b1b"
+   ]
+  },
+  {
+   "cls": "swordsman",
+   "id": "sw_paladin",
+   "name": "성기사",
+   "desc": "파티를 지키는 검사. 체력과 방어력이 오르고 처치할 때 HP를 회복한다.",
+   "perks": {
+    "mhpPct": 0.12,
+    "defPct": 0.1,
+    "hpOnKill": 0.01
+   },
+   "skills": [
+    "sw_b2a",
+    "sw_b2b"
+   ]
+  },
+  {
+   "cls": "berserker",
+   "id": "bk_destroyer",
+   "name": "파괴자",
+   "desc": "오직 파괴만을 생각하는 전사. 공격력과 치명타 피해가 오른다.",
+   "perks": {
+    "atkPct": 0.1,
+    "critDmg": 0.25
+   },
+   "skills": [
+    "bk_b1a",
+    "bk_b1b"
+   ]
+  },
+  {
+   "cls": "berserker",
+   "id": "bk_warlord",
+   "name": "전쟁군주",
+   "desc": "전선의 중심에 서는 지휘관. 체력과 방어력이 크게 오르고 보스에게 강해진다.",
+   "perks": {
+    "mhpPct": 0.15,
+    "defPct": 0.08,
+    "bossDmg": 0.1
+   },
+   "skills": [
+    "bk_b2a",
+    "bk_b2b"
+   ]
+  },
+  {
+   "cls": "blademaster",
+   "id": "dm_assassin",
+   "name": "암살자",
+   "desc": "한순간에 승부를 보는 자객. 치명타 확률과 치명타 피해가 크게 오른다.",
+   "perks": {
+    "crit": 0.08,
+    "critDmg": 0.3
+   },
+   "skills": [
+    "dm_b1a",
+    "dm_b1b"
+   ]
+  },
+  {
+   "cls": "blademaster",
+   "id": "dm_poisoner",
+   "name": "독술사",
+   "desc": "독과 속도로 싸우는 칼잡이. 이동 속도가 오르고 주는 피해가 늘어난다.",
+   "perks": {
+    "speed": 0.3,
+    "dmgMul": 0.06,
+    "crit": 0.03
+   },
+   "skills": [
+    "dm_b2a",
+    "dm_b2b"
+   ]
+  },
+  {
+   "cls": "spellblade",
+   "id": "sb_arcane",
+   "name": "대마도사",
+   "desc": "마력 그 자체가 된 마검사. 공격력과 최대 MP가 크게 오른다.",
+   "perks": {
+    "atkPct": 0.1,
+    "mmpPct": 0.2
+   },
+   "skills": [
+    "sb_b1a",
+    "sb_b1b"
+   ]
+  },
+  {
+   "cls": "spellblade",
+   "id": "sb_chrono",
+   "name": "시공술사",
+   "desc": "시간을 다루는 마검사. 스킬 재사용 시간이 줄고 최대 MP가 오른다.",
+   "perks": {
+    "cdr": 0.08,
+    "mmpPct": 0.15
+   },
+   "skills": [
+    "sb_b2a",
+    "sb_b2b"
+   ]
+  },
+  {
+   "cls": "buffer",
+   "id": "bf_saint",
+   "name": "성자",
+   "desc": "파티를 살리는 치유의 달인. 최대 MP가 크게 오르고 죽은 동료를 살리는 데 능하다.",
+   "perks": {
+    "mmpPct": 0.2,
+    "mhpPct": 0.08,
+    "hpOnKill": 0.01
+   },
+   "skills": [
+    "bf_b1a",
+    "bf_b1b"
+   ]
+  },
+  {
+   "cls": "buffer",
+   "id": "bf_templar",
+   "name": "성전사",
+   "desc": "지팡이로 싸우는 전투 신관. 공격력과 방어력이 오른다.",
+   "perks": {
+    "atkPct": 0.1,
+    "defPct": 0.1,
+    "dmgMul": 0.05
+   },
+   "skills": [
+    "bf_b2a",
+    "bf_b2b"
+   ]
+  },
+  {
+   "cls": "debuffer",
+   "id": "db_hexer",
+   "name": "저주술사",
+   "desc": "저주로 판을 뒤집는 주술사. 주는 피해와 공격력이 오른다.",
+   "perks": {
+    "dmgMul": 0.08,
+    "atkPct": 0.06,
+    "mmpPct": 0.1
+   },
+   "skills": [
+    "db_b1a",
+    "db_b1b"
+   ]
+  },
+  {
+   "cls": "debuffer",
+   "id": "db_reaper",
+   "name": "사신",
+   "desc": "목숨을 거두는 자. 치명타 피해와 피해 흡수가 오른다.",
+   "perks": {
+    "critDmg": 0.2,
+    "leech": 0.02,
+    "crit": 0.05
+   },
+   "skills": [
+    "db_b2a",
+    "db_b2b"
+   ]
+  }
+ ]
+}

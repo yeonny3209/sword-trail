@@ -1,7 +1,8 @@
 import { MoveState, type PlayerInfo, type S2C, type SelfState } from '../../shared/protocol';
 import { BOND, STATUS, type BuffView, type StatusId } from '../../shared/status';
 import { finalStats, type Stats } from '../../shared/rules';
-import { gearBonus } from '../../shared/items';
+import { gearPerks } from '../../shared/gear';
+import type { Fx } from '../../shared/perks';
 import { ACHS, type AchType } from '../../shared/achievements';
 import type { ClassId } from '../../shared/types';
 import { migrateData, type CharData, type CharRow } from '../db';
@@ -15,6 +16,8 @@ export class PlayerSession {
   lv: number;
   data: CharData;
   stats: Stats;
+  /** 장비·세트·룬·전직의 추가 효과 */
+  fx: Fx = {};
   x: number;
   z: number;
   y = 0;
@@ -66,7 +69,9 @@ export class PlayerSession {
       raw = null;
     }
     this.data = migrateData(raw, row.class, row.level);
-    this.stats = finalStats(row.class, row.level, this.data.alloc, gearBonus(this.data.equip));
+    const g = gearPerks(this.data.equip, this.data.branch);
+    this.fx = g.fx;
+    this.stats = finalStats(row.class, row.level, this.data.alloc, g.bonus, g.fx);
     this.data.hp = Math.min(this.data.hp, this.stats.mhp);
     this.data.mp = Math.min(this.data.mp, this.stats.mmp);
     // 쓰러진 채로 나갔다면 바로 부활할 수 있는 상태로 시작
@@ -172,12 +177,15 @@ export class PlayerSession {
       atk: this.eff.atk, def: this.eff.def, crit: this.eff.crit, speed: this.eff.speed,
       alloc: { ...this.data.alloc }, statPoints: this.data.statPoints, skillPoints: this.data.skillPoints, skills: { ...this.data.skills },
       pvp: { ...this.data.pvp },
+      branch: this.data.branch || undefined, senh: { ...this.data.senh }, fx: { ...this.fx },
     };
   }
 
   /** 레벨이 바뀌면 능력치를 다시 계산 */
   recalc(): void {
-    this.stats = finalStats(this.cls, this.lv, this.data.alloc, gearBonus(this.data.equip));
+    const g = gearPerks(this.data.equip, this.data.branch);
+    this.fx = g.fx;
+    this.stats = finalStats(this.cls, this.lv, this.data.alloc, g.bonus, g.fx);
     this.data.hp = Math.min(this.data.hp, this.stats.mhp);
     this.data.mp = Math.min(this.data.mp, this.stats.mmp);
   }

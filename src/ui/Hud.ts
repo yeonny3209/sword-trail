@@ -1,3 +1,4 @@
+import { BRANCHES } from '../../shared/branch';
 import { CLASS_BY_ID, ZONES } from '../../shared/data';
 import type { SelfState } from '../../shared/protocol';
 import { expToNext, MAX_LEVEL } from '../../shared/rules';
@@ -76,7 +77,7 @@ export class Hud {
     if (!m) return;
     this.trackExp(m);
     const cls = CLASS_BY_ID[m.cls];
-    this.q('.nm').innerHTML = `<b>Lv ${m.lv}</b> ${m.name} <small>${cls.name}</small>`;
+    this.q('.nm').innerHTML = `<b>Lv ${m.lv}</b> ${m.name} <small>${m.branch ? (BRANCHES[m.branch]?.name ?? cls.name) : cls.name}</small>`;
     this.q('.hp .fill').style.width = `${(m.hp / m.mhp) * 100}%`;
     this.q('.hp span').textContent = `${Math.round(m.hp)} / ${m.mhp}`;
     this.q('.mp .fill').style.width = `${(m.mp / m.mmp) * 100}%`;

@@ -4,7 +4,7 @@ import type { S2C } from '../../shared/protocol';
 import { isBossFloor, TOWER, towerLevel, towerPlan, towerReward, towerScale, towerStart } from '../../shared/tower';
 import type { MonsterDef, ZoneDef } from '../../shared/types';
 import { newUid } from '../db';
-import { addItem, syncInv } from './Inventory';
+import { addItem, rollRune, syncInv } from './Inventory';
 import type { Monster } from './Monster';
 import type { PlayerSession } from './PlayerSession';
 
@@ -101,6 +101,10 @@ export class TowerSystem {
       if (r.stones) {
         const it = makeItem('enh_stone', r.stones, newUid());
         if (addItem(p, it) < it.n) got.push({ id: it.id, n: it.n });
+      }
+      if (isBossFloor(this.floor)) {
+        const rune = rollRune(towerLevel(this.floor), 0.3);
+        if (addItem(p, rune) === 0) got.push({ id: rune.id, n: 1 });
       }
       if (isBossFloor(this.floor) && Math.random() < TOWER.equipChanceBoss) {
         const lv = towerLevel(this.floor);

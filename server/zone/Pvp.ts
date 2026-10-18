@@ -1,5 +1,6 @@
 import { rollDamage } from '../../shared/combat';
 import { actionOf, isSkill } from '../../shared/data';
+import { enhancedAction, isEnh, type EnhKind } from '../../shared/skillEnh';
 import { dist2 } from '../../shared/geom';
 import { MoveState, type C2S, type S2C } from '../../shared/protocol';
 import { PVP, ratingGain, type PvpRankRow } from '../../shared/pvp';
@@ -47,7 +48,7 @@ export class PvpSystem {
     if (v.st === MoveState.Down || v.st === MoveState.Dead) return;
     const act = p.acts.get(m.i | 0);
     const a = act && actionOf(p.cls, act.a);
-    const hit = a?.hits[m.h | 0];
+    const hit = a && enhancedAction(a, isEnh(p.data.senh[a.id]) ? (p.data.senh[a.id] as EnhKind) : '').hits[m.h | 0];
     if (!act || !a || !hit) return;
     const now = Date.now();
     if (now - act.start > (hit.f[1] / 60) * 1000 + 1500) return;
